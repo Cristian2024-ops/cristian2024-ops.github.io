@@ -3,157 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Mi Web</title>
-    <!-- Iconos corregidos -->
-    <link rel="stylesheet" href="https://cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- SDK de Auth0 corregido -->
-    <script src="https://auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
-    
+    <title>Login - Mi Web</title>
     <style>
-        /* Base y Tipografía */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background-color: #f6f8fa;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #24292f;
-        }
-
-        h1 { font-size: 24px; font-weight: 300; letter-spacing: -0.5px; margin-bottom: 20px; }
-
-        .card {
-            background-color: white;
-            border: 1px solid #d0d7de;
-            border-radius: 6px;
-            padding: 20px;
-            width: 300px;
-            box-shadow: 0 8px 24px rgba(140, 149, 159, 0.1);
-            box-sizing: border-box;
-        }
-
-        form { display: flex; flex-direction: column; gap: 15px; }
-        label { font-size: 14px; font-weight: 600; margin-bottom: -10px; }
-        input { padding: 5px 12px; font-size: 14px; line-height: 20px; color: #24292f; background-color: #ffffff; border: 1px solid #d0d7de; border-radius: 6px; outline: none; }
-        input:focus { border-color: #0969da; box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3); }
-
-        .btn-primary {
-            background-color: #2da44e; color: white; border: 1px solid rgba(27, 31, 36, 0.15);
-            padding: 6px 16px; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer;
-            border: none; transition: 0.2s;
-        }
-        .btn-primary:hover { background-color: #2c974b; }
-
-        .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; color: #57606a; font-size: 12px; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #d0d7de; }
-        .divider:not(:empty)::before { margin-right: .5em; }
-        .divider:not(:empty)::after { margin-left: .5em; }
-
-        .social-group { display: flex; flex-direction: column; gap: 8px; }
-        .btn-social {
-            display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px;
-            font-size: 13px; font-weight: 500; border-radius: 6px; text-decoration: none; color: #24292f;
-            border: 1px solid #d0d7de; background-color: #ffffff; cursor: pointer; transition: 0.2s;
-        }
-        .btn-social:hover { background-color: #f3f4f6; }
-        .fa-google { color: #DB4437; }
-        .fa-github { color: #24292f; }
-
-        .footer-card {
-            margin-top: 15px; padding: 15px; text-align: center; border: 1px solid #d0d7de;
-            border-radius: 6px; width: 300px; font-size: 14px; box-sizing: border-box;
-        }
-        .footer-card a { color: #0969da; text-decoration: none; }
+        /* Usamos los mismos estilos que tu index */
+        body { font-family: -apple-system, sans-serif; background-color: #f6f8fa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 8px; border: 1px solid #d0d7de; box-shadow: 0 8px 24px rgba(140, 149, 159, 0.1); width: 320px; }
+        h1 { font-size: 24px; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #d0d7de; box-sizing: border-box; }
+        .btn-primary { background-color: #0969da; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-primary:hover { background-color: #0860ca; }
+        .footer { text-align: center; margin-top: 15px; font-size: 14px; }
+        a { color: #0969da; text-decoration: none; }
     </style>
 </head>
 <body>
-
-    <h1>🔐 Ingresar</h1>
-
     <div class="card">
-        <!-- FORMULARIO CORREGIDO: Ahora llama a login() de Auth0 -->
-        <form onsubmit="login(); return false;">
-            <label>Correo electrónico</label>
-            <input type="email" placeholder="nombre@ejemplo.com" required>
-            <label>Contraseña</label>
-            <input type="password" required>
-            <button type="submit" class="btn-primary">Entrar</button>
-        </form>
-
-        <div class="divider">O continúa con</div>
-
-        <div class="social-group">
-            <button class="btn-social" onclick="login('google-oauth2')">
-                <i class="fab fa-google"></i> Google
-            </button>
-            <button class="btn-social" onclick="login('github')">
-                <i class="fab fa-github"></i> GitHub
-            </button>
+        <h1>Iniciar Sesión</h1>
+        <input type="text" placeholder="Nombre de usuario">
+        <input type="password" placeholder="Contraseña">
+        <!-- Al hacer clic, nos manda al panel de juegos que querías -->
+        <button class="btn-primary" onclick="window.location.href='juegos.html'">Entrar</button>
+        <div class="footer">
+            ¿No tienes cuenta? <a href="registro.html">Regístrate</a>
         </div>
     </div>
-
-    <div class="footer-card">
-        ¿No tienes cuenta? <a href="registrate.html">Regístrate ahora</a>.
-    </div>
-
-    <script>
-        let auth0 = null;
-
-        async function initAuth0() {
-            try {
-                // Bloqueamos el botón visualmente hasta que Auth0 responda
-                document.querySelectorAll('button').forEach(b => b.disabled = true);
-
-                auth0 = await createAuth0Client({
-                    domain: "dev-2i7nz3hw5y4ob0yb.us.auth0.com",
-                    clientId: "dnP3foqFuc4OAaWe2LNst79GIUYH5qd5",
-                    authorizationParams: {
-                        redirect_uri: window.location.origin // Detecta si es localhost o tu GitHub Pages
-                    }
-                });
-
-                // Si venimos de Auth0 tras loguearnos, procesamos el resultado
-                const query = window.location.search;
-                if (query.includes("code=") && query.includes("state=")) {
-                    await auth0.handleRedirectCallback();
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-
-                // Desbloqueamos los botones cuando todo está listo
-                document.querySelectorAll('button').forEach(b => b.disabled = false);
-
-            } catch (err) {
-                console.error("Fallo al inicializar Auth0:", err);
-            }
-        }
-
-        async function login(provider) {
-            // Verificación de seguridad por si el SDK no cargó
-            if (!auth0) {
-                alert("Espera un segundo, estamos conectando con el servidor...");
-                return;
-            }
-
-            try {
-                const options = {
-                    authorizationParams: {
-                        redirect_uri: window.location.origin
-                    }
-                };
-                
-                if (provider) options.authorizationParams.connection = provider;
-
-                // ¡Esta es la línea que hace la magia del salto!
-                await auth0.loginWithRedirect(options);
-            } catch (err) {
-                console.error("Error en la redirección:", err);
-            }
-        }
-
-        window.onload = initAuth0
-    </script>
 </body>
 </html>
