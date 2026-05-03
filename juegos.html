@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Biblioteca de Juegos</title>
+    <style>
+        /* Mismo estilo profesional que tu index */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #f6f8fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Barra de navegación superior */
+        .navbar {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: #24292f;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+        }
+
+        /* Contenedor del Juego (El proyector) */
+        .game-display {
+            width: 100%;
+            max-width: 1000px;
+            height: 600px;
+            background: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(140, 149, 159, 0.1);
+            display: none; /* Se oculta hasta que elijas un juego */
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* Cuadrícula de Selección de Juegos */
+        .grid-juegos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card-juego {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #d0d7de;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .card-juego:hover {
+            border-color: #0969da;
+            background-color: #f3f4f6;
+            transform: translateY(-2px);
+        }
+
+        .card-juego h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #0969da;
+        }
+
+        .card-juego p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: #57606a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="index.html" class="btn-back">← Volver al Inicio</a>
+        <span style="font-weight: 600;">Biblioteca de Aplicaciones</span>
+    </div>
+
+    <!-- Aquí se abrirá el juego cuando hagas clic -->
+    <div id="pantalla" class="game-display">
+        <iframe id="visor" src=""></iframe>
+    </div>
+
+    <!-- Lista de juegos disponibles -->
+    <div class="grid-juegos">
+        <div class="card-juego" onclick="lanzar('https://skribbl.io')">
+            <h3>🎨 Skribbl.io</h3>
+            <p>Juego de dibujo y adivinanza</p>
+        </div>
+        <div class="card-juego" onclick="lanzar('https://slither.io')">
+            <h3>🐍 Slither.io</h3>
+            <p>La serpiente clásica en línea</p>
+        </div>
+        <div class="card-juego" onclick="lanzar('https://paper-io.com')">
+            <h3>📄 Paper.io 2</h3>
+            <p>Conquista el territorio</p>
+        </div>
+        <div class="card-juego" onclick="lanzar('https://hole-io.com')">
+            <h3>🕳️ Hole.io</h3>
+            <p>Absorbe todo en la ciudad</p>
+        </div>
+        <div class="card-juego" onclick="lanzar('https://diep.io')">
+            <h3>🚀 Diep.io</h3>
+            <p>Batalla de tanques y niveles</p>
+        </div>
+    </div>
+
+    <script>
+        function lanzar(url) {
+            const pantalla = document.getElementById('pantalla');
+            const visor = document.getElementById('visor');
+            
+            pantalla.style.display = "block";
+            visor.src = url;
+
+            // Scroll suave hacia arriba para jugar cómodo
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
