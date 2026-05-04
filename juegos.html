@@ -143,7 +143,11 @@
     </style>
 </head>
 <body>
-
+    
+<div id="offline-message" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 50px; z-index: 9999; border: 2px solid #00d2ff; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+    No estás conectado a internet, conéctate para seguir. ⏳
+</div>
+    
     <div class="navbar">
         <a href="index.html" class="btn">🏠 Inicio</a>
         <h2 style="margin:0; font-size: 1.2rem;">🎮 Arcade Lib</h2>
@@ -204,7 +208,26 @@
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
         }
+
+        // Función que revisa la conexión
+        function actualizarEstadoRed() {
+            const mensaje = document.getElementById('offline-message');
+    
+        if (navigator.onLine) {
+            mensaje.style.display = "none"; // Si hay internet, se esconde
+        } else {
+        mensaje.style.display = "block"; // Si no hay, aparece
+    }
+}
+
+// Escuchar cuando el navegador cambia de estado
+window.addEventListener('online', actualizarEstadoRed);
+window.addEventListener('offline', actualizarEstadoRed);
+
+// Revisar el estado apenas carga la página
+actualizarEstadoRed();
+        
     </script>
 </body>
-            </html>
+</html>
     
