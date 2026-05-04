@@ -133,6 +133,14 @@
             color: var(--text-muted);
         }
 
+        .divider {
+            display: flex; align-items: center; text-align: center;
+            margin: 20px 0; color: #57606a; font-size: 12px;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #d0d7de; }
+        .divider:not(:empty)::before { margin-right: .5em; }
+        .divider:not(:empty)::after { margin-left: .5em; }
+        
         /* Animación para que aparezca suave */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
