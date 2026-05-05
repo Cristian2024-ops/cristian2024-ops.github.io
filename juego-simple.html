@@ -2,105 +2,107 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego Móvil HTML5</title>
     <style>
         body { 
-            margin: 0; 
-            overflow: hidden; /* Evita que la pantalla se mueva al tocar */
-            background: #222; 
-            font-family: Arial, sans-serif;
-            display: flex; justify-content: center; align-items: center; height: 100vh;
+            margin: 0; padding: 0; overflow: hidden; 
+            background: #000; display: flex; justify-content: center; align-items: center; 
+            height: 100vh; width: 100vw; font-family: sans-serif;
         }
-        canvas { 
-            background: #000; 
-            max-width: 100%; 
-            max-height: 100%;
-            border: 2px solid #555;
+        canvas { background: #111; width: 100%; height: 100%; max-width: 400px; max-height: 400px; display: block; }
+        
+        /* Capa inicial para activar el iframe */
+        #overlay {
+            position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; cursor: pointer; z-index: 10;
         }
     </style>
 </head>
 <body>
+    <div id="overlay" onclick="iniciarJuego()">
+        <h2>TAP PARA JUGAR</h2>
+        <p>(Usa Espacio o Touch)</p>
+    </div>
     <canvas id="juegoCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById("juegoCanvas");
         const ctx = canvas.getContext("2d");
+        const overlay = document.getElementById("overlay");
 
-        // Ajustar tamaño del canvas a la pantalla
-        canvas.width = 400;
-        canvas.height = 400;
+        canvas.width = 400; canvas.height = 400;
 
         let x = 50, y = 350, tam = 30;
         let obsX = 400, obsY = 350, obsTam = 30, velocidad = 3;
-        let puntos = 0;
-        let saltando = false;
+        let puntos = 0, saltando = false, juegoActivo = false;
+
+        function iniciarJuego() {
+            overlay.style.display = "none";
+            juegoActivo = true;
+            window.focus(); // Obliga al iframe a tomar el foco para detectar el teclado
+        }
 
         function dibujar() {
+            if (!juegoActivo) return requestAnimationFrame(dibujar);
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Puntos
-            ctx.fillStyle = "white";
-            ctx.font = "20px Arial";
-            ctx.fillText("Puntos: " + puntos, 20, 40);
+            // Marcador
+            ctx.fillStyle = "yellow";
+            ctx.font = "bold 20px Arial";
+            ctx.fillText("SCORE: " + puntos, 20, 40);
 
-            // Jugador
-            ctx.fillStyle = "cyan";
-            ctx.fillRect(x, y, tam, tam);
+            // Suelo
+            ctx.strokeStyle = "#333";
+            ctx.beginPath(); ctx.moveTo(0, 380); ctx.lineTo(400, 380); ctx.stroke();
 
-            // Obstáculo
-            ctx.fillStyle = "red";
-            ctx.fillRect(obsX, obsY, obsTam, obsTam);
+            // Jugador y Obstáculo
+            ctx.fillStyle = "cyan"; ctx.fillRect(x, y, tam, tam);
+            ctx.fillStyle = "#ff4444"; ctx.fillRect(obsX, obsY, obsTam, obsTam);
 
-            // Movimiento
             obsX -= velocidad;
-            if (obsX < -obsTam) {
-                obsX = 400;
-                puntos++;
-                velocidad += 0.2;
-            }
+            if (obsX < -obsTam) { obsX = 400; puntos++; velocidad += 0.1; }
 
-            // Colisión
             if (x < obsX + obsTam && x + tam > obsX && y < obsY + obsTam && y + tam > obsY) {
-                alert("Fin del juego. Puntos: " + puntos);
-                puntos = 0;
-                velocidad = 3;
-                obsX = 400;
+                juegoActivo = false;
+                alert("Game Over! Score: " + puntos);
+                location.reload(); // Reinicia el iframe
             }
 
             requestAnimationFrame(dibujar);
         }
 
-        // --- FUNCIÓN DE SALTO ---
         function saltar() {
-            if (!saltando) {
+            if (!saltando && juegoActivo) {
                 saltando = true;
-                let alturaInicial = y;
-                let impulso = 15;
-                let gravedad = 0.8;
+                let impulso = 12;
+                let g = 0.6;
+                let vY = impulso;
                 
-                let intervaloSalto = setInterval(() => {
-                    y -= impulso;
-                    impulso -= gravedad;
-                    
-                    if (y >= alturaInicial) {
-                        y = alturaInicial;
-                        saltando = false;
-                        clearInterval(intervaloSalto);
+                let loopSalto = setInterval(() => {
+                    y -= vY;
+                    vY -= g;
+                    if (y >= 350) {
+                        y = 350; saltando = false;
+                        clearInterval(loopSalto);
                     }
                 }, 20);
             }
         }
 
-        // --- CONTROLES (PC y MÓVIL) ---
-        // 1. Escuchar el teclado (Espacio)
-        window.addEventListener("keydown", (e) => {
-            if (e.code === "Space") saltar();
+        // Eventos
+        window.addEventListener("keydown", (e) => { 
+            if (e.code === "Space") {
+                e.preventDefault(); // Evita que la página principal baje al saltar
+                saltar();
+            }
         });
-
-        // 2. Escuchar toques en la pantalla (Móvil)
+        
         window.addEventListener("touchstart", (e) => {
-            e.preventDefault(); // Evita el zoom o scroll al tocar
-            saltar();
+            if (juegoActivo) {
+                e.preventDefault(); 
+                saltar();
+            }
         }, { passive: false });
 
         dibujar();
