@@ -1,58 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mi Primer Juego</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Juego Móvil HTML5</title>
     <style>
-        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #222; }
-        canvas { border: 2px solid white; background: #000; }
+        body { 
+            margin: 0; 
+            overflow: hidden; /* Evita que la pantalla se mueva al tocar */
+            background: #222; 
+            font-family: Arial, sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh;
+        }
+        canvas { 
+            background: #000; 
+            max-width: 100%; 
+            max-height: 100%;
+            border: 2px solid #555;
+        }
     </style>
 </head>
 <body>
-    <canvas id="juegoCanvas" width="400" height="400"></canvas>
+    <canvas id="juegoCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById("juegoCanvas");
         const ctx = canvas.getContext("2d");
 
-        // Jugador
+        // Ajustar tamaño del canvas a la pantalla
+        canvas.width = 400;
+        canvas.height = 400;
+
         let x = 50, y = 350, tam = 30;
-        // Obstáculo
         let obsX = 400, obsY = 350, obsTam = 30, velocidad = 3;
+        let puntos = 0;
+        let saltando = false;
 
         function dibujar() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar pantalla
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujar Jugador (Cuadrado azul)
+            // Puntos
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.fillText("Puntos: " + puntos, 20, 40);
+
+            // Jugador
             ctx.fillStyle = "cyan";
             ctx.fillRect(x, y, tam, tam);
 
-            // Dibujar Obstáculo (Cuadrado rojo)
+            // Obstáculo
             ctx.fillStyle = "red";
             ctx.fillRect(obsX, obsY, obsTam, obsTam);
 
-            // Mover obstáculo
+            // Movimiento
             obsX -= velocidad;
-            if (obsX < -obsTam) obsX = 400; // Reiniciar posición
+            if (obsX < -obsTam) {
+                obsX = 400;
+                puntos++;
+                velocidad += 0.2;
+            }
 
-            // Colisión simple
+            // Colisión
             if (x < obsX + obsTam && x + tam > obsX && y < obsY + obsTam && y + tam > obsY) {
-                alert("¡Perdiste!");
+                alert("Fin del juego. Puntos: " + puntos);
+                puntos = 0;
+                velocidad = 3;
                 obsX = 400;
             }
 
-            requestAnimationFrame(dibujar); // Crear el bucle de animación
+            requestAnimationFrame(dibujar);
         }
 
-        // Control de salto
-        window.addEventListener("keydown", (e) => {
-            if (e.code === "Space" && y === 350) {
-                y -= 100; // Salto
-                setTimeout(() => { y += 100; }, 300); // Caída rápida
+        // --- FUNCIÓN DE SALTO ---
+        function saltar() {
+            if (!saltando) {
+                saltando = true;
+                let alturaInicial = y;
+                let impulso = 15;
+                let gravedad = 0.8;
+                
+                let intervaloSalto = setInterval(() => {
+                    y -= impulso;
+                    impulso -= gravedad;
+                    
+                    if (y >= alturaInicial) {
+                        y = alturaInicial;
+                        saltando = false;
+                        clearInterval(intervaloSalto);
+                    }
+                }, 20);
             }
+        }
+
+        // --- CONTROLES (PC y MÓVIL) ---
+        // 1. Escuchar el teclado (Espacio)
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "Space") saltar();
         });
+
+        // 2. Escuchar toques en la pantalla (Móvil)
+        window.addEventListener("touchstart", (e) => {
+            e.preventDefault(); // Evita el zoom o scroll al tocar
+            saltar();
+        }, { passive: false });
 
         dibujar();
     </script>
 </body>
 </html>
-
