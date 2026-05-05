@@ -9,85 +9,116 @@
             display: flex; justify-content: center; align-items: center;
         }
         #contenedor { 
-            position: relative; 
-            width: 100vw; height: 100vh; /* Ocupa todo el ancho y alto visual */
+            position: relative; width: 100vw; height: 100vh; 
+            transition: transform 0.1s; /* Para la animación de sacudida */
         }
-        canvas { 
-            display: block; background: #0a0a0a; 
-            width: 100%; height: 100%; 
-        }
+        canvas { display: block; background: #0a0a0a; width: 100%; height: 100%; }
+        
         #ui-puntos {
             position: absolute; top: 20px; left: 20px;
-            color: #0f0; font-family: sans-serif; font-size: 24px; font-weight: bold;
+            color: #0f0; font-family: 'Courier New', Courier, monospace; 
+            font-size: 28px; font-weight: bold;
             text-shadow: 2px 2px #000; pointer-events: none; z-index: 5;
         }
+
         #mensaje-inicio {
-            position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: white; cursor: pointer; text-align: center; z-index: 10; font-family: sans-serif;
+            color: white; z-index: 100; font-family: sans-serif;
+            cursor: pointer; text-align: center;
+        }
+
+        /* Clase para la sacudida */
+        .shake {
+            animation: shake 0.2s;
+            animation-iteration-count: 2;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(-1deg); }
+            40% { transform: translate(3px, 2px) rotate(1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            80% { transform: translate(3px, 1px) rotate(-1deg); }
+            100% { transform: translate(1px, -2px) rotate(1deg); }
         }
     </style>
 </head>
 <body>
     <div id="contenedor">
         <div id="ui-puntos">PUNTOS: 0</div>
-        <div id="mensaje-inicio" onclick="iniciar()">
-            <h1 style="margin-bottom:10px;">¡TOCA PARA JUGAR!</h1>
-            <p>Esquiva los bloques rojos</p>
+        <div id="mensaje-inicio" onmousedown="iniciar(event)" ontouchstart="iniciar(event)">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0;">¡TOCA PARA JUGAR!</h1>
+            <p style="font-size: 1.2rem; opacity: 0.8;">Esquiva los bloques rojos</p>
         </div>
         <canvas id="juegoCanvas"></canvas>
     </div>
 
     <script>
         const canvas = document.getElementById("juegoCanvas");
+        const contenedor = document.getElementById("contenedor");
         const ctx = canvas.getContext("2d");
         const uiPuntos = document.getElementById("ui-puntos");
         const mensaje = document.getElementById("mensaje-inicio");
 
-        // --- AJUSTE DINÁMICO DE TAMAÑO ---
+        let tam = 45; 
+        let x = 50, y = 0, sueloY = 0;
+        let obsX = 0, obsY = 0, obsTam = 45, velocidad = 6;
+        let puntos = 0, saltando = false, juegoCorriendo = false;
+
         function ajustarPantalla() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            // Reposicionar suelo y personajes según el nuevo alto
-            sueloY = canvas.height * 0.8; 
-            y = sueloY - tam;
+            sueloY = canvas.height * 0.75; 
+            if (!saltando) y = sueloY - tam;
             obsY = sueloY - obsTam;
         }
 
-        let tam = 50; 
-        let x = 50, y = 0;
-        let obsX = 0, obsY = 0, obsTam = 50, velocidad = 5;
-        let sueloY = 0;
-        let puntos = 0, saltando = false, juegoCorriendo = false;
-
         window.addEventListener('resize', ajustarPantalla);
-        ajustarPantalla(); // Ajustar al cargar
+        ajustarPantalla();
 
-        function iniciar() {
+        function iniciar(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (juegoCorriendo) return;
+
             mensaje.style.display = "none";
             juegoCorriendo = true;
-            obsX = canvas.width + 100; // Que el obstáculo empiece fuera
+            obsX = canvas.width + 100; 
+            puntos = 0;
+            velocidad = 6;
+            uiPuntos.innerText = "PUNTOS: 0";
             window.focus();
         }
 
+        function sacudir() {
+            contenedor.classList.add("shake");
+            setTimeout(() => {
+                contenedor.classList.remove("shake");
+            }, 400);
+        }
+
         function dibujar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             if (juegoCorriendo) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Suelo Neon
+                ctx.fillStyle = "#1a1a1a";
+                ctx.fillRect(0, sueloY + 2, canvas.width, canvas.height);
+                ctx.strokeStyle = "#0ff";
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(0, sueloY + 2); ctx.lineTo(canvas.width, sueloY + 2); ctx.stroke();
 
-                // Suelo (Línea decorativa)
-                ctx.strokeStyle = "#444";
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.moveTo(0, sueloY + 5);
-                ctx.lineTo(canvas.width, sueloY + 5);
-                ctx.stroke();
-
-                // Jugador
-                ctx.fillStyle = "#008080"; 
+                // Jugador (Cian)
+                ctx.fillStyle = "#00e5ff"; 
                 ctx.fillRect(x, y, tam, tam);
+                ctx.strokeStyle = "white"; ctx.strokeRect(x, y, tam, tam);
 
-                // Obstáculo
-                ctx.fillStyle = "#8b0000";
+                // Obstáculo (Rojo neón)
+                ctx.fillStyle = "#ff1744";
                 ctx.fillRect(obsX, obsY, obsTam, obsTam);
 
                 obsX -= velocidad;
@@ -95,14 +126,17 @@
                     obsX = canvas.width + 50;
                     puntos++;
                     uiPuntos.innerText = "PUNTOS: " + puntos;
-                    velocidad += 0.2;
+                    velocidad += 0.25;
                 }
 
                 // Colisión
                 if (x < obsX + obsTam && x + tam > obsX && y < obsY + obsTam && y + tam > obsY) {
                     juegoCorriendo = false;
-                    alert("¡GAME OVER! PUNTOS: " + puntos);
-                    location.reload();
+                    sacudir(); // Activamos el efecto
+                    setTimeout(() => {
+                        alert("¡GAME OVER!\nPUNTUACIÓN: " + puntos);
+                        location.reload();
+                    }, 500);
                 }
             }
             requestAnimationFrame(dibujar);
@@ -111,8 +145,8 @@
         function saltar() {
             if (!saltando && juegoCorriendo) {
                 saltando = true;
-                let fuerza = 18;
-                let gravedad = 0.9;
+                let fuerza = 16;
+                let gravedad = 0.8;
                 let nivelSuelo = sueloY - tam;
 
                 let idSalto = setInterval(() => {
@@ -127,11 +161,21 @@
             }
         }
 
-        // Controles
-        window.addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); saltar(); } });
-        window.addEventListener("touchstart", (e) => { e.preventDefault(); saltar(); }, {passive: false});
+        // Controles globales
+        window.addEventListener("keydown", (e) => { 
+            if (e.code === "Space") { e.preventDefault(); saltar(); } 
+        });
+
+        // Toque en pantalla para saltar
+        canvas.addEventListener("touchstart", (e) => {
+            if (juegoCorriendo) {
+                e.preventDefault();
+                saltar();
+            }
+        }, {passive: false});
 
         dibujar();
     </script>
 </body>
-</html>
+    </html>
+    
