@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mi Primer Juego</title>
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #222; }
+        canvas { border: 2px solid white; background: #000; }
+    </style>
+</head>
+<body>
+    <canvas id="juegoCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById("juegoCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Jugador
+        let x = 50, y = 350, tam = 30;
+        // Obstáculo
+        let obsX = 400, obsY = 350, obsTam = 30, velocidad = 3;
+
+        function dibujar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar pantalla
+
+            // Dibujar Jugador (Cuadrado azul)
+            ctx.fillStyle = "cyan";
+            ctx.fillRect(x, y, tam, tam);
+
+            // Dibujar Obstáculo (Cuadrado rojo)
+            ctx.fillStyle = "red";
+            ctx.fillRect(obsX, obsY, obsTam, obsTam);
+
+            // Mover obstáculo
+            obsX -= velocidad;
+            if (obsX < -obsTam) obsX = 400; // Reiniciar posición
+
+            // Colisión simple
+            if (x < obsX + obsTam && x + tam > obsX && y < obsY + obsTam && y + tam > obsY) {
+                alert("¡Perdiste!");
+                obsX = 400;
+            }
+
+            requestAnimationFrame(dibujar); // Crear el bucle de animación
+        }
+
+        // Control de salto
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && y === 350) {
+                y -= 100; // Salto
+                setTimeout(() => { y += 100; }, 300); // Caída rápida
+            }
+        });
+
+        dibujar();
+    </script>
+</body>
+</html>
+
