@@ -3,105 +3,126 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
+        /* Ajustes para que quepa perfecto en tu sitio de Arcade */
         body { 
             margin: 0; padding: 0; overflow: hidden; 
             background: #000; display: flex; justify-content: center; align-items: center; 
-            height: 100vh; width: 100vw; font-family: sans-serif;
+            height: 100vh; width: 100vw; font-family: 'Courier New', Courier, monospace;
         }
-        canvas { background: #111; width: 100%; height: 100%; max-width: 400px; max-height: 400px; display: block; }
+        #contenedor { position: relative; width: 100%; height: 100%; max-width: 400px; max-height: 400px; }
+        canvas { background: #0a0a0a; width: 100%; height: 100%; display: block; border-bottom: 2px solid #333; }
         
-        /* Capa inicial para activar el iframe */
-        #overlay {
-            position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: white; cursor: pointer; z-index: 10;
+        /* Contador persistente arriba a la izquierda */
+        #ui-puntos {
+            position: absolute; top: 10px; left: 15px;
+            color: #0f0; font-size: 20px; font-weight: bold;
+            text-shadow: 2px 2px #000; pointer-events: none; /* No estorba al tocar */
+        }
+
+        #mensaje-inicio {
+            position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+            display: flex; justify-content: center; align-items: center;
+            color: white; cursor: pointer; text-align: center; font-size: 1.2rem;
         }
     </style>
 </head>
-<body>
-    <div id="overlay" onclick="iniciarJuego()">
-        <h2>TAP PARA JUGAR</h2>
-        <p>(Usa Espacio o Touch)</p>
+<body onclick="enfocarIframe()">
+    <div id="contenedor">
+        <div id="ui-puntos">PUNTOS: 0</div>
+        <div id="mensaje-inicio" onclick="iniciar()">CLICK AQUÍ PARA ACTIVAR</div>
+        <canvas id="juegoCanvas"></canvas>
     </div>
-    <canvas id="juegoCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById("juegoCanvas");
         const ctx = canvas.getContext("2d");
-        const overlay = document.getElementById("overlay");
+        const uiPuntos = document.getElementById("ui-puntos");
+        const mensaje = document.getElementById("mensaje-inicio");
 
         canvas.width = 400; canvas.height = 400;
 
-        let x = 50, y = 350, tam = 30;
-        let obsX = 400, obsY = 350, obsTam = 30, velocidad = 3;
-        let puntos = 0, saltando = false, juegoActivo = false;
+        let x = 50, y = 340, tam = 40; // Personaje un poco más grande
+        let obsX = 450, obsY = 340, obsTam = 40, velocidad = 4;
+        let puntos = 0, saltando = false, juegoCorriendo = false;
 
-        function iniciarJuego() {
-            overlay.style.display = "none";
-            juegoActivo = true;
-            window.focus(); // Obliga al iframe a tomar el foco para detectar el teclado
+        // ESTO SOLUCIONA EL SALTO EN IFRAME
+        function enfocarIframe() {
+            window.focus();
+        }
+
+        function iniciar() {
+            mensaje.style.display = "none";
+            juegoCorriendo = true;
+            window.focus(); 
         }
 
         function dibujar() {
-            if (!juegoActivo) return requestAnimationFrame(dibujar);
+            if (juegoCorriendo) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Jugador (Verde como en tu imagen)
+                ctx.fillStyle = "#008080"; 
+                ctx.fillRect(x, y, tam, tam);
 
-            // Marcador
-            ctx.fillStyle = "yellow";
-            ctx.font = "bold 20px Arial";
-            ctx.fillText("SCORE: " + puntos, 20, 40);
+                // Obstáculo (Rojo)
+                ctx.fillStyle = "#8b0000";
+                ctx.fillRect(obsX, obsY, obsTam, obsTam);
 
-            // Suelo
-            ctx.strokeStyle = "#333";
-            ctx.beginPath(); ctx.moveTo(0, 380); ctx.lineTo(400, 380); ctx.stroke();
+                obsX -= velocidad;
+                if (obsX < -obsTam) {
+                    obsX = 400;
+                    puntos++;
+                    uiPuntos.innerText = "PUNTOS: " + puntos; // Actualiza el texto HTML
+                    velocidad += 0.2;
+                }
 
-            // Jugador y Obstáculo
-            ctx.fillStyle = "cyan"; ctx.fillRect(x, y, tam, tam);
-            ctx.fillStyle = "#ff4444"; ctx.fillRect(obsX, obsY, obsTam, obsTam);
-
-            obsX -= velocidad;
-            if (obsX < -obsTam) { obsX = 400; puntos++; velocidad += 0.1; }
-
-            if (x < obsX + obsTam && x + tam > obsX && y < obsY + obsTam && y + tam > obsY) {
-                juegoActivo = false;
-                alert("Game Over! Score: " + puntos);
-                location.reload(); // Reinicia el iframe
+                // Colisión
+                if (x < obsX + obsTam && x + tam > obsX && y < obsY + obsTam && y + tam > obsY) {
+                    juegoCorriendo = false;
+                    alert("¡Perdiste! Puntos: " + puntos);
+                    location.reload(); 
+                }
             }
-
             requestAnimationFrame(dibujar);
         }
 
         function saltar() {
-            if (!saltando && juegoActivo) {
+            if (!saltando && juegoCorriendo) {
                 saltando = true;
-                let impulso = 12;
-                let g = 0.6;
-                let vY = impulso;
-                
-                let loopSalto = setInterval(() => {
-                    y -= vY;
-                    vY -= g;
-                    if (y >= 350) {
-                        y = 350; saltando = false;
-                        clearInterval(loopSalto);
+                let fuerza = 15;
+                let gravedad = 0.8;
+                let posOriginal = 340;
+
+                let idSalto = setInterval(() => {
+                    y -= fuerza;
+                    fuerza -= gravedad;
+                    if (y >= posOriginal) {
+                        y = posOriginal;
+                        saltando = false;
+                        clearInterval(idSalto);
                     }
                 }, 20);
             }
         }
 
-        // Eventos
-        window.addEventListener("keydown", (e) => { 
+        // Eventos mejorados para detectar siempre
+        window.addEventListener("keydown", (e) => {
             if (e.code === "Space") {
-                e.preventDefault(); // Evita que la página principal baje al saltar
+                e.preventDefault();
                 saltar();
             }
         });
-        
-        window.addEventListener("touchstart", (e) => {
-            if (juegoActivo) {
-                e.preventDefault(); 
-                saltar();
+
+        canvas.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            saltar();
+        }, {passive: false});
+
+        dibujar();
+    </script>
+</body>
+</html>
+saltar();
             }
         }, { passive: false });
 
