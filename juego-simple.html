@@ -3,33 +3,38 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
-        /* Ajustes para que quepa perfecto en tu sitio de Arcade */
-        body { 
-            margin: 0; padding: 0; overflow: hidden; 
-            background: #000; display: flex; justify-content: center; align-items: center; 
-            height: 100vh; width: 100vw; font-family: 'Courier New', Courier, monospace;
-        }
-        #contenedor { position: relative; width: 100%; height: 100%; max-width: 400px; max-height: 400px; }
-        canvas { background: #0a0a0a; width: 100%; height: 100%; display: block; border-bottom: 2px solid #333; }
-        
-        /* Contador persistente arriba a la izquierda */
-        #ui-puntos {
-            position: absolute; top: 10px; left: 15px;
-            color: #0f0; font-size: 20px; font-weight: bold;
-            text-shadow: 2px 2px #000; pointer-events: none; /* No estorba al tocar */
-        }
-
-        #mensaje-inicio {
-            position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; background: #000; 
             display: flex; justify-content: center; align-items: center;
-            color: white; cursor: pointer; text-align: center; font-size: 1.2rem;
+        }
+        #contenedor { 
+            position: relative; 
+            width: 100vw; height: 100vh; /* Ocupa todo el ancho y alto visual */
+        }
+        canvas { 
+            display: block; background: #0a0a0a; 
+            width: 100%; height: 100%; 
+        }
+        #ui-puntos {
+            position: absolute; top: 20px; left: 20px;
+            color: #0f0; font-family: sans-serif; font-size: 24px; font-weight: bold;
+            text-shadow: 2px 2px #000; pointer-events: none; z-index: 5;
+        }
+        #mensaje-inicio {
+            position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; cursor: pointer; text-align: center; z-index: 10; font-family: sans-serif;
         }
     </style>
 </head>
-<body onclick="enfocarIframe()">
+<body>
     <div id="contenedor">
         <div id="ui-puntos">PUNTOS: 0</div>
-        <div id="mensaje-inicio" onclick="iniciar()">CLICK AQUÍ PARA ACTIVAR</div>
+        <div id="mensaje-inicio" onclick="iniciar()">
+            <h1 style="margin-bottom:10px;">¡TOCA PARA JUGAR!</h1>
+            <p>Esquiva los bloques rojos</p>
+        </div>
         <canvas id="juegoCanvas"></canvas>
     </div>
 
@@ -39,48 +44,65 @@
         const uiPuntos = document.getElementById("ui-puntos");
         const mensaje = document.getElementById("mensaje-inicio");
 
-        canvas.width = 400; canvas.height = 400;
+        // --- AJUSTE DINÁMICO DE TAMAÑO ---
+        function ajustarPantalla() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Reposicionar suelo y personajes según el nuevo alto
+            sueloY = canvas.height * 0.8; 
+            y = sueloY - tam;
+            obsY = sueloY - obsTam;
+        }
 
-        let x = 50, y = 340, tam = 40; // Personaje un poco más grande
-        let obsX = 450, obsY = 340, obsTam = 40, velocidad = 4;
+        let tam = 50; 
+        let x = 50, y = 0;
+        let obsX = 0, obsY = 0, obsTam = 50, velocidad = 5;
+        let sueloY = 0;
         let puntos = 0, saltando = false, juegoCorriendo = false;
 
-        // ESTO SOLUCIONA EL SALTO EN IFRAME
-        function enfocarIframe() {
-            window.focus();
-        }
+        window.addEventListener('resize', ajustarPantalla);
+        ajustarPantalla(); // Ajustar al cargar
 
         function iniciar() {
             mensaje.style.display = "none";
             juegoCorriendo = true;
-            window.focus(); 
+            obsX = canvas.width + 100; // Que el obstáculo empiece fuera
+            window.focus();
         }
 
         function dibujar() {
             if (juegoCorriendo) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Jugador (Verde como en tu imagen)
+                // Suelo (Línea decorativa)
+                ctx.strokeStyle = "#444";
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(0, sueloY + 5);
+                ctx.lineTo(canvas.width, sueloY + 5);
+                ctx.stroke();
+
+                // Jugador
                 ctx.fillStyle = "#008080"; 
                 ctx.fillRect(x, y, tam, tam);
 
-                // Obstáculo (Rojo)
+                // Obstáculo
                 ctx.fillStyle = "#8b0000";
                 ctx.fillRect(obsX, obsY, obsTam, obsTam);
 
                 obsX -= velocidad;
                 if (obsX < -obsTam) {
-                    obsX = 400;
+                    obsX = canvas.width + 50;
                     puntos++;
-                    uiPuntos.innerText = "PUNTOS: " + puntos; // Actualiza el texto HTML
+                    uiPuntos.innerText = "PUNTOS: " + puntos;
                     velocidad += 0.2;
                 }
 
                 // Colisión
                 if (x < obsX + obsTam && x + tam > obsX && y < obsY + obsTam && y + tam > obsY) {
                     juegoCorriendo = false;
-                    alert("¡Perdiste! Puntos: " + puntos);
-                    location.reload(); 
+                    alert("¡GAME OVER! PUNTOS: " + puntos);
+                    location.reload();
                 }
             }
             requestAnimationFrame(dibujar);
@@ -89,42 +111,25 @@
         function saltar() {
             if (!saltando && juegoCorriendo) {
                 saltando = true;
-                let fuerza = 15;
-                let gravedad = 0.8;
-                let posOriginal = 340;
+                let fuerza = 18;
+                let gravedad = 0.9;
+                let nivelSuelo = sueloY - tam;
 
                 let idSalto = setInterval(() => {
                     y -= fuerza;
                     fuerza -= gravedad;
-                    if (y >= posOriginal) {
-                        y = posOriginal;
+                    if (y >= nivelSuelo) {
+                        y = nivelSuelo;
                         saltando = false;
                         clearInterval(idSalto);
                     }
-                }, 20);
+                }, 16);
             }
         }
 
-        // Eventos mejorados para detectar siempre
-        window.addEventListener("keydown", (e) => {
-            if (e.code === "Space") {
-                e.preventDefault();
-                saltar();
-            }
-        });
-
-        canvas.addEventListener("touchstart", (e) => {
-            e.preventDefault();
-            saltar();
-        }, {passive: false});
-
-        dibujar();
-    </script>
-</body>
-</html>
-saltar();
-            }
-        }, { passive: false });
+        // Controles
+        window.addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); saltar(); } });
+        window.addEventListener("touchstart", (e) => { e.preventDefault(); saltar(); }, {passive: false});
 
         dibujar();
     </script>
