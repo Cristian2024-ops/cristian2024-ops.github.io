@@ -1,181 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dino Chrome Original Style</title>
     <style>
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background: #000; 
-            display: flex; justify-content: center; align-items: center;
-        }
-        #contenedor { 
-            position: relative; width: 100vw; height: 100vh; 
-            transition: transform 0.1s; /* Para la animación de sacudida */
-        }
-        canvas { display: block; background: #0a0a0a; width: 100%; height: 100%; }
-        
-        #ui-puntos {
-            position: absolute; top: 20px; left: 20px;
-            color: #0f0; font-family: 'Courier New', Courier, monospace; 
-            font-size: 28px; font-weight: bold;
-            text-shadow: 2px 2px #000; pointer-events: none; z-index: 5;
-        }
-
-        #mensaje-inicio {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: white; z-index: 100; font-family: sans-serif;
-            cursor: pointer; text-align: center;
-        }
-
-        /* Clase para la sacudida */
-        .shake {
-            animation: shake 0.2s;
-            animation-iteration-count: 2;
-        }
-
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            20% { transform: translate(-3px, 0px) rotate(-1deg); }
-            40% { transform: translate(3px, 2px) rotate(1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            80% { transform: translate(3px, 1px) rotate(-1deg); }
-            100% { transform: translate(1px, -2px) rotate(1deg); }
-        }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f7f7f7; font-family: Arial, sans-serif; overflow: hidden; }
+        canvas { background: #fff; border-bottom: 2px solid #535353; max-width: 100%; }
+        .instrucciones { position: absolute; top: 20px; color: #535353; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="contenedor">
-        <div id="ui-puntos">PUNTOS: 0</div>
-        <div id="mensaje-inicio" onmousedown="iniciar(event)" ontouchstart="iniciar(event)">
-            <h1 style="font-size: 2.5rem; margin-bottom: 0;">¡TOCA PARA JUGAR!</h1>
-            <p style="font-size: 1.2rem; opacity: 0.8;">Esquiva los bloques rojos</p>
-        </div>
-        <canvas id="juegoCanvas"></canvas>
-    </div>
+
+    <div class="instrucciones">ESPACIO: Saltar | FLECHA ABAJO: Agacharse</div>
+    <canvas id="canvas"></canvas>
 
     <script>
-        const canvas = document.getElementById("juegoCanvas");
-        const contenedor = document.getElementById("contenedor");
+        const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
-        const uiPuntos = document.getElementById("ui-puntos");
-        const mensaje = document.getElementById("mensaje-inicio");
 
-        let tam = 45; 
-        let x = 50, y = 0, sueloY = 0;
-        let obsX = 0, obsY = 0, obsTam = 45, velocidad = 6;
-        let puntos = 0, saltando = false, juegoCorriendo = false;
+        // --- Configuración y Carga de Imágenes ---
+        canvas.width = 800;
+        canvas.height = 200;
 
-        function ajustarPantalla() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            sueloY = canvas.height * 0.75; 
-            if (!saltando) y = sueloY - tam;
-            obsY = sueloY - obsTam;
-        }
+        const sprite = new Image();
+        sprite.src = "https://githubusercontent.com";
 
-        window.addEventListener('resize', ajustarPantalla);
-        ajustarPantalla();
+        let score = 0;
+        let gameSpeed = 7;
+        let isGameOver = false;
+        let frame = 0;
 
-        function iniciar(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
+        // --- Clases del Juego ---
+
+        const dino = {
+            x: 50, y: 150, w: 44, h: 47,
+            frame: 0,
+            vY: 0,
+            gravity: 0.8,
+            jumpForce: -12,
+            isJumping: false,
+            isDucking: false,
+
+            update() {
+                // Saltar
+                if (this.isJumping) {
+                    this.vY += this.gravity;
+                    this.y += this.vY;
+                }
+
+                // Suelo
+                if (this.y >= 150) {
+                    this.y = 150;
+                    this.isJumping = false;
+                    this.vY = 0;
+                }
+
+                // Animación (cambia cada 10 frames)
+                if (frame % 8 === 0) this.frame = this.frame === 0 ? 1 : 0;
+                
+                this.draw();
+            },
+
+            draw() {
+                let clipX = 1338; // Posición Dino en el sprite
+                let clipW = 44, clipH = 47;
+
+                if (this.isDucking && !this.isJumping) {
+                    clipX = 1866 + (this.frame * 59); // Sprite agachado
+                    clipW = 59;
+                    ctx.drawImage(sprite, clipX, 36, clipW, 30, this.x, this.y + 17, clipW, 30);
+                } else if (this.isJumping) {
+                    ctx.drawImage(sprite, 1338, 2, 44, 47, this.x, this.y, 44, 47);
+                } else {
+                    clipX = 1514 + (this.frame * 44); // Sprite corriendo
+                    ctx.drawImage(sprite, clipX, 2, 44, 47, this.x, this.y, 44, 47);
+                }
             }
-            if (juegoCorriendo) return;
+        };
 
-            mensaje.style.display = "none";
-            juegoCorriendo = true;
-            obsX = canvas.width + 100; 
-            puntos = 0;
-            velocidad = 6;
-            uiPuntos.innerText = "PUNTOS: 0";
-            window.focus();
+        const obstacles = [];
+
+        function spawnObstacle() {
+            const chance = Math.random();
+            if (score > 500 && chance < 0.3) { // Pterodáctilos después de 500 puntos
+                const heights = [150, 120, 80]; // Suelo, medio, alto
+                obstacles.push({ type: 'bird', x: 800, y: heights[Math.floor(Math.random()*3)], w: 46, h: 40, frame: 0 });
+            } else {
+                obstacles.push({ type: 'cactus', x: 800, y: 155, w: 25, h: 40 });
+            }
         }
 
-        function sacudir() {
-            contenedor.classList.add("shake");
-            setTimeout(() => {
-                contenedor.classList.remove("shake");
-            }, 400);
-        }
+        // --- Bucle Principal ---
 
-        function dibujar() {
+        function loop() {
+            if (isGameOver) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            frame++;
+            score++;
 
-            if (juegoCorriendo) {
-                // Suelo Neon
-                ctx.fillStyle = "#1a1a1a";
-                ctx.fillRect(0, sueloY + 2, canvas.width, canvas.height);
-                ctx.strokeStyle = "#0ff";
-                ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.moveTo(0, sueloY + 2); ctx.lineTo(canvas.width, sueloY + 2); ctx.stroke();
+            // Suelo (línea infinita)
+            ctx.drawImage(sprite, 2, 104, 1200, 12, -(frame * gameSpeed % 1200), 185, 1200, 12);
+            ctx.drawImage(sprite, 2, 104, 1200, 12, -(frame * gameSpeed % 1200) + 1200, 185, 1200, 12);
 
-                // Jugador (Cian)
-                ctx.fillStyle = "#00e5ff"; 
-                ctx.fillRect(x, y, tam, tam);
-                ctx.strokeStyle = "white"; ctx.strokeRect(x, y, tam, tam);
+            // Marcador
+            ctx.fillStyle = "#535353";
+            ctx.font = "18px 'Courier New'";
+            ctx.fillText(String(Math.floor(score/10)).padStart(5, '0'), 730, 30);
 
-                // Obstáculo (Rojo neón)
-                ctx.fillStyle = "#ff1744";
-                ctx.fillRect(obsX, obsY, obsTam, obsTam);
+            dino.update();
 
-                obsX -= velocidad;
-                if (obsX < -obsTam) {
-                    obsX = canvas.width + 50;
-                    puntos++;
-                    uiPuntos.innerText = "PUNTOS: " + puntos;
-                    velocidad += 0.25;
+            // Obstáculos
+            if (frame % Math.max(60, Math.floor(100 - gameSpeed)) === 0) spawnObstacle();
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let o = obstacles[i];
+                o.x -= gameSpeed;
+
+                if (o.type === 'cactus') {
+                    ctx.drawImage(sprite, 446, 2, 34, 70, o.x, o.y, 25, 40);
+                } else {
+                    if (frame % 15 === 0) o.frame = o.frame === 0 ? 1 : 0;
+                    ctx.drawImage(sprite, 260 + (o.frame * 46), 2, 46, 40, o.x, o.y, 46, 40);
                 }
 
-                // Colisión
-                if (x < obsX + obsTam && x + tam > obsX && y < obsY + obsTam && y + tam > obsY) {
-                    juegoCorriendo = false;
-                    sacudir(); // Activamos el efecto
-                    setTimeout(() => {
-                        alert("¡GAME OVER!\nPUNTUACIÓN: " + puntos);
-                        location.reload();
-                    }, 500);
+                // Colisión (ajustada para ser más justa)
+                if (dino.x < o.x + o.w - 5 && dino.x + dino.w - 5 > o.x && dino.y < o.y + o.h - 5 && dino.y + dino.h - 5 > o.y) {
+                    gameOver();
                 }
+
+                if (o.x < -100) obstacles.splice(i, 1);
             }
-            requestAnimationFrame(dibujar);
+
+            if (score % 1000 === 0) gameSpeed += 0.5;
+            requestAnimationFrame(loop);
         }
 
-        function saltar() {
-            if (!saltando && juegoCorriendo) {
-                saltando = true;
-                let fuerza = 16;
-                let gravedad = 0.8;
-                let nivelSuelo = sueloY - tam;
-
-                let idSalto = setInterval(() => {
-                    y -= fuerza;
-                    fuerza -= gravedad;
-                    if (y >= nivelSuelo) {
-                        y = nivelSuelo;
-                        saltando = false;
-                        clearInterval(idSalto);
-                    }
-                }, 16);
-            }
+        function gameOver() {
+            isGameOver = true;
+            ctx.drawImage(sprite, 954, 29, 191, 11, 300, 80, 191, 11); // Texto Game Over
+            ctx.drawImage(sprite, 2, 2, 36, 32, 380, 110, 36, 32); // Botón Restart
         }
 
-        // Controles globales
-        window.addEventListener("keydown", (e) => { 
-            if (e.code === "Space") { e.preventDefault(); saltar(); } 
+        // --- Controles ---
+
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "Space" || e.code === "ArrowUp") {
+                if (isGameOver) location.reload();
+                else if (!dino.isJumping) { dino.isJumping = true; dino.vY = dino.jumpForce; }
+            }
+            if (e.code === "ArrowDown") dino.isDucking = true;
         });
 
-        // Toque en pantalla para saltar
-        canvas.addEventListener("touchstart", (e) => {
-            if (juegoCorriendo) {
-                e.preventDefault();
-                saltar();
-            }
-        }, {passive: false});
+        window.addEventListener("keyup", (e) => {
+            if (e.code === "ArrowDown") dino.isDucking = false;
+        });
 
-        dibujar();
+        sprite.onload = loop;
+
     </script>
 </body>
-    </html>
-    
+</html>
