@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Sitio que nose</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f3f7fa;
+      color: #222;
+    }
+    header {
+      background: linear-gradient(90deg, #4f8cff 60%, #7fd9ff 100%);
+      color: #fff;
+      padding: 2rem 1rem 1.2rem;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0 0 0.3em;
+      letter-spacing: 2px;
+      font-size: 2.5em;
+      font-weight: 800;
+    }
+    .intro {
+      text-align: center;
+      font-size: 1.15em;
+      padding: 1em 2em;
+      margin-bottom: 1.2em;
+    }
+    main {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 3px 16px 0 #a1c5e740;
+      padding: 2em 2em 1.5em;
+      margin-bottom: 2em;
+    }
+    .img-section {
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    .img-section img {
+      width: 180px;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #b1cbee55;
+    }
+    main h2 {
+      color: #4079c5;
+      margin-top: 0;
+    }
+    a.btn {
+      display: inline-block;
+      background: #4f8cff;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      margin-top: 1.2em;
+      transition: background 0.2s;
+    }
+    a.btn:hover {
+      background: #225fa9;
+    }
+    button {
+      background: #7fd9ff;
+      border: none;
+      border-radius: 20px;
+      color: #225fa9;
+      padding: 8px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 1em;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #4f8cff;
+      color: #fff;
+    }
+    footer {
+      text-align: center;
+      padding: 1em 0;
+      color: #7088ab;
+      background: #e9f3fc;
+      font-size: 0.98em;
+    }
+    .social-links a {
+      color: #4079c5;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+    .social-links a:hover { color: #225fa9; text-decoration: underline;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mi Sitio Increíble</h1>
+    <div class="intro">¡Bienvenido! Aquí encontrarás contenido interesante sobre tecnología, creatividad y aprendizaje digital.</div>
+  </header>
+  <main>
+    <section class="img-section">
+      <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80" alt="Inspiración tecnológica">
+    </section>
+    <h2>¿Por qué crear una web?</h2>
+    <p>
+      Tener tu propia página web te permite compartir tus ideas, proyectos y pasiones con el mundo. Aquí podrás descubrir recursos útiles, consejos de diseño y trucos para empezar hoy mismo.
+    </p>
+    <ul>
+      <li>Aprende HTML, CSS y JavaScript desde cero</li>
+      <li>Comparte tus avances y proyectos favoritos</li>
+      <li>Conecta con otros entusiastas de la tecnología</li>
+    </ul>
+    <a class="btn" href="https://developer.mozilla.org/es/docs/Learn" target="_blank">¡Aprende desarrollo web!</a>
+    <br>
+    <button onclick="cambiarMensaje()">¿Sabías esto?</button>
+    <p id="mensaje" style="font-style:italic; color:#225fa9; margin-top:10px;">
+      ¡Puedes crear páginas increíbles con solo un poco de código!
+    </p>
+  </main>
+  <footer>
+    <div>
+      © 2026 – Tu Nombre • <span class="social-links">
+        <a href="https://twitter.com/" target="_blank">X/Twitter</a> |
+        <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+      </span>
+      <br>
+      Contacto: <a href="mailto:tucorreo@ejemplo.com">tucorreo@ejemplo.com</a>
+    </div>
+  </footer>
+  <script>
+    function cambiarMensaje() {
+      const frase = [
+        "La web es tu espacio creativo: ¡exprésate!",
+        "Cada línea de código es un nuevo logro.",
+        "¡Sigue explorando y aprendiendo algo nuevo cada día!",
+        "Comparte tu web y recibe retroalimentación positiva.",
+        "Dominar HTML y CSS es más fácil de lo que crees."
+      ];
+      let idx = Math.floor(Math.random() * frase.length);
+      document.getElementById("mensaje").innerText = frase[idx];
+    }
+  </script>
+</body>
+</html>
