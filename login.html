@@ -4,140 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.auth0.com/js/auth0/9.27/auth0.min.js"></script>
-
-    <title>Login - Mi Web</title>
+    <title>Login Auth0 - Mi Web</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background-color: #f6f8fa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 8px; border: 1px solid #d0d7de; box-shadow: 0 8px 24px rgba(140,149,159,0.1); width: 320px; }
-        h1 { font-size: 24px; text-align: center; }
-        label { display:block; margin: 12px 0 4px 2px; font-size: 15px; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #d0d7de; box-sizing: border-box; }
-        .btn-primary { background-color: #0969da; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-primary:hover { background-color: #0860ca; }
-        .footer { text-align: center; margin-top: 15px; font-size: 14px; }
-        a { color: #0969da; text-decoration: none; }
-        .show-pass { position: relative; left: 90%; top: -34px; background: none; border: none; cursor: pointer; font-size: 16px; color:#0969da; }
+        body { font-family: Arial, sans-serif; background-color: #f0f4f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #fff; padding: 2rem; border-radius: 10px; width: 320px; box-shadow: 0 8px 24px 0 rgba(140,149,159,0.1);}
+        h1 { text-align: center; }
+        #user-profile { margin-top: 1rem; text-align: center; }
+        .btn { display: block; width: 100%; margin-top: 1rem; padding: 12px; border-radius: 6px; font-size: 1.06em; border: none; background: #1a53ff; color: white; cursor: pointer;}
+        .btn.alt { background: #ff414d; }
+        .btn:disabled { background: #ccc; }
     </style>
 </head>
 <body>
-    <div class="card" role="main" aria-label="Formulario de inicio de sesión">
-        <h1>Iniciar Sesión</h1>
-        <form autocomplete="on" onsubmit="return validarLogin(event)">
-            <label for="usuario">Nombre de usuario</label>
-            <input id="usuario" name="usuario" type="text" placeholder="Nombre de usuario" autocomplete="username" required>
-            <label for="pass">Contraseña</label>
-            <input id="pass" name="pass" type="password" placeholder="Contraseña" autocomplete="current-password" required>
-            <button class="show-pass" tabindex="0" type="button" onclick="toggleMostrarPass()" aria-label="Mostrar u ocultar contraseña">👁️</button>
-            <button class="btn-primary" type="submit">Entrar</button>
-        </form>
-        <div class="footer">
-            ¿No tienes cuenta? <a href="registrate">Regístrate</a>
+    <div class="card">
+        <h1>Bienvenido</h1>
+        <div id="auth-buttons">
+            <button class="btn" id="login" style="display:none;">Iniciar sesión con Auth0</button>
+            <button class="btn alt" id="logout" style="display:none;">Cerrar sesión</button>
         </div>
+        <div id="user-profile"></div>
     </div>
+
     <script>
-    function toggleMostrarPass() {
-        const pass = document.getElementById('pass');
-        pass.type = pass.type === 'password' ? 'text' : 'password';
-    }
-    function validarLogin(e) {
-        var usuario = document.getElementById('usuario').value.trim();
-        var pass = document.getElementById('pass').value.trim();
-        if (usuario === "" || pass === "") {
-            alert("Por favor completa ambos campos.");
-            return false;
+        // MÉTODO OFICIAL SPA Auth0
+        var auth0 = new auth0.WebAuth({
+            domain:     'dev-bzsbnr5w8wtmmiqg.us.auth0.com',
+            clientID:   'S8fcQCKtU9G3FD6ConZSspY8eVOxaM5Q',
+            redirectUri: window.location.origin,
+            responseType: 'token id_token',
+            scope: 'openid profile email'
+        });
+
+        // Al cargar la página...
+        window.onload = function() { handleAuth(); };
+
+        function handleAuth() {
+            auth0.parseHash(function(err, authResult) {
+                if (authResult && authResult.accessToken && authResult.idToken) {
+                    window.location.hash = '';
+                    localLogin(authResult);
+                } else if (err) {
+                    alert('Error: ' + err.error + '\n' + err.errorDescription);
+                } else {
+                    renewTokens();
+                }
+            });
         }
-        // Simulamos envío
-        window.location.href = 'juegos';
-        return false; // No recarga la página
-    }
+
+        function localLogin(authResult) {
+            sessionStorage.setItem('access_token', authResult.accessToken);
+            sessionStorage.setItem('id_token', authResult.idToken);
+            sessionStorage.setItem('expires_at', JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime()));
+            showProfile();
+        }
+
+        function renewTokens() {
+            var expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
+            if(new Date().getTime() < expiresAt) {
+                showProfile();
+            } else {
+                showLoggedOut();
+            }
+        }
+
+        function isLoggedIn() {
+            var expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
+            return new Date().getTime() < expiresAt;
+        }
+
+        function showProfile() {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('logout').style.display = '';
+            auth0.client.userInfo(sessionStorage.getItem('access_token'), function(err, profile) {
+                if (profile) {
+                    document.getElementById('user-profile').innerHTML =
+                        `<div>
+                            <img src="${profile.picture}" alt="avatar" style="width:60px;border-radius:50%;margin-bottom:6px;"><br>
+                            <strong>${profile.nickname || profile.name}</strong><br>
+                            <small>${profile.email || ''}</small>
+                        </div>`;
+                }
+            });
+        }
+
+        function showLoggedOut() {
+            document.getElementById('login').style.display = '';
+            document.getElementById('logout').style.display = 'none';
+            document.getElementById('user-profile').innerHTML = '';
+        }
+
+        document.getElementById('login').onclick = function() {
+            auth0.authorize();
+        };
+        document.getElementById('logout').onclick = function() {
+            sessionStorage.clear();
+            window.location.href = 
+                `https://${auth0.baseOptions.domain}/v2/logout?returnTo=${encodeURIComponent(window.location.origin)}&client_id=${auth0.baseOptions.clientID}`;
+        };
     </script>
-    <script>
-  // Configura tus datos
-  var auth0 = new auth0.WebAuth({
-    domain:     'dev-bzsbnr5w8wtmmiqg.us.auth0.com',     // <--- Cambia esto si quieres también crear tu página web
-    clientID:   'S8fcQCKtU9G3FD6ConZSspY8eVOxaM5Q',             // <--- Cambia esto
-    redirectUri: window.location.origin,    // Después del login, vuelve aquí
-    responseType: 'token id_token',
-    scope: 'openid profile email'
-  });
-
-  // Al cargar la página...
-  window.onload = function() {
-    handleAuth();
-  };
-  
-  function handleAuth() {
-    // Checar si volvemos del login Auth0 (hash en la URL)
-    auth0.parseHash(function(err, authResult) {
-      if (authResult && authResult.accessToken && authResult.idToken) {
-        window.location.hash = '';
-        localLogin(authResult);
-      } else if (err) {
-        alert('Error: ' + err.error + '\n' + err.errorDescription);
-      } else {
-        renewTokens();
-      }
-    });
-  }
-
-  function localLogin(authResult) {
-    // Guarda info en sessionStorage (memoria local pero se borra al cerrar pestaña)
-    // Puedes usar localStorage si prefieres persistencia
-    sessionStorage.setItem('access_token', authResult.accessToken);
-    sessionStorage.setItem('id_token', authResult.idToken);
-    sessionStorage.setItem('expires_at', JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime()));
-    showProfile();
-  }
-
-  function renewTokens() {
-    // Checa si hay sesión guardada
-    var expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
-    if(new Date().getTime() < expiresAt) {
-      // Token válido
-      showProfile();
-    } else {
-      showLoggedOut();
-    }
-  }
-
-  function isLoggedIn() {
-    var expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
-    return new Date().getTime() < expiresAt;
-  }
-
-  function showProfile() {
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('logout').style.display = '';
-    document.getElementById('user-profile').textContent = "Cargando perfil...";
-
-    auth0.client.userInfo(sessionStorage.getItem('access_token'), function(err, profile) {
-      if (profile) {
-        document.getElementById('user-profile').innerHTML =
-          `<span style="color:#ffd97d;font-weight:bold;">¡Hola, ${profile.nickname || profile.name}!</span>`;
-      } else {
-        document.getElementById('user-profile').textContent = 'Sesión activa';
-      }
-    });
-  }
-
-  function showLoggedOut() {
-    document.getElementById('login').style.display = '';
-    document.getElementById('logout').style.display = 'none';
-    document.getElementById('user-profile').textContent = '';
-  }
-
-  // Hooks de los botones
-  document.getElementById('login').onclick = function() {
-    auth0.authorize();
-  };
-
-  document.getElementById('logout').onclick = function() {
-    sessionStorage.clear();
-    // Redirige a logout universal
-    window.location.href = 
-      `https://${auth0.baseOptions.domain}/v2/logout?returnTo=${encodeURIComponent(window.location.origin)}&client_id=${auth0.baseOptions.clientID}`;
-  };
-    </script>
-    
 </body>
 </html>
