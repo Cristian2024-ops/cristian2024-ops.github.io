@@ -5,27 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Mi Web</title>
     <style>
-        /* Usamos los mismos estilos que tu index */
         body { font-family: -apple-system, sans-serif; background-color: #f6f8fa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 8px; border: 1px solid #d0d7de; box-shadow: 0 8px 24px rgba(140, 149, 159, 0.1); width: 320px; }
+        .card { background: white; padding: 2rem; border-radius: 8px; border: 1px solid #d0d7de; box-shadow: 0 8px 24px rgba(140,149,159,0.1); width: 320px; }
         h1 { font-size: 24px; text-align: center; }
-        input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #d0d7de; box-sizing: border-box; }
+        label { display:block; margin: 12px 0 4px 2px; font-size: 15px; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #d0d7de; box-sizing: border-box; }
         .btn-primary { background-color: #0969da; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-primary:hover { background-color: #0860ca; }
         .footer { text-align: center; margin-top: 15px; font-size: 14px; }
         a { color: #0969da; text-decoration: none; }
+        .show-pass { position: relative; left: 90%; top: -34px; background: none; border: none; cursor: pointer; font-size: 16px; color:#0969da; }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="card" role="main" aria-label="Formulario de inicio de sesión">
         <h1>Iniciar Sesión</h1>
-        <input type="text" placeholder="Nombre de usuario">
-        <input type="password" placeholder="Contraseña">
-        <!-- Al hacer clic, nos manda al panel de juegos que querías -->
-        <button class="btn-primary" onclick="window.location.href='juegos'">Entrar</button>
+        <form autocomplete="on" onsubmit="return validarLogin(event)">
+            <label for="usuario">Nombre de usuario</label>
+            <input id="usuario" name="usuario" type="text" placeholder="Nombre de usuario" autocomplete="username" required>
+            <label for="pass">Contraseña</label>
+            <input id="pass" name="pass" type="password" placeholder="Contraseña" autocomplete="current-password" required>
+            <button class="show-pass" tabindex="0" type="button" onclick="toggleMostrarPass()" aria-label="Mostrar u ocultar contraseña">👁️</button>
+            <button class="btn-primary" type="submit">Entrar</button>
+        </form>
         <div class="footer">
             ¿No tienes cuenta? <a href="registrate">Regístrate</a>
         </div>
     </div>
+    <script>
+    function toggleMostrarPass() {
+        const pass = document.getElementById('pass');
+        pass.type = pass.type === 'password' ? 'text' : 'password';
+    }
+    function validarLogin(e) {
+        var usuario = document.getElementById('usuario').value.trim();
+        var pass = document.getElementById('pass').value.trim();
+        if (usuario === "" || pass === "") {
+            alert("Por favor completa ambos campos.");
+            return false;
+        }
+        // Simulamos envío
+        window.location.href = 'juegos';
+        return false; // No recarga la página
+    }
+    </script>
 </body>
 </html>
