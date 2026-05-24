@@ -15,7 +15,6 @@
             --shadow: rgba(140, 149, 159, 0.1);
         }
 
-        /* Variables para Modo Oscuro */
         body.dark-mode {
             --bg-body: #0d1117;
             --bg-card: #161b22;
@@ -65,11 +64,10 @@
             background: var(--bg-body);
         }
 
-        /* Contenedor del Juego mejorado */
         .game-display {
             width: 100%;
             max-width: 1000px;
-            height: 65vh; /* Altura relativa al dispositivo */
+            height: 65vh;
             background: #000;
             border: 2px solid var(--accent);
             border-radius: 12px;
@@ -80,7 +78,6 @@
             position: relative;
         }
 
-        /* Botón para cerrar el juego */
         .close-game {
             position: absolute;
             top: 10px;
@@ -141,21 +138,88 @@
         .divider:not(:empty)::before { margin-right: .5em; }
         .divider:not(:empty)::after { margin-left: .5em; }
         
-        /* Animación para que aparezca suave */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .fade-in { animation: fadeIn 0.5s ease forwards; }
+        .user-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 15px;
+        }
+        .username {
+            color: #0969da;
+            font-weight: bold;
+            font-size:14px;
+        }
     </style>
+    <!-- Auth0 SDK -->
+    <script src="https://cdn.auth0.com/js/auth0/9.27/auth0.min.js"></script>
+    <script>
+    // --- Auth0 config ---
+    const auth0 = new auth0.WebAuth({
+      domain:     'dev-bzsbnr5w8wtmmiqg.us.auth0.com',
+      clientID:   'S8fcQCKtU9G3FD6ConZSspY8eVOxaM5Q',
+      redirectUri: "https://cristian2024-ops.github.io/login",
+      responseType: 'token id_token',
+      scope: 'openid profile email'
+    });
+
+    function isLoggedIn() {
+      var expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
+      return new Date().getTime() < expiresAt;
+    }
+
+    window.onload = function() {
+      // Tema
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+      }
+      // Sin sesión, redirige
+      if (!isLoggedIn()) {
+        window.location.href = "/login";
+        return;
+      }
+      // Mostrar perfil y botón logout
+      auth0.client.userInfo(sessionStorage.getItem('access_token'), function(err, profile) {
+        if (profile) {
+          const navbar = document.querySelector('.navbar');
+          // Saludo y avatar
+          let userBar = document.createElement('div');
+          userBar.className = 'user-bar';
+          if(profile.picture){
+              let avatar = document.createElement('img');
+              avatar.src = profile.picture;
+              avatar.alt = "avatar";
+              avatar.style="width:28px;height:28px;border-radius:50%;object-fit:cover;";
+              userBar.appendChild(avatar);
+          }
+          let nameSpan = document.createElement('span');
+          nameSpan.className = 'username';
+          nameSpan.textContent = `Hola, ${profile.nickname || profile.name}`;
+          userBar.appendChild(nameSpan);
+          // Cerrar sesión
+          let logoutBtn = document.createElement('button');
+          logoutBtn.textContent = "Cerrar sesión";
+          logoutBtn.className = "btn";
+          logoutBtn.onclick = function() {
+            sessionStorage.clear();
+            window.location.href =
+              `https://${auth0.baseOptions.domain}/v2/logout?returnTo=${encodeURIComponent("https://cristian2024-ops.github.io/login")}&client_id=${auth0.baseOptions.clientID}`;
+          };
+          userBar.appendChild(logoutBtn);
+          navbar.appendChild(userBar);
+        }
+      });
+    };
+    </script>
 </head>
 <body>
-    
 <div id="offline-message" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 50px; z-index: 9999; border: 2px solid #00d2ff; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
     No estás conectado a internet, conéctate para seguir. ⏳
-</div>
-    
+</div>    
     <div class="navbar">
         <a href="/" class="btn">🏠 Inicio</a>
         <h2 style="margin:0; font-size: 1.2rem;">🎮 Arcade Lib</h2>
@@ -168,17 +232,14 @@
     </div>
 
     <div class="grid-juegos">
-        <!-- Ejemplo con un juego que suele permitir iframe -->
         <div class="card-juego fade-in" onclick="lanzar('https://retrogames.cc')">
             <h3>🎞️ Retro games</h3>
             <p>Clásico Retro (Emu)</p>
         </div>
-        
         <div class="card-juego fade-in" onclick="lanzar('https://skribbl.io')">
             <h3>🎨 Skribbl.io</h3>
             <p>Dibuja y adivina</p>
         </div>
-
         <div class="card-juego fade-in" onclick="lanzar('https://Diep.io')">
             <h3>🚀 Diep.io</h3>
             <p>Batalla de tanques</p>
@@ -213,8 +274,7 @@
         </div>
     </div>
     
-    <div class="divider">
-        <p></p>
+    <div class="divider"><p></p>
     <h2 style="margin:0; font-size: 1.2rem;">🎮 Cosas y juegos al azar</h2>
         <p></p>
     </div>
@@ -265,29 +325,19 @@
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         }
 
-        // Cargar preferencia al iniciar
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
-
         // Función que revisa la conexión
         function actualizarEstadoRed() {
             const mensaje = document.getElementById('offline-message');
-    
-        if (navigator.onLine) {
-            mensaje.style.display = "none"; // Si hay internet, se esconde
-        } else {
-        mensaje.style.display = "block"; // Si no hay, aparece
-    }
-}
+            if (navigator.onLine) {
+                mensaje.style.display = "none";
+            } else {
+                mensaje.style.display = "block";
+            }
+        }
 
-// Escuchar cuando el navegador cambia de estado
-window.addEventListener('online', actualizarEstadoRed);
-window.addEventListener('offline', actualizarEstadoRed);
-
-// Revisar el estado apenas carga la página
-actualizarEstadoRed();
-        
+        window.addEventListener('online', actualizarEstadoRed);
+        window.addEventListener('offline', actualizarEstadoRed);
+        actualizarEstadoRed();
     </script>
 </body>
 </html>
