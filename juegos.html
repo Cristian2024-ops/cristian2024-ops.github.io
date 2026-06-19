@@ -311,7 +311,17 @@
     <div id="pantalla" class="game-display">
         <button class="close-game" onclick="cerrarJuego()">×</button>
         <button class="fullscreen-game" onclick="pantallaCompleta()" title="Pantalla completa">⛶</button>
-        <iframe id="visor" src="" allowfullscreen></iframe>
+        <div id="game-loader" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none;">
+            <div id="loader-dot" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,0.06);">⏳</div>
+        </div>
+        <iframe id="visor" src="" allowfullscreen allow="autoplay; fullscreen; clipboard-write; encrypted-media; picture-in-picture" loading="lazy" style="background:#000"></iframe>
+        <div id="game-error" style="display:none;position:absolute;inset:0;z-index:6;background:rgba(0,0,0,0.75);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
+            <p id="game-error-msg" style="max-width:700px;text-align:center;margin-bottom:12px;">No se pudo cargar el juego en el iframe. Puedes abrirlo en una pestaña nueva.</p>
+            <div style="display:flex;gap:8px;">
+                <button id="open-external" class="btn">Abrir en nueva pestaña</button>
+                <button id="retry-load" class="btn">Reintentar</button>
+            </div>
+        </div>
     </div>
 
     <!-- ... (grid de juegos, etc.) ... -->
@@ -362,6 +372,10 @@
         </div>
         <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-lite/index.html')">
             <h3>🧊 Geometry dash Lite (PC)</h3>
+            <p>Funciona ✅</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://cristian2024-ops.github.io/Juegos/Geometry-dash-skeletal-shenigans')">
+            <h3>🧊 Geometry dash skeletal shenigans</h3>
             <p>Funciona ✅</p>
         </div>
         <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-subzero/geometry-dash-subzero.html')">
@@ -423,6 +437,11 @@
         <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf.kdata1.com/2026/kapi/2.12/desktop/')">
             <h3>🎤 Friday Night Funkin VS. KAPI v2</h3>
             <p>Funciona ✅</p>
+        </div>
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://kbhgames.com/wp-content/themes/v1/embed.php?url=https%3A%2F%2Ffnf.kdata1.com%2Fimpostor-v4%2F1.5%2F&canonical=https%3A%2F%2Fkbhgames.com%2Fgame%2Ffnf-vs-impostor-among-us-v4&w=960&h=540&pid=137716&thumb=https%3A%2F%2Fkbhgames.com%2Fwp-content%2Fuploads%2F2023%2F01%2FFNF-vs-Impostor-Among-Us-V4-2.webp&title=FNF+vs+Impostor+Among+Us+V4&agelimit=')">
+            <h3>🎤 FNF vs Impostor Among Us V4</h3>
+            <p>Funciona ✅</p>
+        </div>
     </div>
 
     <div class="divider"><p></p>
@@ -454,21 +473,76 @@
     </div>
     <!-- (No se modifica nada más) -->
 
+
     <script>
+        let __visorLoadTimer = null;
+        let __currentGameUrl = '';
+        let __fullscreenTimer = null;
+
         function lanzar(url) {
+            __currentGameUrl = url;
             const pantalla = document.getElementById('pantalla');
             const visor = document.getElementById('visor');
-            
-            pantalla.style.display = "block";
+            const loader = document.getElementById('game-loader');
+            const errorBox = document.getElementById('game-error');
+            const fsBtn = document.querySelector('.fullscreen-game');
+
+            // Reset UI
+            if(errorBox) errorBox.style.display = 'none';
+            if(loader) loader.style.display = 'flex';
+            pantalla.style.display = 'block';
+            visor.style.display = 'block';
             visor.src = url;
+
+            // Clear any existing timer
+            if(__visorLoadTimer) clearTimeout(__visorLoadTimer);
+
+            // If this is the Among Us / Impostor embed, hide the fullscreen button for 36s
+            try {
+                const isAmongUs = (url || '').includes('impostor-v4') || ((url || '').includes('kbhgames.com') && (url || '').includes('impostor'));
+                if(isAmongUs && fsBtn){
+                    // hide and disable
+                    fsBtn.style.display = 'none';
+                    fsBtn.disabled = true;
+                    if(__fullscreenTimer) clearTimeout(__fullscreenTimer);
+                    __fullscreenTimer = setTimeout(function(){
+                        fsBtn.style.display = '';
+                        fsBtn.disabled = false;
+                        __fullscreenTimer = null;
+                    }, 50000);
+                } else if(fsBtn) {
+                    // ensure visible for other games
+                    fsBtn.style.display = '';
+                    fsBtn.disabled = false;
+                }
+            } catch(e) { console.warn('Error handling fullscreen toggle:', e); }
+
+            // onload handler clears loader
+            visor.onload = function() {
+                if(__visorLoadTimer) clearTimeout(__visorLoadTimer);
+                if(loader) loader.style.display = 'none';
+                if(errorBox) errorBox.style.display = 'none';
+            };
+
+            // Fallback: if iframe doesn't finish loading in time, show error overlay
+            __visorLoadTimer = setTimeout(function() {
+                if(loader) loader.style.display = 'none';
+                if(errorBox) errorBox.style.display = 'flex';
+            }, 7000);
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function cerrarJuego() {
             const pantalla = document.getElementById('pantalla');
             const visor = document.getElementById('visor');
+            const loader = document.getElementById('game-loader');
+            const errorBox = document.getElementById('game-error');
             pantalla.style.display = "none";
-            visor.src = ""; // Detiene el audio del juego
+            if(visor) visor.src = ""; // Detiene el audio del juego
+            if(__visorLoadTimer) { clearTimeout(__visorLoadTimer); __visorLoadTimer = null; }
+            if(loader) loader.style.display = 'none';
+            if(errorBox) errorBox.style.display = 'none';
             exitFullscreen();
         }
 
@@ -597,5 +671,13 @@
           });
         })();
       </script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function(){
+                    const openBtn = document.getElementById('open-external');
+                    const retryBtn = document.getElementById('retry-load');
+                    if(openBtn) openBtn.addEventListener('click', function(){ if(__currentGameUrl) window.open(__currentGameUrl, '_blank'); });
+                    if(retryBtn) retryBtn.addEventListener('click', function(){ if(__currentGameUrl) lanzar(__currentGameUrl); });
+                });
+            </script>
 </body>
 </html>
