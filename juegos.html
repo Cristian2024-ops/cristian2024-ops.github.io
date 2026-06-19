@@ -93,6 +93,29 @@
             cursor: pointer;
         }
 
+        .fullscreen-game {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            z-index: 10;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background 0.2s ease;
+        }
+
+        .fullscreen-game:hover {
+            background: rgba(0,0,0,0.85);
+        }
+
         iframe { width: 100%; height: 100%; border: none; }
 
         .grid-juegos {
@@ -134,6 +157,29 @@
         .divider {
             display: flex; align-items: center; text-align: center;
             margin: 20px 0; color: #57606a; font-size: 12px;
+        }
+        /* Filter bar */
+        .filter-bar {
+          width: 100%;
+          max-width: 1000px;
+          display: flex;
+          gap: 8px;
+          margin-bottom: 16px;
+          flex-wrap: wrap;
+        }
+        .filter-btn {
+          padding: 8px 12px;
+          border-radius: 8px;
+          border: 1px solid var(--border);
+          background: var(--bg-card);
+          color: var(--text-main);
+          cursor: pointer;
+          font-weight: 600;
+        }
+        .filter-btn.active {
+          background: var(--accent);
+          color: white;
+          border-color: var(--accent);
         }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #d0d7de; }
         .divider:not(:empty)::before { margin-right: .5em; }
@@ -1214,56 +1260,105 @@
         </label>
     </div>
 
-    <div id="pantalla" class="game-display">
-        <button class="close-game" onclick="cerrarJuego()">×</button>
-        <iframe id="visor" src=""></iframe>
+    <!-- Filter buttons -->
+    <div class="filter-bar" role="toolbar" aria-label="Filtros de juegos">
+      <button class="filter-btn" data-filter="">Todos</button>
+      <button class="filter-btn" data-filter="juegos">Juegos</button>
+      <button class="filter-btn" data-filter="carreras">Carreras</button>
+      <button class="filter-btn" data-filter="geometry-dash">Geometry Dash</button>
+      <button class="filter-btn" data-filter="fnf-mods">FNF MODS</button>
+      <button class="filter-btn" data-filter="paginas-webs">Páginas webs</button>
+      <button class="filter-btn" data-filter="juegos-io">Juegos.io</button>
+      <button class="filter-btn" data-filter="otros">Otros</button>
     </div>
 
-    <!-- ... resto de tu HTML ... (grid de juegos, etc.) ... -->
+    <div id="pantalla" class="game-display">
+        <button class="close-game" onclick="cerrarJuego()">×</button>
+        <button class="fullscreen-game" onclick="pantallaCompleta()" title="Pantalla completa">⛶</button>
+        <iframe id="visor" src="" allowfullscreen></iframe>
+    </div>
+
+    <!-- ... (grid de juegos, etc.) ... -->
     <div class="grid-juegos">
-        <div class="card-juego fade-in" onclick="lanzar('https://retrogames.cc')">
+        <div class="card-juego fade-in" data-category="juegos" onclick="lanzar('https://retrogames.cc')">
             <h3>🎞️ Retro games</h3>
             <p>Clásico Retro (Emu)</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://skribbl.io')">
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://skribbl.io')">
             <h3>🎨 Skribbl.io</h3>
             <p>Dibuja y adivina</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://Diep.io')">
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://Diep.io')">
             <h3>🚀 Diep.io</h3>
             <p>Batalla de tanques</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://friday-nightfunkin.io/friday-night-funkin')">
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://friday-nightfunkin.io/friday-night-funkin')">
             <h3>🎤🎶 FNF</h3>
             <p>friday night funkin es una gran lista de retos de rap</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://play.tetris.com/')">
+        <div class="card-juego fade-in" data-category="juegos" onclick="lanzar('https://play.tetris.com/')">
             <h3>🟩📥 Tetris</h3>
             <p>Un juego de reacomodar los bloques hasta el final</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('http://slither.com/io')">
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('http://slither.com/io')">
             <h3>🪱/🐍 slither.io</h3>
             <p>una serpiente que debe comer puntos brillantes para crecer y bloquear a otros jugadores</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://Agar.io')">
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://Agar.io')">
             <h3>🟢 agar.io</h3>
             <p>una célula que come a otras células más pequeñas (no funciona)</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://venge.io/')">
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://venge.io/')">
             <h3>😎 venge.io</h3>
             <p>un juego de disparos</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://krunker.io/')">
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://krunker.io/')">
             <h3>😛 krunker.io</h3>
             <p>un juego de disparos muy bueno</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://fnf-2.io/fnf-vs-indie-cross')">
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf-2.io/fnf-vs-indie-cross')">
             <h3>🎤 FNF indie croos</h3>
             <p>Fase de prueba</p>
         </div>
-        <div class="card-juego fade-in" onclick="lanzar('https://dashmetry.1games.io')">
-            <h3>🧊 Geometry dash</h3>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://dashmetry.1games.io')">
+            <h3>🧊 Geometry dash de temu (Dashmetry)</h3>
+            <p>Funciona ✅</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-lite/index.html')">
+            <h3>🧊 Geometry dash Lite (PC)</h3>
+            <p>Funciona ✅</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://cristian2024-ops.github.io/Juegos/Geometry-dash-skeletal-shenigans')">
+            <h3>🧊 Geometry dash skeletal shenigans</h3>
+            <p>Funciona ✅</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-subzero/geometry-dash-subzero.html')">
+            <h3>🧊 Geometry dash subzero</h3>
+            <p>Funciona ✅</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-meltdown/geometry-dash-meltdown.html')">
+            <h3>🧊 Geometry dash meltdown</h3>
+            <p>Funciona ✅</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-world/index.html')">
+            <h3>🧊 Geometry dash world</h3>
+            <p>Funciona ✅</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-11')">
+            <h3>🧊 Geometry dash 2.11</h3>
             <p>Fase de prueba</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-2')">
+            <h3>🧊 Geometry dash 2.2</h3>
+            <p>Fase de prueba</p>
+        </div>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-1')">
+            <h3>🧊 Geometry dash 2.1</h3>
+            <p>Fase de prueba</p>
+        </div>
+        <div class="card-juego fade-in" data-category="carreras" onclick="lanzar('https://smashkarts.io')">
+            <h3>🎮 Smash Karts</h3>
+            <p>Funciona ✅</p>
         </div>
     </div>
 
@@ -1273,23 +1368,23 @@
     </div>
 
     <div class="grid-juegos">
-        <div class="card-juego fade-in" onclick="lanzar('https://cristianaguilarm-creator.github.io')">
+        <div class="card-juego fade-in" data-category="paginas-webs" onclick="lanzar('https://cristianaguilarm-creator.github.io')">
             <h3>🔢 Página web de matemáticas</h3>
             <p>ehhh zi</p>
         </div>
-        <a href="https://cristian2024-ops.github.io/Juegos/Dino-sin-internet" target="_blank" class="card-juego fade-in" style="text-decoration: none; color: inherit; display: block;">
+        <a href="https://cristian2024-ops.github.io/Juegos/Dino-sin-internet" target="_blank" class="card-juego fade-in" data-category="juegos" style="text-decoration: none; color: inherit; display: block;">
             <h3>🦖 Juego simple</h3>
             <p>Una reecreación del dino sin conexión a Internet <br> (En fase de prueba y de desarrollo :D) </p>
         </a>
-        <div class="card-juego fade-in" onclick="lanzar('https://uiverse.io/elements')">
+        <div class="card-juego fade-in" data-category="paginas-webs" onclick="lanzar('https://uiverse.io/elements')">
             <h3>🌜 UiVerse.io</h3>
             <p>Es una página para buscar diseños de botones o otras cosas.</p>
         </div>
-        <a href="https://codedex.io" target="_blank" class="card-juego fade-in" style="text-decoration: none; color: inherit; display: block;">
+        <a href="https://codedex.io" target="_blank" class="card-juego fade-in" data-category="paginas-webs" style="text-decoration: none; color: inherit; display: block;">
             <h3>🤓 CodeDex.io</h3>
             <p>Es una plataforma de aprendizaje de lenguajes de programación.</p>
         </a>
-        <a href="https://flowith.io" target="_blank" class="card-juego fade-in" style="text-decoration: none; color: inherit; display: block;">
+        <a href="https://flowith.io" target="_blank" class="card-juego fade-in" data-category="paginas-webs" style="text-decoration: none; color: inherit; display: block;">
             <h3>👁️‍🗨️ FloWith.io</h3>
             <p>Una página web de una gran variedad de IA's</p>
         </a>
@@ -1311,6 +1406,35 @@
             const visor = document.getElementById('visor');
             pantalla.style.display = "none";
             visor.src = ""; // Detiene el audio del juego
+            exitFullscreen();
+        }
+
+        function pantallaCompleta() {
+            if (isFullscreen()) {
+                exitFullscreen();
+                return;
+            }
+            const pantalla = document.getElementById('pantalla');
+            const request = pantalla.requestFullscreen || pantalla.webkitRequestFullscreen || pantalla.mozRequestFullScreen || pantalla.msRequestFullscreen;
+            if (request) {
+                request.call(pantalla);
+            }
+        }
+
+        function isFullscreen() {
+            return !!(
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement
+            );
+        }
+
+        function exitFullscreen() {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (exit) {
+                exit.call(document);
+            }
         }
 
         // Manejo modo oscuro BB8
@@ -1348,5 +1472,67 @@
         window.addEventListener('offline', actualizarEstadoRed);
         actualizarEstadoRed();
     </script>
+      <script>
+        // Filter buttons behavior with persistence
+        (function(){
+          const buttons = document.querySelectorAll('.filter-btn');
+          let activeCategory = null;
+
+          function showAll() {
+            document.querySelectorAll('.card-juego').forEach(el => el.style.display = 'block');
+          }
+
+          function filterCategory(cat){
+            document.querySelectorAll('.card-juego').forEach(el => {
+              const c = el.getAttribute('data-category') || '';
+              if(!cat || cat === ''){
+                el.style.display = 'block';
+              } else if(c === cat){
+                el.style.display = 'block';
+              } else {
+                el.style.display = 'none';
+              }
+            });
+          }
+
+          function setActiveButton(btn){
+            buttons.forEach(b=>b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+          }
+
+          // Initialize from localStorage (if present)
+          const saved = localStorage.getItem('activeFilter');
+          if(saved !== null){
+            const btn = Array.from(buttons).find(b => b.getAttribute('data-filter') === saved);
+            if(btn){
+              setActiveButton(btn);
+              activeCategory = saved;
+              if(saved === '') showAll(); else filterCategory(saved);
+            } else {
+              showAll();
+            }
+          } else {
+            showAll();
+          }
+
+          buttons.forEach(btn => {
+            btn.addEventListener('click', function(){
+              const cat = this.getAttribute('data-filter');
+              if(this.classList.contains('active')){
+                // Clear filter
+                setActiveButton(null);
+                activeCategory = null;
+                localStorage.removeItem('activeFilter');
+                showAll();
+              } else {
+                setActiveButton(this);
+                activeCategory = cat;
+                if(cat === '') showAll(); else filterCategory(cat);
+                localStorage.setItem('activeFilter', cat);
+              }
+            });
+          });
+        })();
+      </script>
 </body>
 </html>
