@@ -524,7 +524,7 @@
             __visorLoadTimer = setTimeout(function() {
                 if(loader) loader.style.display = 'none';
                 if(errorBox) errorBox.style.display = 'flex';
-            }, 20000);
+            }, 20000); // El iframe espera 20 segundos para cargar por completo
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
