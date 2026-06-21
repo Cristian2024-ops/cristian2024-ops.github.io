@@ -528,7 +528,7 @@
             __visorLoadTimer = setTimeout(function() {
                 if(loader) loader.style.display = 'none';
                 if(errorBox) errorBox.style.display = 'flex';
-            }, 7000);
+            }, 20000);  # Configurado para que espere 20 segundos
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
