@@ -6,35 +6,22 @@
     <title>Dashboard - Biblioteca de Juegos</title>
     <link rel="stylesheet" href="CSS/estilos-tema.css">
     <link rel="stylesheet" href="CSS/estilos-bb8.css">
-        <style>
-        /* Partículas, Fondo y Contenedor */
-        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 1; pointer-events: none; }
+    <style>
+        /* Estilos base ajustados */
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important; color: var(--text-main); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        body.dark-mode { background: var(--bg-body) !important; }
-        .navbar, .filter-bar, .game-display, .grid-juegos, .divider { position: relative; z-index: 5; }
+    
+        /* Corrección navbar: espaciado y alineación */
+        .navbar { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
 
-        /* Componentes Estilo Cristal (Glassmorphism) */
-        .btn, .card-juego, .filter-btn { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 12px; }
-        .btn { padding: 8px 16px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: 0.2s; }
-        body:not(.dark-mode) .btn { color: #fff; }
-        .btn:hover { border-color: var(--accent) !important; background: var(--bg-body) !important; }
+        /* Corrección visor de juegos: tamaño y posición */
+        .game-display { width: 100%; max-width: 1000px; height: 65vh; background: #000; border-radius: 16px; margin-bottom: 30px; }
 
-        .card-juego { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.18); padding: 24px; text-align: center; cursor: pointer; transition: all 0.3s; }
-        body:not(.dark-mode) .card-juego { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.25); }
-        .card-juego:hover { transform: translateY(-5px); border-color: var(--accent) !important; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .card-juego h3 { color: var(--accent); margin: 0; }
-        body:not(.dark-mode) .card-juego h3, body:not(.dark-mode) .card-juego p { color: #fff !important; }
-
-        .filter-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-main); }
-        body:not(.dark-mode) .filter-btn { color: #fff; }
-        .filter-btn.active { background: var(--accent) !important; border-color: var(--accent) !important; }
-
-        /* Layout */
-        .navbar, .grid-juegos, .filter-bar, .divider { width: 100%; max-width: 1000px; }
-        .grid-juegos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-        .divider::before, .divider::after { border-bottom: 1px solid rgba(255,255,255,0.2); }
-        body.dark-mode .divider::before, body.dark-mode .divider::after { border-bottom-color: #d0d7de; }
+        /* Refinamiento componentes */
+        .btn, .card-juego { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.1); }
+        .filter-bar { width: 100%; max-width: 1000px; display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .grid-juegos { width: 100%; max-width: 1000px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
     </style>
+
     <!-- Auth0 SDK -->
     <script src="https://cdn.auth0.com/js/auth0/9.27/auth0.min.js"></script>
     <script>
