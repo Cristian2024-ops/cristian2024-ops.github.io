@@ -58,10 +58,11 @@
             line-height: 1.5;
         }
 
+        /* AJUSTE: Ahora controla la separación real de los botones */
         .buttons {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 18px; /* Cambiado de 12px a 18px para dar más aire */
         }
 
         .btn {
@@ -137,10 +138,10 @@
     <div class="card">
         <h1>🏠 Bienvenida</h1>
         <p>Gestiona tus proyectos y monitorea tus cuentas desde un solo lugar de forma segura.</p>
+        
+        <!-- CORRECCIÓN: Un solo contenedor para que funcione el gap -->
         <div class="buttons">
             <a href="juegos.html" class="btn">🎮 Arcade Lib</a>
-        </div>
-        <div class="buttons">
             <a href="https://cristianaguilarm-creator.github.io/" class="btn btn-primary">Aprende Matematicas!</a>
         </div>
     </div>
