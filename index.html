@@ -56,19 +56,19 @@
             margin-left: 10px;
         }
 
-        /* TARJETA CRISTAL SÚPER TRANSLÚCIDA */
+                /* TARJETA CRISTAL SÚPER TRANSLÚCIDA CORREGIDA */
         .card {
             position: relative;
             z-index: 5;
-            /* Fondo con opacidad muy baja (0.06) para que sea súper transparente */
-            background: rgba(255, 255, 255, 0.06); 
-            backdrop-filter: blur(20px); /* Desenfoque alto para el efecto borroso */
-            -webkit-backdrop-filter: blur(20px); /* Soporte para Safari */
+            /* Fondo ultra transparente con !important para anular el CSS externo */
+            background: rgba(255, 255, 255, 0.02) !important; 
+            backdrop-filter: blur(10px) !important; /* Menos borroso para ver pasar las partículas */
+            -webkit-backdrop-filter: blur(10px) !important; 
             padding: 3rem 2.5rem;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.25); /* Borde estilo cristal */
+            border: 1px solid rgba(255, 255, 255, 0.2) !important; /* Borde más fino */
             box-shadow: 0 20px 40px var(--shadow), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
             text-align: center;
             max-width: 420px;
             width: 100%;
@@ -77,9 +77,9 @@
 
         /* TARJETA EN MODO DÍA: Tinte azulado ultra transparente */
         body:not(.dark-mode) .card { 
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.04) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            box-shadow: 0 20px 45px rgba(2, 132, 199, 0.4);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 0 20px 45px rgba(2, 132, 199, 0.3);
         }
 
         /* Ajuste de color de texto en modo día para asegurar legibilidad */
@@ -88,15 +88,15 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
         }
         body:not(.dark-mode) p {
-            color: #f0fdf4 !important; /* Blanco suave contrastado */
+            color: #f0fdf4 !important; 
             font-weight: 500;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
-        /* TARJETA EN MODO NOCHE: Se adapta para verse profunda sin perder transparencia */
+        /* TARJETA EN MODO NOCHE: Oscuridad rebajada para que se luzca el fondo vivo */
         body.dark-mode .card {
-            background: rgba(15, 23, 42, 0.2); 
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(15, 23, 42, 0.12) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
 
         .card:hover {
