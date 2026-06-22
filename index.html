@@ -6,11 +6,22 @@
     <title>Mi Web - Home</title>
     <link rel="stylesheet" href="CSS/estilos-tema.css">
     <link rel="stylesheet" href="CSS/estilos-bb8.css">
-    <!-- CORRECCIÓN: Enlace de tipografía reparado -->
-    <link href="https://googleapis.com" rel="stylesheet">
+    <!-- CORRECCIÓN: Enlace completo a Google Fonts -->
+    <link href="https://googleapis.com/fonts.css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* FONDO MEJORADO (MODO DÍA): Azul cielo más notable */
+        /* CONTENEDOR PARA LAS PARTÍCULAS */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1; /* Detrás de todo */
+            pointer-events: none; /* Permite hacer clic a través de ellas */
+        }
+
+        /* FONDO POR DEFECTO (MODO DÍA) */
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important; 
@@ -26,7 +37,7 @@
             overflow: hidden;
         }
 
-        /* CUANDO SE ACTIVA EL MODO OSCURO: Vuelve a tu CSS oscuro */
+        /* CUANDO SE ACTIVA EL MODO OSCURO */
         body.dark-mode {
             background: var(--bg-body) !important;
         }
@@ -45,8 +56,10 @@
             margin-left: 10px;
         }
 
-        /* ESTRUCTURA BASE DE LA TARJETA CRISTAL */
+        /* TARJETA CRISTAL (Z-INDEX SUPERIOR PARA QUE QUEDE ANTE LAS PARTÍCULAS) */
         .card {
+            position: relative;
+            z-index: 5;
             background: rgba(255, 255, 255, 0.4); 
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -61,13 +74,11 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
         }
 
-        /* TARJETA EN MODO DÍA: Tinte azul translúcido sutil */
         body:not(.dark-mode) .card { 
             background: linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(255, 255, 255, 0.5) 100%);
             border: 1px solid rgba(14, 165, 233, 0.25);
         }
 
-        /* TARJETA EN MODO NOCHE: Oscura y profunda */
         body.dark-mode .card {
             background: rgba(30, 41, 59, 0.4); 
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -124,7 +135,6 @@
             overflow: hidden;
         }
 
-        /* Botón secundario adaptable */
         .btn-secondary {
             background: rgba(14, 165, 233, 0.05);
             backdrop-filter: blur(5px);
@@ -139,7 +149,6 @@
             box-shadow: 0 8px 20px var(--shadow);
         }
 
-        /* Botón principal */
         .btn-primary {
             background: linear-gradient(135deg, var(--accent) 0%, #00bcff 100%);
             color: white;
@@ -160,9 +169,12 @@
     </style>
 </head>
 <body>
+    <!-- Capa de partículas de fondo -->
+    <div id="particles-js"></div>
+
     <div class="navbar">
         <label class="bb8-toggle" title="Modo Día/Noche">
-          <input class="bb8-toggle__checkbox" type="checkbox" aria-label="Alternar modo día/noche">
+          <input id="bb8-checkbox" class="bb8-toggle__checkbox" type="checkbox" aria-label="Alternar modo día/noche">
           <div class="bb8-toggle__container">
             <div class="bb8-toggle__scenery">
               <div class="bb8-toggle__star"></div>
@@ -207,5 +219,40 @@
     </div>
 
     <script src="JS/estilos-bb8.js"></script>
+    
+    <!-- CORRECCIÓN: Enlace completo a la librería CDN de Particles.js -->
+    <script src="https://jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Configuración inicial de partículas (Modo Día: Azules)
+        function cargarParticulas(colorParticula) {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": colorParticula },
+                    "shape": { "type": "circle" },
+                    "opacity": { "value": 0.4, "random": true },
+                    "size": { "value": 4, "random": true },
+                    "line_linked": { "enable": true, "distance": 150, "color": colorParticula, "opacity": 0.2, "width": 1 },
+                    "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out" }
+                },
+                "interactivity": { "detect_on": "canvas", "events": { "resize": true } }
+            });
+        }
+
+        // Carga inicial según el estado actual al abrir la web
+        const esOscuro = document.body.classList.contains('dark-mode');
+        cargarParticulas(esOscuro ? "#ffffff" : "#0284c7");
+
+        // Escuchar el click en tu botón BB8 para actualizar el color de las partículas en tiempo real
+        const toggleBtn = document.getElementById('bb8-checkbox');
+        if(toggleBtn) {
+            toggleBtn.addEventListener('change', function() {
+                setTimeout(() => {
+                    const modoNocheActivo = document.body.classList.contains('dark-mode');
+                    cargarParticulas(modoNocheActivo ? "#ffffff" : "#0284c7");
+                }, 50);
+            });
+        }
+    </script>
 </body>
 </html>
