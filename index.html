@@ -58,11 +58,10 @@
             line-height: 1.5;
         }
 
-        /* AJUSTE: Ahora controla la separación real de los botones */
         .buttons {
             display: flex;
             flex-direction: column;
-            gap: 18px; /* Cambiado de 12px a 18px para dar más aire */
+            gap: 18px; /* Separación amplia de los botones */
         }
 
         .btn {
@@ -72,28 +71,35 @@
             font-weight: 600;
             text-decoration: none;
             border-radius: 6px;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición más fluida */
             text-align: center;
             border: 1px solid var(--border);
             background: var(--bg-card);
             color: var(--text-main);
             cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Sombra inicial sutil */
         }
 
+        /* EFECTO ANIMADO PARA EL BOTÓN SECUNDARIO */
         .btn:hover {
             border-color: var(--accent);
             background: var(--bg-body);
+            transform: translateY(-3px); /* Eleva el botón ligeramente */
+            box-shadow: 0 8px 20px var(--shadow); /* Crea la sombra profunda */
         }
 
         .btn-primary {
             background: var(--accent);
             color: white;
             border: 1px solid var(--accent);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
 
+        /* EFECTO ANIMADO PARA EL BOTÓN PRINCIPAL */
         .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+            opacity: 0.95;
+            transform: translateY(-3px); /* Eleva el botón ligeramente */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25); /* Sombra más intensa y llamativa */
         }
     </style>
 </head>
@@ -139,10 +145,9 @@
         <h1>🏠 Bienvenida</h1>
         <p>Gestiona tus proyectos y monitorea tus cuentas desde un solo lugar de forma segura.</p>
         
-        <!-- CORRECCIÓN: Un solo contenedor para que funcione el gap -->
         <div class="buttons">
             <a href="juegos.html" class="btn">🎮 Arcade Lib</a>
-            <a href="https://cristianaguilarm-creator.github.io/" class="btn btn-primary">Aprende Matematicas!</a>
+            <a href="https://github.io" class="btn btn-primary">Aprende Matematicas!</a>
         </div>
     </div>
 
