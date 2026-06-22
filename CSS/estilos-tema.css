@@ -1,0 +1,20 @@
+/* Variables y tema día/noche (movido desde juegos.html) */
+:root {
+    --bg-body: #f6f8fa;
+    --bg-card: #ffffff;
+    --text-main: #24292f;
+    --text-muted: #57606a;
+    --accent: #0969da;
+    --border: #d0d7de;
+    --shadow: rgba(140, 149, 159, 0.1);
+}
+
+body.dark-mode {
+    --bg-body: #0d1117;
+    --bg-card: #161b22;
+    --text-main: #c9d1d9;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --border: #30363d;
+    --shadow: rgba(0, 0, 0, 0.5);
+}
