@@ -21,10 +21,10 @@
             pointer-events: none; /* Permite hacer clic a través de ellas */
         }
 
-        /* FONDO POR DEFECTO (MODO DÍA) */
+        /* FONDO EN MODO DÍA: Ahora con una base azul real, viva y tecnológica */
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important; 
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important; 
             color: var(--text-main);
             display: flex;
             flex-direction: column;
@@ -74,11 +74,20 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
         }
 
+        /* TARJETA EN MODO DÍA: Cristal translúcido con mayor contraste */
         body:not(.dark-mode) .card { 
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(255, 255, 255, 0.5) 100%);
-            border: 1px solid rgba(14, 165, 233, 0.25);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            box-shadow: 0 20px 45px rgba(2, 132, 199, 0.4);
         }
 
+        /* Forzamos que el texto descriptivo sea legible en modo día sobre fondo azul */
+        body:not(.dark-mode) p {
+            color: #0f172a !important; /* Gris oscuro profundo para legibilidad */
+            font-weight: 500;
+        }
+
+        /* TARJETA EN MODO NOCHE: Se adapta para verse profunda y oscura */
         body.dark-mode .card {
             background: rgba(30, 41, 59, 0.4); 
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -90,7 +99,7 @@
         }
 
         body:not(.dark-mode) .card:hover {
-            border-color: rgba(14, 165, 233, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
         }
 
         h1 {
@@ -136,9 +145,14 @@
         }
 
         .btn-secondary {
-            background: rgba(14, 165, 233, 0.05);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
+        }
+
+        body:not(.dark-mode) .btn-secondary {
+            color: #0f172a;
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
         .btn-secondary:hover {
@@ -220,36 +234,34 @@
 
     <script src="JS/estilos-bb8.js"></script>
     
-    <!-- CORRECCIÓN: Enlace completo a la librería CDN de Particles.js -->
+    <!-- Cargando librería local guardada -->
     <script src="JS/particles.min.js"></script>
     <script>
-        // Configuración inicial de partículas (Modo Día: Azules)
+        // Configuración de partículas (Blanco para ambos modos para que resalten al máximo)
         function cargarParticulas(colorParticula) {
             particlesJS("particles-js", {
                 "particles": {
-                    "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                    "number": { "value": 65, "density": { "enable": true, "value_area": 800 } },
                     "color": { "value": colorParticula },
                     "shape": { "type": "circle" },
-                    "opacity": { "value": 0.4, "random": true },
+                    "opacity": { "value": 0.5, "random": true },
                     "size": { "value": 4, "random": true },
-                    "line_linked": { "enable": true, "distance": 150, "color": colorParticula, "opacity": 0.2, "width": 1 },
+                    "line_linked": { "enable": true, "distance": 140, "color": colorParticula, "opacity": 0.25, "width": 1 },
                     "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out" }
                 },
                 "interactivity": { "detect_on": "canvas", "events": { "resize": true } }
             });
         }
 
-        // Carga inicial según el estado actual al abrir la web
-        const esOscuro = document.body.classList.contains('dark-mode');
-        cargarParticulas(esOscuro ? "#ffffff" : "#0284c7");
+        // Carga inicial (Usamos partículas blancas para que contrasten genial)
+        cargarParticulas("#ffffff");
 
-        // Escuchar el click en tu botón BB8 para actualizar el color de las partículas en tiempo real
+        // Monitorear el cambio del botón BB8 por si acaso necesitas re-activarlas
         const toggleBtn = document.getElementById('bb8-checkbox');
         if(toggleBtn) {
             toggleBtn.addEventListener('change', function() {
                 setTimeout(() => {
-                    const modoNocheActivo = document.body.classList.contains('dark-mode');
-                    cargarParticulas(modoNocheActivo ? "#ffffff" : "#0284c7");
+                    cargarParticulas("#ffffff");
                 }, 50);
             });
         }
