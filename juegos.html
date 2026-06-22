@@ -197,7 +197,7 @@
           margin-bottom: 16px;
           flex-wrap: wrap;
         }
-        .filter-btn {
+                .filter-btn {
           padding: 8px 12px;
           border-radius: 8px;
           border: 1px solid var(--border);
@@ -207,12 +207,19 @@
           font-weight: 600;
         }
 
-        /* MODIFICACIÓN AUTOMÁTICA: Botones de filtro transparentes en modo día */
+        /* MODIFICACIÓN: Cristal ultra translúcido para ver pasar las partículas */
         body:not(.dark-mode) .filter-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+        }
+
+        /* Efecto hover al pasar el cursor encima en modo día */
+        body:not(.dark-mode) .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
         }
 
         .filter-btn.active {
@@ -221,10 +228,12 @@
           border-color: var(--accent);
         }
 
+        /* Filtro que se encuentra activo en modo día */
         body:not(.dark-mode) .filter-btn.active {
-            background: rgba(255, 255, 255, 0.4) !important;
+            background: rgba(255, 255, 255, 0.35) !important;
             border-color: #ffffff !important;
             color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
         }
 
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #d0d7de; }
