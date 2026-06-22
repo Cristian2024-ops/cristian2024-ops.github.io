@@ -604,7 +604,7 @@
         let __currentGameUrl = '';
         let __fullscreenTimer = null;
 
-        function lanzar(url) {
+            function lanzar(url) {
             __currentGameUrl = url;
             const pantalla = document.getElementById('pantalla');
             const visor = document.getElementById('visor');
@@ -614,7 +614,13 @@
 
             // Reset UI
             if(errorBox) errorBox.style.display = 'none';
-            if(loader) loader.style.display = 'flex';
+            
+            /* CORRECCIÓN: Activamos el loader con la transición fluida de CSS */
+            if(loader) {
+                loader.style.opacity = '1';
+                loader.style.visibility = 'visible';
+            }
+            
             pantalla.style.display = 'block';
             visor.style.display = 'block';
             visor.src = url;
@@ -645,13 +651,23 @@
             // onload handler clears loader
             visor.onload = function() {
                 if(__visorLoadTimer) clearTimeout(__visorLoadTimer);
-                if(loader) loader.style.display = 'none';
+                
+                /* CORRECCIÓN: Apagamos el anillo de carga giratorio suavemente */
+                if(loader) {
+                    loader.style.opacity = '0';
+                    loader.style.visibility = 'hidden';
+                }
+                
                 if(errorBox) errorBox.style.display = 'none';
             };
 
             // Fallback: if iframe doesn't finish loading in time, show error overlay
             __visorLoadTimer = setTimeout(function() {
-                if(loader) loader.style.display = 'none';
+                /* CORRECCIÓN: Ocultamos loader si se agota el tiempo */
+                if(loader) {
+                    loader.style.opacity = '0';
+                    loader.style.visibility = 'hidden';
+                }
                 if(errorBox) errorBox.style.display = 'flex';
             }, 20000); // El iframe espera 20 segundos para cargar por completo
 
@@ -666,7 +682,13 @@
             pantalla.style.display = "none";
             if(visor) visor.src = ""; // Detiene el audio del juego
             if(__visorLoadTimer) { clearTimeout(__visorLoadTimer); __visorLoadTimer = null; }
-            if(loader) loader.style.display = 'none';
+            
+            /* CORRECCIÓN: Forzamos el apagado total del loader al cerrar */
+            if(loader) {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+            }
+            
             if(errorBox) errorBox.style.display = 'none';
             exitFullscreen();
         }
@@ -698,7 +720,7 @@
                 exit.call(document);
             }
         }
-        
+
         // Manejo modo oscuro BB8
         document.addEventListener('DOMContentLoaded', function() {
             const toggle = document.querySelector('.bb8-toggle__checkbox');
