@@ -250,18 +250,26 @@
     
     <!-- Librería local -->
     <script src="JS/particles.min.js"></script>
-    <script>
-        // Configuración de partículas
+        <script>
+        // Configuración de partículas optimizada para alta visibilidad
         function cargarParticulas(colorParticula) {
             particlesJS("particles-js", {
                 "particles": {
-                    "number": { "value": 65, "density": { "enable": true, "value_area": 800 } },
+                    "number": { "value": 70, "density": { "enable": true, "value_area": 800 } },
                     "color": { "value": colorParticula },
                     "shape": { "type": "circle" },
-                    "opacity": { "value": 0.5, "random": true },
-                    "size": { "value": 4, "random": true },
-                    "line_linked": { "enable": true, "distance": 140, "color": colorParticula, "opacity": 0.25, "width": 1 },
-                    "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out" }
+                    /* CORRECCIÓN: Partículas más sólidas y brillantes */
+                    "opacity": { "value": 0.75, "random": false }, 
+                    "size": { "value": 4.5, "random": true },
+                    /* CORRECCIÓN: Líneas de conexión más oscuras, nítidas y gruesas */
+                    "line_linked": { 
+                        "enable": true, 
+                        "distance": 145, 
+                        "color": colorParticula, 
+                        "opacity": 0.45, 
+                        "width": 1.5 
+                    },
+                    "move": { "enable": true, "speed": 2.2, "direction": "none", "random": true, "straight": false, "out_mode": "out" }
                 },
                 "interactivity": { "detect_on": "canvas", "events": { "resize": true } }
             });
