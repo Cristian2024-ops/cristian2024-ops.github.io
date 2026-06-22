@@ -6,7 +6,7 @@
     <title>Mi Web - Home</title>
     <link rel="stylesheet" href="CSS/estilos-tema.css">
     <link rel="stylesheet" href="CSS/estilos-bb8.css">
-    <!-- CORRECCIÓN: Enlace completo a Google Fonts -->
+    <!-- Enlace completo a Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -21,7 +21,7 @@
             pointer-events: none; /* Permite hacer clic a través de ellas */
         }
 
-        /* FONDO EN MODO DÍA: Ahora con una base azul real, viva y tecnológica */
+        /* FONDO EN MODO DÍA: Azul tecnológico */
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important; 
@@ -56,16 +56,17 @@
             margin-left: 10px;
         }
 
-        /* TARJETA CRISTAL (Z-INDEX SUPERIOR PARA QUE QUEDE ANTE LAS PARTÍCULAS) */
+        /* TARJETA CRISTAL SÚPER TRANSLÚCIDA */
         .card {
             position: relative;
             z-index: 5;
-            background: rgba(255, 255, 255, 0.4); 
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            /* Fondo con opacidad muy baja (0.06) para que sea súper transparente */
+            background: rgba(255, 255, 255, 0.06); 
+            backdrop-filter: blur(20px); /* Desenfoque alto para el efecto borroso */
+            -webkit-backdrop-filter: blur(20px); /* Soporte para Safari */
             padding: 3rem 2.5rem;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25); /* Borde estilo cristal */
             box-shadow: 0 20px 40px var(--shadow), 
                         inset 0 1px 0 rgba(255, 255, 255, 0.2);
             text-align: center;
@@ -74,23 +75,28 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
         }
 
-        /* TARJETA EN MODO DÍA: Cristal translúcido con mayor contraste */
+        /* TARJETA EN MODO DÍA: Tinte azulado ultra transparente */
         body:not(.dark-mode) .card { 
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.45);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.04) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             box-shadow: 0 20px 45px rgba(2, 132, 199, 0.4);
         }
 
-        /* Forzamos que el texto descriptivo sea legible en modo día sobre fondo azul */
+        /* Ajuste de color de texto en modo día para asegurar legibilidad */
+        body:not(.dark-mode) h1 {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
         body:not(.dark-mode) p {
-            color: #0f172a !important; /* Gris oscuro profundo para legibilidad */
+            color: #f0fdf4 !important; /* Blanco suave contrastado */
             font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
-        /* TARJETA EN MODO NOCHE: Se adapta para verse profunda y oscura */
+        /* TARJETA EN MODO NOCHE: Se adapta para verse profunda sin perder transparencia */
         body.dark-mode .card {
-            background: rgba(30, 41, 59, 0.4); 
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 23, 42, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .card:hover {
@@ -99,7 +105,7 @@
         }
 
         body:not(.dark-mode) .card:hover {
-            border-color: rgba(255, 255, 255, 0.6);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         h1 {
@@ -144,15 +150,23 @@
             overflow: hidden;
         }
 
+        /* Botón secundario adaptado para el cristal */
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
         }
 
         body:not(.dark-mode) .btn-secondary {
-            color: #0f172a;
-            border-color: rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        body:not(.dark-mode) .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            border-color: #ffffff;
         }
 
         .btn-secondary:hover {
@@ -228,16 +242,16 @@
         
         <div class="buttons">
             <a href="juegos.html" class="btn btn-secondary">🎮 Arcade Lib</a>
-            <a href="https://cristianaguilarm-creator.github.io" class="btn btn-primary">✨ Aprende Matemáticas!</a>
+            <a href="https://github.io" class="btn btn-primary">✨ Aprende Matemáticas!</a>
         </div>
     </div>
 
     <script src="JS/estilos-bb8.js"></script>
     
-    <!-- Cargando librería local guardada -->
+    <!-- Librería local -->
     <script src="JS/particles.min.js"></script>
     <script>
-        // Configuración de partículas (Blanco para ambos modos para que resalten al máximo)
+        // Configuración de partículas
         function cargarParticulas(colorParticula) {
             particlesJS("particles-js", {
                 "particles": {
@@ -253,10 +267,9 @@
             });
         }
 
-        // Carga inicial (Usamos partículas blancas para que contrasten genial)
+        // Partículas blancas fijas para que se luzcan en ambos fondos
         cargarParticulas("#ffffff");
 
-        // Monitorear el cambio del botón BB8 por si acaso necesitas re-activarlas
         const toggleBtn = document.getElementById('bb8-checkbox');
         if(toggleBtn) {
             toggleBtn.addEventListener('change', function() {
