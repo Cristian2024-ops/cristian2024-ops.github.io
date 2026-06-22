@@ -743,5 +743,30 @@
                     if(retryBtn) retryBtn.addEventListener('click', function(){ if(__currentGameUrl) lanzar(__currentGameUrl); });
                 });
             </script>
+        <!-- Llamado a tu librería local de partículas -->
+    <script src="JS/particles.min.js"></script>
+    <script>
+        // Función para cargar las partículas con alta visibilidad
+        function cargarParticulas(colorParticula) {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 70, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": colorParticula },
+                    "opacity": { "value": 0.75 },
+                    "size": { "value": 4.5, "random": true },
+                    "move": { "enable": true, "speed": 2.2 }
+                }
+            });
+        }
+
+        // Carga inicial y mantenimiento de partículas blancas
+        cargarParticulas("#ffffff");
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.bb8-toggle__checkbox')?.addEventListener('change', () => {
+                setTimeout(() => cargarParticulas("#ffffff"), 50);
+            });
+        });
+    </script>
+
 </body>
 </html>
