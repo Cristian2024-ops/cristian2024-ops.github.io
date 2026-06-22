@@ -604,7 +604,7 @@
         let __currentGameUrl = '';
         let __fullscreenTimer = null;
 
-            function lanzar(url) {
+        function lanzar(url) {
             __currentGameUrl = url;
             const pantalla = document.getElementById('pantalla');
             const visor = document.getElementById('visor');
@@ -615,7 +615,7 @@
             // Reset UI
             if(errorBox) errorBox.style.display = 'none';
             
-            /* CORRECCIÓN: Activamos el loader con la transición fluida de CSS */
+            /* Activamos el loader con la transición fluida de CSS */
             if(loader) {
                 loader.style.opacity = '1';
                 loader.style.visibility = 'visible';
@@ -652,24 +652,21 @@
             visor.onload = function() {
                 if(__visorLoadTimer) clearTimeout(__visorLoadTimer);
                 
-                /* CORRECCIÓN: Apagamos el anillo de carga giratorio suavemente */
+                /* CORRECCIÓN: Solo apagamos el anillo de carga, quitamos el disparador de error automático */
                 if(loader) {
                     loader.style.opacity = '0';
                     loader.style.visibility = 'hidden';
                 }
-                
-                if(errorBox) errorBox.style.display = 'none';
             };
 
-            // Fallback: if iframe doesn't finish loading in time, show error overlay
+            // Fallback: si el iframe no termina de cargar a tiempo, levantamos el error al cumplir los 20 segundos reales
             __visorLoadTimer = setTimeout(function() {
-                /* CORRECCIÓN: Ocultamos loader si se agota el tiempo */
                 if(loader) {
                     loader.style.opacity = '0';
                     loader.style.visibility = 'hidden';
                 }
                 if(errorBox) errorBox.style.display = 'flex';
-            }, 20000); // El iframe espera 20 segundos para cargar por completo
+            }, 20000); // Espera obligatoria de 20 segundos
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -683,7 +680,7 @@
             if(visor) visor.src = ""; // Detiene el audio del juego
             if(__visorLoadTimer) { clearTimeout(__visorLoadTimer); __visorLoadTimer = null; }
             
-            /* CORRECCIÓN: Forzamos el apagado total del loader al cerrar */
+            /* Forzamos el apagado total del loader al cerrar */
             if(loader) {
                 loader.style.opacity = '0';
                 loader.style.visibility = 'hidden';
