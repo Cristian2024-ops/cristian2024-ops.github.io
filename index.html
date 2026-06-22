@@ -4,40 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Web - Home</title>
+    <link rel="stylesheet" href="estilos-tema.css">
+    <link rel="stylesheet" href="estilos-bb8.css">
     <style>
-        /* Estilos Globales - Manteniendo la línea del Admin */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background-color: #f6f8fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            color: #24292f;
+            padding: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .navbar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .navbar .bb8-toggle {
+            margin-left: 10px;
         }
 
         .card {
-            background: white;
+            background: var(--bg-card);
             padding: 2.5rem;
-            border-radius: 8px;
-            border: 1px solid #d0d7de;
-            box-shadow: 0 8px 24px rgba(140, 149, 159, 0.1);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px var(--shadow);
             text-align: center;
-            max-width: 400px;
-            width: 90%;
+            max-width: 450px;
+            width: 100%;
         }
 
-        h1 { 
-            font-size: 26px;
-            margin-bottom: 12px;
-            color: #1f2328;
+        h1 {
+            font-size: 28px;
+            margin: 0 0 12px 0;
+            color: var(--accent);
         }
 
-        p { 
-            font-size: 16px;
-            color: #57606a;
-            margin-bottom: 30px;
+        p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 0 0 30px 0;
             line-height: 1.5;
         }
 
@@ -47,47 +64,59 @@
             gap: 12px;
         }
 
-        /* Estilos de Botones */
         .btn {
             display: block;
-            padding: 12px;
+            padding: 12px 16px;
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
             border-radius: 6px;
             transition: all 0.2s;
             text-align: center;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-main);
+            cursor: pointer;
         }
 
-        /* Botón Principal (Azul GitHub) */
+        .btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-body);
+        }
+
         .btn-primary {
-            background-color: #0969da;
+            background: var(--accent);
             color: white;
-            border: 1px solid rgba(27, 31, 36, 0.15);
-        }
-        .btn-primary:hover {
-            background-color: #0860ca;
+            border: 1px solid var(--accent);
         }
 
-        /* Botón Secundario (Gris/Outline) */
-        .btn-outline {
-            background-color: #f6f8fa;
-            color: #24292f;
-            border: 1px solid #d0d7de;
-        }
-        .btn-outline:hover {
-            background-color: #f3f4f6;
-            border-color: #8c959f;
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <label class="bb8-toggle" title="Cambiar tema">
+            <input type="checkbox" class="bb8-toggle__checkbox">
+            <div class="bb8-toggle__container">
+                <div class="bb8-toggle__circle"></div>
+            </div>
+        </label>
+    </div>
+
     <div class="card">
         <h1>🏠 Bienvenida</h1>
         <p>Gestiona tus proyectos y monitorea tus cuentas desde un solo lugar de forma segura.</p>
         <div class="buttons">
-            <a href="login" class="btn btn-primary">Iniciar Sesión e Crear Cuenta</a>
+            <a href="juegos.html" class="btn">Explorar Juegos</a>
+        </div>
+        <div class="buttons">
+            <a href="https://cristianaguilarm-creator.github.io/" class="btn btn-primary">Aprende Matematicas!</a>
         </div>
     </div>
+
+    <script src="estilos-bb8.js"></script>
 </body>
 </html>
