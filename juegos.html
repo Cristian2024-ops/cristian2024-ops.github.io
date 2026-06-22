@@ -137,7 +137,7 @@
             max-width: 1000px;
         }
 
-        .card-juego {
+            .card-juego {
             background: var(--bg-card);
             padding: 24px;
             border-radius: 12px;
@@ -147,11 +147,20 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* MODIFICACIÓN AUTOMÁTICA: Tarjetas transparentes de cristal en modo día */
+        /* MODIFICACIÓN: Cristal translúcido para el MODO NOCHE */
+        body.dark-mode .card-juego {
+            background: rgba(15, 23, 42, 0.25) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+        }
+
+        /* MODIFICACIÓN: Tarjetas transparentes de cristal en MODO DÍA */
         body:not(.dark-mode) .card-juego {
             background: rgba(255, 255, 255, 0.04) !important;
             border: 1px solid rgba(255, 255, 255, 0.25) !important;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
         }
         body:not(.dark-mode) .card-juego h3, body:not(.dark-mode) .card-juego p {
             color: #ffffff !important;
@@ -163,6 +172,8 @@
             box-shadow: 0 5px 15px var(--shadow);
         }
 
+        /* Efecto hover para ambos modos en cristal */
+        body.dark-mode .card-juego:hover,
         body:not(.dark-mode) .card-juego:hover {
             border-color: rgba(255, 255, 255, 0.6) !important;
         }
