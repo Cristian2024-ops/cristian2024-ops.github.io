@@ -6,371 +6,78 @@
     <title>Dashboard - Biblioteca de Juegos</title>
     <link rel="stylesheet" href="CSS/estilos-tema.css">
     <link rel="stylesheet" href="CSS/estilos-bb8.css">
+    <link rel="stylesheet" href="CSS/estilos-dashboard.css">
     <script src="https://cdn.auth0.com/js/auth0/9.27/auth0.min.js"></script>
-    <style>
-      /* CAPA DE PARTÍCULAS (Agregada al inicio) */
-      #particles-js {
-          position: fixed !important;
-          width: 100% !important;
-          height: 100% !important;
-          top: 0 !important;
-          left: 0 !important;
-          z-index: 1 !important;
-          pointer-events: none !important;
-      }
-
-      .navbar, .filter-bar, .game-display, .grid-juegos, .divider { 
-          position: relative; 
-          z-index: 5; 
-      }
-
-      body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            transition: background 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        body.dark-mode {
-            background: var(--bg-body) !important;
-        }
-
-        .navbar {
-            width: 100%;
-            max-width: 1000px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .navbar .bb8-toggle { margin-left: 10px; }
-
-        .btn {
-            text-decoration: none;
-            color: var(--text-main);
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn:hover {
-            border-color: var(--accent);
-            background: var(--bg-body);
-        }
-
-        body:not(.dark-mode) .btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(8px);
-        }
-
-        .game-display {
-            width: 100%;
-            max-width: 1000px;
-            height: 65vh;
-            background: #000;
-            border: 2px solid var(--accent);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px var(--shadow);
-            display: none; 
-            overflow: hidden;
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .close-game {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-        }
-
-        .fullscreen-game {
-            position: absolute;
-            bottom: 14px;
-            right: 14px;
-            z-index: 10;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: background 0.2s ease;
-        }
-
-        .fullscreen-game:hover {
-            background: rgba(0,0,0,0.85);
-        }
-
-        iframe { width: 100%; height: 100%; border: none; }
-
-        .grid-juegos {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 1000px;
-        }
-
-        .card-juego {
-            background: var(--bg-card);
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.dark-mode .card-juego {
-            background: rgba(15, 23, 42, 0.25) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
-        }
-
-        body:not(.dark-mode) .card-juego {
-            background: rgba(255, 255, 255, 0.04) !important;
-            border: 1px solid rgba(255, 255, 255, 0.25) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
-        }
-        body:not(.dark-mode) .card-juego h3, body:not(.dark-mode) .card-juego p {
-            color: #ffffff !important;
-        }
-
-        .card-juego:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px var(--shadow);
-        }
-
-        body.dark-mode .card-juego:hover,
-        body:not(.dark-mode) .card-juego:hover {
-            border-color: rgba(255, 255, 255, 0.6) !important;
-        }
-
-        .card-juego h3 {
-            margin: 0;
-            font-size: 18px;
-            color: var(--accent);
-        }
-
-        .card-juego p {
-            margin: 8px 0 0;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .divider {
-            display: flex; align-items: center; text-align: center;
-            margin: 20px 0; color: #57606a; font-size: 12px;
-        }
-        
-        body:not(.dark-mode) .divider {
-            color: #ffffff;
-        }
-
-        .filter-bar {
-          width: 100%;
-          max-width: 1000px;
-          display: flex;
-          gap: 8px;
-          margin-bottom: 16px;
-          flex-wrap: wrap;
-        }
-        .filter-btn {
-          padding: 8px 12px;
-          border-radius: 8px;
-          border: 1px solid var(--border);
-          background: var(--bg-card);
-          color: var(--text-main);
-          cursor: pointer;
-          font-weight: 600;
-        }
-
-        body:not(.dark-mode) .filter-btn {
-            background: rgba(255, 255, 255, 0.05) !important;
-            color: #ffffff !important;
-            border-color: rgba(255, 255, 255, 0.25) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-        }
-
-        body:not(.dark-mode) .filter-btn:hover {
-            background: rgba(255, 255, 255, 0.15) !important;
-            border-color: rgba(255, 255, 255, 0.5) !important;
-        }
-
-        .filter-btn.active {
-          background: var(--accent);
-          color: white;
-          border-color: var(--accent);
-        }
-
-        body:not(.dark-mode) .filter-btn.active {
-            background: rgba(255, 255, 255, 0.35) !important;
-            border-color: #ffffff !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-        }
-
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #d0d7de; }
-        body:not(.dark-mode) .divider::before, body:not(.dark-mode) .divider::after { border-bottom-color: rgba(255, 255, 255, 0.3); }
-        .divider:not(:empty)::before { margin-right: .5em; }
-        .divider:not(:empty)::after { margin-left: .5em; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
-
-        /* NUEVO CONTENEDOR DE CRISTAL PARA EL PERFIL */
-        .user-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 6px 14px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .username {
-            font-weight: bold;
-            font-size: 14px;
-            color: #ffffff;
-        }
-        body.dark-mode .username { color: var(--text-main); }
-        
-        body:not(.dark-mode) .navbar h2 {
-            color: #ffffff !important;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-            font-weight: 700;
-        }
-
-        body:not(.dark-mode) .navbar .btn {
-            color: #ffffff !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        #game-loader {
-            background: rgba(15, 23, 42, 0.85) !important;
-            backdrop-filter: blur(4px);
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-
-        #loader-dot {
-            width: 50px !important;
-            height: 50px !important;
-            border-radius: 50% !important;
-            background: transparent !important;
-            border: 4px solid rgba(255, 255, 255, 0.1) !important;
-            border-top: 4px solid #00d2ff !important;
-            animation: spin-loader 1s linear infinite;
-            text-indent: -9999px;
-            overflow: hidden;
-        }
-
-        @keyframes spin-loader {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
 </head>
 <body>
-<div id="particles-js"></div>
-<div id="offline-message" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 50px; z-index: 9999; border: 2px solid #00d2ff; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-    No estás conectado a internet, conéctate para seguir. ⏳
-</div>    
-    <div class="navbar">
-        <a href="/" class="btn">🏠 Inicio</a>
-        <h2 style="margin:0; font-size: 1.2rem;">🎮 Arcade Lib</h2>
-        
-        <div id="navbar-right-side" style="display: flex; align-items: center; gap: 12px;">
-            <label class="bb8-toggle" title="Modo Día/Noche">
-              <input class="bb8-toggle__checkbox" type="checkbox" aria-label="Alternar modo día/noche">
-              <div class="bb8-toggle__container">
-                <div class="bb8-toggle__scenery">
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="tatto-1"></div>
-                  <div class="tatto-2"></div>
-                  <div class="gomrassen"></div>
-                  <div class="hermes"></div>
-                  <div class="chenini"></div>
-                  <div class="bb8-toggle__cloud"></div>
-                  <div class="bb8-toggle__cloud"></div>
-                  <div class="bb8-toggle__cloud"></div>
-                </div>
-                <div class="bb8">
-                  <div class="bb8__head-container">
-                    <div class="bb8__antenna"></div>
-                    <div class="bb8__antenna"></div>
-                    <div class="bb8__head"></div>
-                  </div>
-                  <div class="bb8__body"></div>
-                </div>
-                <div class="artificial__hidden">
-                  <div class="bb8__shadow"></div>
-                </div>
-              </div>
-            </label>
-        </div>
+    <div id="particles-js"></div>
+
+    <div id="offline-message">
+        No estás conectado a internet, conéctate para seguir.
     </div>
 
+    <nav class="navbar">
+        <a href="/" class="btn">Inicio</a>
+        <h2>Arcade Lib</h2>
+
+        <div id="navbar-right-side" style="display: flex; align-items: center; gap: 12px;">
+            <label class="bb8-toggle" title="Modo Día/Noche">
+                <input class="bb8-toggle__checkbox" type="checkbox" aria-label="Alternar modo día/noche">
+                <div class="bb8-toggle__container">
+                    <div class="bb8-toggle__scenery">
+                        <div class="bb8-toggle__star"></div>
+                        <div class="bb8-toggle__star"></div>
+                        <div class="bb8-toggle__star"></div>
+                        <div class="bb8-toggle__star"></div>
+                        <div class="bb8-toggle__star"></div>
+                        <div class="bb8-toggle__star"></div>
+                        <div class="bb8-toggle__star"></div>
+                        <div class="tatto-1"></div>
+                        <div class="tatto-2"></div>
+                        <div class="gomrassen"></div>
+                        <div class="hermes"></div>
+                        <div class="chenini"></div>
+                        <div class="bb8-toggle__cloud"></div>
+                        <div class="bb8-toggle__cloud"></div>
+                        <div class="bb8-toggle__cloud"></div>
+                    </div>
+                    <div class="bb8">
+                        <div class="bb8__head-container">
+                            <div class="bb8__antenna"></div>
+                            <div class="bb8__antenna"></div>
+                            <div class="bb8__head"></div>
+                        </div>
+                        <div class="bb8__body"></div>
+                    </div>
+                    <div class="artificial__hidden">
+                        <div class="bb8__shadow"></div>
+                    </div>
+                </div>
+            </label>
+        </div>
+    </nav>
+
     <div class="filter-bar" role="toolbar" aria-label="Filtros de juegos">
-      <button class="filter-btn" data-filter="">Todos</button>
-      <button class="filter-btn" data-filter="juegos">Juegos</button>
-      <button class="filter-btn" data-filter="carreras">Carreras</button>
-      <button class="filter-btn" data-filter="geometry-dash">Geometry Dash</button>
-      <button class="filter-btn" data-filter="fnf-mods">FNF MODS</button>
-      <button class="filter-btn" data-filter="paginas-webs">Páginas webs</button>
-      <button class="filter-btn" data-filter="juegos-io">Juegos.io</button>
-      <button class="filter-btn" data-filter="futball">Futball</button>
-      <button class="filter-btn" data-filter="otros">Otros</button>
+        <button class="filter-btn" data-filter="">Todos</button>
+        <button class="filter-btn" data-filter="juegos">Juegos</button>
+        <button class="filter-btn" data-filter="carreras">Carreras</button>
+        <button class="filter-btn" data-filter="geometry-dash">Geometry Dash</button>
+        <button class="filter-btn" data-filter="fnf-mods">FNF MODS</button>
+        <button class="filter-btn" data-filter="paginas-webs">Páginas webs</button>
+        <button class="filter-btn" data-filter="juegos-io">Juegos.io</button>
+        <button class="filter-btn" data-filter="futball">Futball</button>
+        <button class="filter-btn" data-filter="otros">Otros</button>
     </div>
 
     <div id="pantalla" class="game-display">
-        <button class="close-game" onclick="cerrarJuego()">×</button>
-        <button class="fullscreen-game" onclick="pantallaCompleta()" title="Pantalla completa">⛶</button>
+        <button class="close-game" onclick="cerrarJuego()" aria-label="Cerrar juego">x</button>
+        <button class="fullscreen-game" onclick="pantallaCompleta()" title="Pantalla completa" aria-label="Pantalla completa">FS</button>
         <div id="game-loader" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none;">
-            <div id="loader-dot" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,0.06);">⏳</div>
+            <div id="loader-dot"></div>
         </div>
-        <iframe id="visor" src="" allowfullscreen allow="autoplay; fullscreen; clipboard-write; encrypted-media; picture-in-picture" loading="lazy" style="background:#000"></iframe>
-        <div id="game-error" style="display:none;position:absolute;inset:0;z-index:6;background:rgba(0,0,0,0.75);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
-            <p id="game-error-msg" style="max-width:700px;text-align:center;margin-bottom:12px;">No se pudo cargar el juego en el iframe. Puedes abrirlo en una pestaña nueva.</p>
+        <iframe id="visor" src="" allowfullscreen allow="autoplay; fullscreen; clipboard-write; encrypted-media; picture-in-picture" loading="lazy" style="background:#000" title="Visor de juegos"></iframe>
+        <div id="game-error">
+            <p id="game-error-msg">No se pudo cargar el juego en el iframe. Puedes abrirlo en una pestaña nueva.</p>
             <div style="display:flex;gap:8px;">
                 <button id="open-external" class="btn">Abrir en nueva pestaña</button>
                 <button id="retry-load" class="btn">Reintentar</button>
@@ -378,417 +85,155 @@
         </div>
     </div>
 
-    <div class="grid-juegos">
-        <div class="card-juego fade-in" data-category="juegos" onclick="lanzar('https://retrogames.cc')">
-            <h3>🎞️ Retro games</h3>
+    <main class="grid-juegos">
+        <div class="card-juego fade-in" data-category="juegos" onclick="lanzar('https://retrogames.cc')" tabindex="0" role="button">
+            <h3>Retro games</h3>
             <p>Clásico Retro (Emu)</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://skribbl.io')">
-            <h3>🎨 Skribbl.io</h3>
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://skribbl.io')" tabindex="0" role="button">
+            <h3>Skribbl.io</h3>
             <p>Dibuja y adivina</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://Diep.io')">
-            <h3>🚀 Diep.io</h3>
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://Diep.io')" tabindex="0" role="button">
+            <h3>Diep.io</h3>
             <p>Batalla de tanques</p>
         </div>
-        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://friday-nightfunkin.io/friday-night-funkin.embed')">
-            <h3>🎤🎶 FNF (PC) </h3>
-            <p>friday night funkin es una gran lista de retos de rap</p>
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://friday-nightfunkin.io/friday-night-funkin.embed')" tabindex="0" role="button">
+            <h3>FNF (PC)</h3>
+            <p>Friday night funkin es una gran lista de retos de rap</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos" onclick="lanzar('https://play.tetris.com/')">
-            <h3>🟩📥 Tetris</h3>
+        <div class="card-juego fade-in" data-category="juegos" onclick="lanzar('https://play.tetris.com/')" tabindex="0" role="button">
+            <h3>Tetris</h3>
             <p>Un juego de reacomodar los bloques hasta el final</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('http://slither.com/io')">
-            <h3>🪱/🐍 slither.io</h3>
-            <p>una serpiente que debe comer puntos brillantes para crecer y bloquear a otros jugadores</p>
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('http://slither.com/io')" tabindex="0" role="button">
+            <h3>Slither.io</h3>
+            <p>Una serpiente que debe comer puntos brillantes para crecer y bloquear a otros jugadores</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://Agar.io')">
-            <h3>🟢 agar.io</h3>
-            <p>una célula que come a otras células más pequeñas (no funciona)</p>
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://Agar.io')" tabindex="0" role="button">
+            <h3>Agar.io</h3>
+            <p>Una célula que come a otras células más pequeñas (no funciona)</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://venge.io/')">
-            <h3>😎 venge.io</h3>
-            <p>un juego de disparos</p>
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://venge.io/')" tabindex="0" role="button">
+            <h3>Venge.io</h3>
+            <p>Un juego de disparos</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://krunker.io/')">
-            <h3>😛 krunker.io</h3>
-            <p>un juego de disparos muy bueno</p>
+        <div class="card-juego fade-in" data-category="juegos-io" onclick="lanzar('https://krunker.io/')" tabindex="0" role="button">
+            <h3>Krunker.io</h3>
+            <p>Un juego de disparos muy bueno</p>
         </div>
-        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf-2.io/fnf-vs-indie-cross')">
-            <h3>🎤 FNF indie croos</h3>
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf-2.io/fnf-vs-indie-cross')" tabindex="0" role="button">
+            <h3>FNF Indie Cross</h3>
             <p>Fase de prueba</p>
         </div>
-        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://dashmetry.1games.io')">
-            <h3>🧊 Geometry dash de temu (Dashmetry)</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://dashmetry.1games.io')" tabindex="0" role="button">
+            <h3>Geometry Dash (Dashmetry)</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-lite/index.html')">
-            <h3>🧊 Geometry dash Lite (PC)</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-lite/index.html')" tabindex="0" role="button">
+            <h3>Geometry Dash Lite (PC)</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-subzero/geometry-dash-subzero.html')">
-            <h3>🧊 Geometry dash subzero</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-subzero/geometry-dash-subzero.html')" tabindex="0" role="button">
+            <h3>Geometry Dash Subzero</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-meltdown/geometry-dash-meltdown.html')">
-            <h3>🧊 Geometry dash meltdown</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-meltdown/geometry-dash-meltdown.html')" tabindex="0" role="button">
+            <h3>Geometry Dash Meltdown</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-world/index.html')">
-            <h3>🧊 Geometry dash world</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://s.geometrydashgames.io/games/geometry-dash-world/index.html')" tabindex="0" role="button">
+            <h3>Geometry Dash World</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-11')">
-            <h3>🧊 Geometry dash 2.11</h3>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-11')" tabindex="0" role="button">
+            <h3>Geometry Dash 2.11</h3>
             <p>Fase de prueba</p>
         </div>
-        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-2')">
-            <h3>🧊 Geometry dash 2.2</h3>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-2')" tabindex="0" role="button">
+            <h3>Geometry Dash 2.2</h3>
             <p>Fase de prueba</p>
         </div>
-        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-1')">
-            <h3>🧊 Geometry dash 2.1</h3>
+        <div class="card-juego fade-in" data-category="geometry-dash" onclick="lanzar('https://www.crazygames.com/game/geometry-dash-2-1')" tabindex="0" role="button">
+            <h3>Geometry Dash 2.1</h3>
             <p>Fase de prueba</p>
         </div>
-        <div class="card-juego fade-in" data-category="carreras" onclick="lanzar('https://smashkarts.io')">
-            <h3>🎮 Smash Karts</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="carreras" onclick="lanzar('https://smashkarts.io')" tabindex="0" role="button">
+            <h3>Smash Karts</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="futball juegos-io" onclick="lanzar('https://www.bumpyball.io')">
-            <h3>🚘 BumpyBall.io</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="futball juegos-io" onclick="lanzar('https://www.bumpyball.io')" tabindex="0" role="button">
+            <h3>BumpyBall.io</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io carreras" onclick="lanzar('https://kartbros.io/753b458b-5283-4b50-9962-c2a9d962cfa3')">
-            <h3>🚗 kart bros.io</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="juegos-io carreras" onclick="lanzar('https://kartbros.io/753b458b-5283-4b50-9962-c2a9d962cfa3')" tabindex="0" role="button">
+            <h3>Kart Bros.io</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io futball" onclick="lanzar('https://teamball.io/')">
-            <h3>⚽ TeamBall.io</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="juegos-io futball" onclick="lanzar('https://teamball.io/')" tabindex="0" role="button">
+            <h3>TeamBall.io</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io futball" onclick="lanzar('https://www.twoplayergames.org/gameframe/soccer-physics')">
-            <h3>⚽ Soccer Randoms</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="juegos-io futball" onclick="lanzar('https://www.twoplayergames.org/gameframe/soccer-physics')" tabindex="0" role="button">
+            <h3>Soccer Randoms</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="juegos-io futball" onclick="lanzar('https://rocketsoccerderby.gitlab.io/file/')">
-            <h3>⚽🚗 Rocket Soccer</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="juegos-io futball" onclick="lanzar('https://rocketsoccerderby.gitlab.io/file/')" tabindex="0" role="button">
+            <h3>Rocket Soccer</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf.kdata1.com/2026/garcello/desktop/1/')">
-            <h3>🎤 Friday Night Funkin VS Garcello (Pc/Teléfono) </h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf.kdata1.com/2026/garcello/desktop/1/')" tabindex="0" role="button">
+            <h3>Friday Night Funkin VS Garcello (PC/Teléfono)</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf.kdata1.com/2024/silly-billy-vs-yourself/1/')">
-            <h3>🎤 FNF Silly Billy vs Yourself</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf.kdata1.com/2024/silly-billy-vs-yourself/1/')" tabindex="0" role="button">
+            <h3>FNF Silly Billy vs Yourself</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf.kdata1.com/2026/kapi/2.12/desktop/')">
-            <h3>🎤 Friday Night Funkin VS. KAPI v2</h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://fnf.kdata1.com/2026/kapi/2.12/desktop/')" tabindex="0" role="button">
+            <h3>Friday Night Funkin VS KAPI v2</h3>
+            <p>Funciona</p>
         </div>
-        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://kbhgames.com/wp-content/themes/v1/embed.php?url=https%3A%2F%2Ffnf.kdata1.com%2Fimpostor-v4%2F1.5%2F&canonical=https%3A%2F%2Fkbhgames.com%2Fgame%2Ffnf-vs-impostor-among-us-v4&w=960&h=540&pid=137716&thumb=https%3A%2F%2Fkbhgames.com%2Fwp-content%2Fuploads%2F2023%2F01%2FFNF-vs-Impostor-Among-Us-V4-2.webp&title=FNF+vs+Impostor+Among+Us+V4&agelimit=')">
-            <h3>🎤 FNF vs Impostor Among Us V4 (PC) </h3>
-            <p>Funciona ✅</p>
+        <div class="card-juego fade-in" data-category="fnf-mods" onclick="lanzar('https://kbhgames.com/wp-content/themes/v1/embed.php?url=https%3A%2F%2Ffnf.kdata1.com%2Fimpostor-v4%2F1.5%2F&canonical=https%3A%2F%2Fkbhgames.com%2Fgame%2Ffnf-vs-impostor-among-us-v4&w=960&h=540&pid=137716&thumb=https%3A%2F%2Fkbhgames.com%2Fwp-content%2Fuploads%2F2023%2F01%2FFNF-vs-Impostor-Among-Us-V4-2.webp&title=FNF+vs+Impostor+Among+Us+V4&agelimit=')" tabindex="0" role="button">
+            <h3>FNF vs Impostor Among Us V4 (PC)</h3>
+            <p>Funciona</p>
         </div>
-    </div>
+    </main>
 
-    <div class="divider"><p></p>
-    <h2 style="margin:0; font-size: 1.2rem;">🎮 Cosas y juegos al azar</h2>
+    <div class="divider">
+        <p></p>
+        <h2 style="margin:0; font-size: 1.2rem;">Cosas y juegos al azar</h2>
         <p></p>
     </div>
 
-    <div class="grid-juegos">
-        <div class="card-juego fade-in" data-category="paginas-webs" onclick="lanzar('https://cristianaguilarm-creator.github.io')">
-            <h3>🔢 Página web de matemáticas</h3>
-            <p>ehhh zi</p>
+    <main class="grid-juegos">
+        <div class="card-juego fade-in" data-category="paginas-webs" onclick="lanzar('https://cristianaguilarm-creator.github.io')" tabindex="0" role="button">
+            <h3>Página web de matemáticas</h3>
+            <p>Ehhh zi</p>
         </div>
-        <a href="https://cristian2024-ops.github.io/Juegos/Dino-sin-internet" target="_blank" class="card-juego fade-in" data-category="juegos" style="text-decoration: none; color: inherit; display: block;">
-            <h3>🦖 Juego simple</h3>
-            <p>Una reecreación del dino sin conexión a Internet <br> (En fase de prueba y de desarrollo :D) </p>
+        <a href="https://cristian2024-ops.github.io/Juegos/Dino-sin-internet" target="_blank" rel="noopener noreferrer" class="card-juego fade-in" data-category="juegos">
+            <h3>Juego simple</h3>
+            <p>Una recreación del dino sin conexión a Internet (En fase de prueba y desarrollo)</p>
         </a>
-        <div class="card-juego fade-in" data-category="paginas-webs" onclick="lanzar('https://uiverse.io/elements')">
-            <h3>🌜 UiVerse.io</h3>
+        <div class="card-juego fade-in" data-category="paginas-webs" onclick="lanzar('https://uiverse.io/elements')" tabindex="0" role="button">
+            <h3>UiVerse.io</h3>
             <p>Es una página para buscar diseños de botones o otras cosas.</p>
         </div>
-        <a href="https://codedex.io" target="_blank" class="card-juego fade-in" data-category="paginas-webs" style="text-decoration: none; color: inherit; display: block;">
-            <h3>🤓 CodeDex.io</h3>
+        <a href="https://codedex.io" target="_blank" rel="noopener noreferrer" class="card-juego fade-in" data-category="paginas-webs">
+            <h3>CodeDex.io</h3>
             <p>Es una plataforma de aprendizaje de lenguajes de programación.</p>
         </a>
-        <a href="https://flowith.io" target="_blank" class="card-juego fade-in" data-category="paginas-webs" style="text-decoration: none; color: inherit; display: block;">
-            <h3>👁️‍🗨️ FloWith.io</h3>
-            <p>Una página web de una gran variedad de IA's</p>
+        <a href="https://flowith.io" target="_blank" rel="noopener noreferrer" class="card-juego fade-in" data-category="paginas-webs">
+            <h3>FloWith.io</h3>
+            <p>Una página web de una gran variedad de IAs</p>
         </a>
-    </div>
+    </main>
 
-        <script>
-        // 1. Inicialización global y segura
-        const auth0 = new auth0.WebAuth({
-          domain: 'dev-ekkbx30j1ns6gm5g.us.auth0.com',
-          clientID: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC',
-          redirectUri: "https://cristian2024-ops.github.io/login.html",
-          responseType: 'token id_token',
-          scope: 'openid profile email'
-        });
+    <!-- Configuracion de Auth0 (cargar desde archivo separado en produccion) -->
+    <script src="JS/.gitignore/auth0-config.js"></script>
 
-        // 2. Lógica que se ejecuta al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-          var expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
-      
-          // Verificación de sesión
-          if (new Date().getTime() > expiresAt || !sessionStorage.getItem('access_token')) {
-            window.location.href = "/login.html";
-            return;
-          }
-
-          // Obtener datos del usuario e inyectar barra
-          auth0.client.userInfo(sessionStorage.getItem('access_token'), function(err, profile) {
-            if (profile) {
-              const rightContainer = document.getElementById('navbar-right-side');
-          
-              // Crear contenedor de usuario
-              let userBar = document.createElement('div');
-              userBar.className = 'user-bar';
-          
-              // Inyectar HTML del perfil
-              userBar.innerHTML = `
-                ${profile.picture ? `<img src="${profile.picture}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid #00bcff;">` : ''}
-                <span class="username">${profile.nickname || profile.name}</span>
-                <button class="btn" title="Cerrar sesión" style="padding: 4px 8px; font-size: 12px; background: rgba(255,65,77,0.2); border-color: rgba(255,65,77,0.4);" 
-                        onclick="sessionStorage.clear(); window.location.href='https://dev-ekkbx30j1ns6gm5g.us.auth0.com/v2/logout?returnTo=${encodeURIComponent("https://cristian2024-ops.github.io/")}&client_id=Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC'">
-                    🚪
-                </button>
-              `;
-          
-              // Insertar antes del BB-8
-              rightContainer.insertBefore(userBar, rightContainer.firstChild);
-            }
-          });
-        });
-    </script>
-    <script>
-        let __visorLoadTimer = null;
-        let __currentGameUrl = '';
-        let __fullscreenTimer = null;
-
-        function lanzar(url) {
-            __currentGameUrl = url;
-            const pantalla = document.getElementById('pantalla');
-            const visor = document.getElementById('visor');
-            const loader = document.getElementById('game-loader');
-            const errorBox = document.getElementById('game-error');
-            const fsBtn = document.querySelector('.fullscreen-game');
-
-            if(errorBox) errorBox.style.display = 'none';
-            if(loader) {
-                loader.style.opacity = '1';
-                loader.style.visibility = 'visible';
-            }
-            pantalla.style.display = 'block';
-            visor.style.display = 'block';
-            visor.src = url;
-
-            if(__visorLoadTimer) clearTimeout(__visorLoadTimer);
-
-            try {
-                const isAmongUs = (url || '').includes('impostor-v4') || ((url || '').includes('kbhgames.com') && (url || '').includes('impostor'));
-                if(isAmongUs && fsBtn){
-                    fsBtn.style.display = 'none';
-                    fsBtn.disabled = true;
-                    if(__fullscreenTimer) clearTimeout(__fullscreenTimer);
-                    __fullscreenTimer = setTimeout(function(){
-                        fsBtn.style.display = '';
-                        fsBtn.disabled = false;
-                        __fullscreenTimer = null;
-                    }, 50000);
-                } else if(fsBtn) {
-                    fsBtn.style.display = '';
-                    fsBtn.disabled = false;
-                }
-            } catch(e) { console.warn('Error handling fullscreen toggle:', e); }
-
-            visor.onload = function() {
-                if(__visorLoadTimer) clearTimeout(__visorLoadTimer);
-                if(loader) {
-                    loader.style.opacity = '0';
-                    loader.style.visibility = 'hidden';
-                }
-            };
-
-            __visorLoadTimer = setTimeout(function() {
-                if(loader) {
-                    loader.style.opacity = '0';
-                    loader.style.visibility = 'hidden';
-                }
-                if(errorBox) errorBox.style.display = 'flex';
-            }, 120000);
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function cerrarJuego() {
-            const pantalla = document.getElementById('pantalla');
-            const visor = document.getElementById('visor');
-            const loader = document.getElementById('game-loader');
-            const errorBox = document.getElementById('game-error');
-            pantalla.style.display = "none";
-            if(visor) visor.src = ""; 
-            if(__visorLoadTimer) { clearTimeout(__visorLoadTimer); __visorLoadTimer = null; }
-            if(loader) {
-                loader.style.opacity = '0';
-                loader.style.visibility = 'hidden';
-            }
-            if(errorBox) errorBox.style.display = 'none';
-            exitFullscreen();
-        }
-
-        function pantallaCompleta() {
-            if (isFullscreen()) {
-                exitFullscreen();
-                return;
-            }
-            const pantalla = document.getElementById('pantalla');
-            const request = pantalla.requestFullscreen || pantalla.webkitRequestFullscreen || pantalla.mozRequestFullScreen || pantalla.msRequestFullscreen;
-            if (request) {
-                request.call(pantalla);
-            }
-        }
-
-        function isFullscreen() {
-            return !!(
-                document.fullscreenElement ||
-                document.webkitFullscreenElement ||
-                document.mozFullScreenElement ||
-                document.msFullscreenElement
-            );
-        }
-
-        function exitFullscreen() {
-            const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-            if (exit) {
-                exit.call(document);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.querySelector('.bb8-toggle__checkbox');
-            if(toggle){
-                if(localStorage.getItem('theme') === 'dark'){
-                    document.body.classList.add('dark-mode');
-                    toggle.checked = true;
-                }
-                toggle.addEventListener('change', function(e){
-                    if(e.target.checked){
-                        document.body.classList.add('dark-mode');
-                        localStorage.setItem('theme','dark');
-                    }else{
-                        document.body.classList.remove('dark-mode');
-                        localStorage.setItem('theme','light');
-                    }
-                });
-            }
-        });
-
-        function actualizarEstadoRed() {
-            const mensaje = document.getElementById('offline-message');
-            if (navigator.onLine) {
-                mensaje.style.display = "none";
-            } else {
-                mensaje.style.display = "block";
-            }
-        }
-
-        window.addEventListener('online', actualizarEstadoRed);
-        window.addEventListener('offline', actualizarEstadoRed);
-        actualizarEstadoRed();
-    </script>
-    <script>
-        (function(){
-          const buttons = document.querySelectorAll('.filter-btn');
-          let activeCategory = null;
-
-          function showAll() {
-            document.querySelectorAll('.card-juego').forEach(el => el.style.display = 'block');
-          }
-
-          function filterCategory(cat){
-            document.querySelectorAll('.card-juego').forEach(el => {
-              const categories = (el.getAttribute('data-category') || '').trim().split(/\s+/);
-              if(!cat || cat === ''){
-                el.style.display = 'block';
-              } else if(categories.includes(cat)){
-                el.style.display = 'block';
-              } else {
-                el.style.display = 'none';
-              }
-            });
-          }
-
-          function setActiveButton(btn){
-            buttons.forEach(b=>b.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-          }
-
-          const saved = localStorage.getItem('activeFilter');
-          if(saved !== null){
-            const btn = Array.from(buttons).find(b => b.getAttribute('data-filter') === saved);
-            if(btn){
-              setActiveButton(btn);
-              activeCategory = saved;
-              if(saved === '') showAll(); else filterCategory(saved);
-            } else {
-              showAll();
-            }
-          } else {
-            showAll();
-          }
-
-          buttons.forEach(btn => {
-            btn.addEventListener('click', function(){
-              const cat = this.getAttribute('data-filter');
-              if(this.classList.contains('active')){
-                setActiveButton(null);
-                activeCategory = null;
-                localStorage.removeItem('activeFilter');
-                showAll();
-              } else {
-                setActiveButton(this);
-                activeCategory = cat;
-                if(cat === '') showAll(); else filterCategory(cat);
-                localStorage.setItem('activeFilter', cat);
-              }
-            });
-          });
-        })();
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function(){
-            const openBtn = document.getElementById('open-external');
-            const retryBtn = document.getElementById('retry-load');
-            if(openBtn) openBtn.addEventListener('click', function(){ if(__currentGameUrl) window.open(__currentGameUrl, '_blank'); });
-            if(retryBtn) retryBtn.addEventListener('click', function(){ if(__currentGameUrl) lanzar(__currentGameUrl); });
-        });
-    </script>
+    <!-- Scripts principales -->
     <script src="JS/particles.min.js"></script>
-    <script>
-        function cargarParticulas(colorParticula) {
-            particlesJS("particles-js", {
-                "particles": {
-                    "number": { "value": 70, "density": { "enable": true, "value_area": 800 } },
-                    "color": { "value": colorParticula },
-                    "opacity": { "value": 0.75 },
-                    "size": { "value": 4.5, "random": true },
-                    "move": { "enable": true, "speed": 2.2 }
-                }
-            });
-        }
-
-        cargarParticulas("#ffffff");
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('.bb8-toggle__checkbox')?.addEventListener('change', () => {
-                setTimeout(() => cargarParticulas("#ffffff"), 50);
-            });
-        });
-    </script>
+    <script src="JS/dashboard.js"></script>
 </body>
 </html>
