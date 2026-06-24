@@ -815,5 +815,51 @@
             });
         });
     </script>
+    <script src="https://cdn.auth0.com/js/auth0/9.27/auth0.min.js"></script>
+<script>
+    // 1. Inicialización global y segura
+    const auth0 = new auth0.WebAuth({
+      domain: 'dev-ekkbx30j1ns6gm5g.us.auth0.com',
+      clientID: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC',
+      redirectUri: "https://cristian2024-ops.github.io/login.html",
+      responseType: 'token id_token',
+      scope: 'openid profile email'
+    });
+
+    // 2. Lógica que se ejecuta al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      var expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
+      
+      // Verificación de sesión
+      if (new Date().getTime() > expiresAt || !sessionStorage.getItem('access_token')) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      // Obtener datos del usuario e inyectar barra
+      auth0.client.userInfo(sessionStorage.getItem('access_token'), function(err, profile) {
+        if (profile) {
+          const rightContainer = document.getElementById('navbar-right-side');
+          
+          // Crear contenedor de usuario
+          let userBar = document.createElement('div');
+          userBar.className = 'user-bar';
+          
+          // Inyectar HTML del perfil
+          userBar.innerHTML = `
+            ${profile.picture ? `<img src="${profile.picture}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid #00bcff;">` : ''}
+            <span class="username">${profile.nickname || profile.name}</span>
+            <button class="btn" title="Cerrar sesión" style="padding: 4px 8px; font-size: 12px; background: rgba(255,65,77,0.2); border-color: rgba(255,65,77,0.4);" 
+                    onclick="sessionStorage.clear(); window.location.href='https://dev-ekkbx30j1ns6gm5g.us.auth0.com/v2/logout?returnTo=${encodeURIComponent("https://cristian2024-ops.github.io/")}&client_id=Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC'">
+                🚪
+            </button>
+          `;
+          
+          // Insertar antes del BB-8
+          rightContainer.insertBefore(userBar, rightContainer.firstChild);
+        }
+      });
+    });
+</script>
 </body>
 </html>
