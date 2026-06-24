@@ -6,16 +6,80 @@
     <script src="https://cdn.auth0.com/js/auth0/9.27/auth0.min.js"></script>
     <title>Login Auth0 - Mi Web</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f0f4f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: #fff; padding: 2rem; border-radius: 10px; width: 320px; box-shadow: 0 8px 24px 0 rgba(140,149,159,0.1);}
-        h1 { text-align: center; }
-        #user-profile { margin-top: 1rem; text-align: center; }
-        .btn { display: block; width: 100%; margin-top: 1rem; padding: 12px; border-radius: 6px; font-size: 1.06em; border: none; background: #1a53ff; color: white; cursor: pointer;}
+        /* 1. CAPA DE PARTÍCULAS */
+        #particles-js {
+            position: fixed !important;
+            width: 100% !important;
+            height: 100% !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
+        }
+
+        .card { 
+            position: relative !important; 
+            z-index: 5 !important; 
+        }
+
+        :root {
+            --bg-gradiente: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-tarjeta: rgba(255, 255, 255, 0.08);
+            --borde-cristal: rgba(255, 255, 255, 0.25);
+            --texto: white;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: var(--bg-gradiente) !important; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0;
+            color: var(--texto);
+        }
+
+        /* DISEÑO CRISTAL */
+        .card { 
+            background: var(--bg-tarjeta) !important; 
+            padding: 2.5rem; 
+            border-radius: 20px; 
+            width: 320px; 
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid var(--borde-cristal) !important;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h1 { text-shadow: 0 2px 4px rgba(0,0,0,0.15); margin-top: 0; }
+        #user-profile { margin-top: 1.5rem; }
+        
+        .btn { 
+            display: block; 
+            width: 100%; 
+            margin-top: 1rem; 
+            padding: 12px; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            font-weight: bold;
+            border: none; 
+            background: #2ed573; 
+            color: white; 
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
         .btn.alt { background: #ff414d; }
         .btn:disabled { background: #ccc; }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
+
+    <div id="particles-js"></div>
+
     <div class="card">
         <h1>Bienvenido</h1>
         <div id="auth-buttons">
@@ -25,18 +89,33 @@
         <div id="user-profile"></div>
     </div>
 
+    <script src="js/particles.min.js"></script>
     <script>
-        // MÉTODO OFICIAL SPA Auth0
+        // MÉTODO OFICIAL SPA Auth0 - CORREGIDO EL REDIRECT URI
         var auth0 = new auth0.WebAuth({
             domain:     'dev-bzsbnr5w8wtmmiqg.us.auth0.com',
             clientID:   'S8fcQCKtU9G3FD6ConZSspY8eVOxaM5Q',
-            redirectUri: "https://cristian2024-ops.github.io/login",
+            redirectUri: "https://cristian2024-ops.github.io/login.html", // <- CORRECCIÓN AQUÍ (.html)
             responseType: 'token id_token',
             scope: 'openid profile email'
         });
 
-        // Al cargar la página...
-        window.onload = function() { handleAuth(); };
+        window.onload = function() { 
+            handleAuth(); 
+            if(typeof particlesJS !== 'undefined') {
+                particlesJS("particles-js", {
+                    "particles": {
+                        "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": "#ffffff" },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.6 },
+                        "size": { "value": 4, "random": true },
+                        "line_linked": { "enable": true, "distance": 140, "color": "#ffffff", "opacity": 0.3, "width": 1 },
+                        "move": { "enable": true, "speed": 2 }
+                    }
+                });
+            }
+        };
 
         function handleAuth() {
             auth0.parseHash(function(err, authResult) {
@@ -65,11 +144,6 @@
             } else {
                 showLoggedOut();
             }
-        }
-
-        function isLoggedIn() {
-            var expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
-            return new Date().getTime() < expiresAt;
         }
 
         function showProfile() {
