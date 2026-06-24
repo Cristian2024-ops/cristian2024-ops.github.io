@@ -36,16 +36,11 @@ function initAuth0() {
     });
 }
 
-// Verificar sesion
-function checkSession(auth0Instance) {
+// Verificar si hay una sesion valida (NO redirige: el login es opcional)
+function hasValidSession() {
     const expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
     const accessToken = sessionStorage.getItem('access_token');
-
-    if (new Date().getTime() > expiresAt || !accessToken) {
-        window.location.href = '/login.html';
-        return false;
-    }
-    return true;
+    return !!accessToken && new Date().getTime() < expiresAt;
 }
 
 // Mostrar perfil del usuario
@@ -77,6 +72,27 @@ function displayUserProfile(profile) {
     });
 
     rightContainer.insertBefore(userBar, rightContainer.firstChild);
+}
+
+// Mostrar boton de iniciar sesion cuando NO hay sesion activa
+function displayLoginButton() {
+    const rightContainer = document.getElementById('navbar-right-side');
+    if (!rightContainer) return;
+
+    const loginBar = document.createElement('div');
+    loginBar.className = 'user-bar';
+    loginBar.innerHTML = `
+        <button class="btn" aria-label="Iniciar sesion" style="padding: 4px 12px; font-size: 12px; background: rgba(0,188,255,0.2); border-color: rgba(0,188,255,0.4);">
+            Iniciar sesion
+        </button>
+    `;
+
+    const loginBtn = loginBar.querySelector('button');
+    loginBtn.addEventListener('click', function() {
+        window.location.href = 'login.html';
+    });
+
+    rightContainer.insertBefore(loginBar, rightContainer.firstChild);
 }
 
 // Lanzar juego
@@ -318,12 +334,11 @@ function cargarParticulas(colorParticula) {
 
 // Inicializacion principal
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar Auth0
+    // Inicializar Auth0 (opcional: ya NO es obligatorio iniciar sesion)
     const auth0Instance = initAuth0();
 
-    if (auth0Instance) {
-        if (!checkSession(auth0Instance)) return;
-
+    if (auth0Instance && hasValidSession()) {
+        // Hay sesion activa: mostramos el perfil del usuario
         const accessToken = sessionStorage.getItem('access_token');
         auth0Instance.client.userInfo(accessToken, function(err, profile) {
             if (err) {
@@ -332,6 +347,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             displayUserProfile(profile);
         });
+    } else {
+        // Sin sesion: dejamos entrar igual y ofrecemos un boton para iniciar sesion
+        displayLoginButton();
     }
 
     // Inicializar componentes
