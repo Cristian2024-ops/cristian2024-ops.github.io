@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Administración - GitHub Style</title>
-  <!-- SDK de Auth0 -->
-  <script src="https://auth0.com"></script>
   <style>
-    /* Estilos Base */
+    /* Estilos Base Originales */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       background-color: #f6f8fa;
@@ -28,10 +26,11 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       width: 90%;
       max-width: 800px;
-      display: none; /* Se muestra solo al cargar el usuario */
+      display: none; /* Se muestra solo al cargar los datos */
     }
 
     #loading { font-size: 14px; color: #57606a; }
+    #error-message { font-size: 14px; color: #cf222e; display: none; background: #ffebe9; padding: 10px; border-radius: 6px; border: 1px solid rgba(207,34,46,0.2); margin-bottom: 15px; }
 
     h1 { font-size: 24px; margin-bottom: 8px; color: #1f2328; }
     p { color: #636e72; margin-bottom: 24px; }
@@ -50,10 +49,10 @@
     /* Etiquetas de Estado */
     .status-badge { padding: 3px 10px; border-radius: 2em; font-size: 12px; font-weight: 500; border: 1px solid transparent; }
     .status-active { background: #dafbe1; color: #1a7f37; border-color: rgba(26, 127, 55, 0.2); }
-    .status-pending { background: #fff8c5; color: #9a6700; border-color: rgba(154, 103, 0, 0.2); }
 
     /* Botones */
     .btn { display: inline-block; padding: 6px 16px; background-color: #0984e3; color: white; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; border: none; }
+    .btn:hover { background-color: #076bba; }
     .btn-logout { background-color: #f6f8fa; color: #cf222e; border: 1px solid #d0d7de; margin-left: 10px; }
     .btn-logout:hover { background-color: #cf222e; color: white; }
 
@@ -62,96 +61,106 @@
 </head>
 <body>
 
-  <div id="loading">Iniciando panel seguro...</div>
+  <div id="loading">Iniciando panel seguro y conectando con Vercel...</div>
+  <div id="error-message"></div>
 
   <div class="card" id="dashboard-card">
-    <h1>💻 Panel de Control</h1>
-    <p>Sesión activa para: <strong id="display-name">...</strong></p>
+    <h1>💻 Panel de Control (Vercel Backend)</h1>
+    <p>Sesión activa administrando usuarios reales de Auth0</p>
 
     <div class="table-container">
       <table class="user-table">
         <thead>
           <tr>
             <th>Usuario</th>
-            <th>Rol</th>
+            <th>Identificador Auth0</th>
             <th>Estado</th>
             <th>Última conexión</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Fila del usuario REAL logueado -->
-          <tr>
-            <td>
-              <div class="user-cell">
-                <img id="user-avatar" src="" class="avatar-mini" alt="">
-                <a href="#" id="user-email-link" class="username">Cargando...</a>
-              </div>
-            </td>
-            <td>Administrador</td>
-            <td><span class="status-badge status-active">Activo</span></td>
-            <td>Ahora mismo</td>
-          </tr>
-          <!-- Filas de ejemplo estáticas -->
-          <tr>
-            <td>
-              <div class="user-cell">
-                <img src="https://github.com" class="avatar-mini">
-                <a href="#" class="username">@dev_ux</a>
-              </div>
-            </td>
-            <td>Mantenedor</td>
-            <td><span class="status-badge status-active">Activo</span></td>
-            <td>Ayer</td>
-          </tr>
+        <tbody id="users-table-body">
+          <!-- Las filas se inyectan dinámicamente aquí -->
         </tbody>
       </table>
     </div>
 
     <div class="buttons">
-      <a href="index.html" class="btn">Inicio</a>
+      <button onclick="loadDashboardUsers()" class="btn">Refrescar Lista</button>
       <button onclick="logout()" class="btn btn-logout">Cerrar sesión</button>
     </div>
   </div>
 
   <script>
-    let auth0 = null;
+    // URL de tu API segura desplegada en Vercel
+    const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app/';
 
-    async function initDashboard() {
-      // 1. Configuración con tus datos reales
-      auth0 = await createAuth0Client({
-        domain: "://auth0.com",
-        clientId: "dnP3foqFuc4OAaWe2LNst79GIUYH5qd5"
-      });
+    async function loadDashboardUsers() {
+      const loadingDiv = document.getElementById('loading');
+      const cardDiv = document.getElementById('dashboard-card');
+      const errorDiv = document.getElementById('error-message');
+      const tbody = document.getElementById('users-table-body');
 
-      // 2. Comprobar si está logueado
-      const isAuthenticated = await auth0.isAuthenticated();
-      if (!isAuthenticated) {
-        window.location.href = 'https://cristian2024-ops.github.io/login.html';
-        return;
+      try {
+        // Consultar de forma segura tu backend de Vercel
+        const response = await fetch(VERCEL_API_URL);
+        
+        if (!response.ok) {
+          throw new Error(`Error en el servidor de Vercel: ${response.status}`);
+        }
+
+        const users = await response.json();
+
+        // Validar que la respuesta sea un arreglo válido de usuarios
+        if (!Array.isArray(users)) {
+          throw new Error("El backend no devolvió una lista válida de usuarios.");
+        }
+
+        // Limpiar filas anteriores de la tabla
+        tbody.innerHTML = '';
+
+        // Inyectar dinámicamente cada usuario real de Auth0
+        users.forEach(user => {
+          // Si no tiene foto configurada, asignamos un avatar por defecto
+          const userAvatar = user.picture || 'https://unsplash.com';
+          // Convertir fecha de última conexión de forma legible
+          const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A';
+
+          const row = `
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <img src="${userAvatar}" class="avatar-mini" alt="Avatar">
+                  <a href="#" class="username">${user.email || user.name || 'Usuario sin email'}</a>
+                </div>
+              </td>
+              <td style="color: #57606a; font-family: monospace;">${user.user_id}</td>
+              <td><span class="status-badge status-active">Activo</span></td>
+              <td>${lastLoginDate}</td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+
+        // Ocultar cargador y mostrar la interfaz completa
+        loadingDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        cardDiv.style.display = 'block';
+
+      } catch (error) {
+        console.error("Error cargando el dashboard:", error);
+        loadingDiv.style.display = 'none';
+        errorDiv.textContent = `No se pudieron cargar los datos de Auth0: ${error.message}`;
+        errorDiv.style.display = 'block';
       }
-
-      // 3. Obtener datos del usuario
-      const user = await auth0.getUser();
-
-      // 4. Actualizar la interfaz
-      document.getElementById('display-name').textContent = user.name || user.nickname;
-      document.getElementById('user-email-link').textContent = user.email;
-      document.getElementById('user-avatar').src = user.picture;
-
-      // 5. Mostrar el dashboard
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('dashboard-card').style.display = 'block';
     }
 
     function logout() {
-      auth0.logout({
-        logoutParams: {
-          returnTo: "https://cristian2024-ops.github.io/login.html"
-        }
-      });
+      // Flujo de redirección para salir del panel
+      window.location.href = 'https://cristian2024-ops.github.io/';
     }
 
-    window.onload = initDashboard;
+    // Ejecutar la petición automática al abrir la página
+    window.onload = loadDashboardUsers;
   </script>
 
 </body>
