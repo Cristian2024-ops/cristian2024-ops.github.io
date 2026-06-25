@@ -258,7 +258,7 @@
       const errorDiv = document.getElementById('error-message');
 
       try {
-        const response = await fetch(`${VERCEL_API_URL}/api/users/${userId}`, {
+        const response = await fetch(`${VERCEL_API_URL}/api/users?id=${userId}`, {
           method: 'DELETE'
         });
 
