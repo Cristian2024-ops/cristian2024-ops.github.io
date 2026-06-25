@@ -222,36 +222,50 @@
       }
     }
 
-    // 2. CREAR NUEVO USUARIO (POST)
     async function createUser(event) {
-      event.preventDefault();
-      const name = document.getElementById('user-name').value;
-      const email = document.getElementById('user-email').value;
-      const password = document.getElementById('user-password').value;
-      const errorDiv = document.getElementById('error-message');
+  event.preventDefault();
+  
+  // Selecciona el botón para controlar su estado
+  const submitButton = event.target.querySelector('button[type="submit"]');
+  const name = document.getElementById('user-name').value.trim();
+  const email = document.getElementById('user-email').value.trim();
+  const password = document.getElementById('user-password').value;
+  const errorDiv = document.getElementById('error-message');
 
-      try {
-        errorDiv.style.display = 'none';
-        
-        // Corrección definitiva usando concatenación tradicional para evitar fallos de comillas
-        const response = await fetch(VERCEL_API_URL + "/api/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, password }) });
+  // Validación simple en frontend
+  if (!name || !email || !password) {
+    errorDiv.textContent = 'Error al crear usuario: Todos los campos son obligatorios.';
+    errorDiv.style.display = 'block';
+    return;
+  }
 
-        const data = await response.json();
+  try {
+    errorDiv.style.display = 'none';
+    if (submitButton) submitButton.disabled = true; // Evita doble clic
+    
+    const response = await fetch(VERCEL_API_URL + "/api/users", { 
+      method: "POST", 
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify({ name, email, password }) 
+    });
 
-        if (!response.ok) {
-          // Captura el objeto de error estructurado tal como lo devuelve Next.js
-          throw new Error(data.error || 'Error del servidor: ' + response.status);
-        }
+    const data = await response.json();
 
-        document.getElementById('create-user-form').reset();
-        alert('Usuario creado con éxito en Auth0');
-        loadDashboardUsers(); // Actualiza la tabla automáticamente
-
-      } catch (error) {
-        errorDiv.textContent = 'Error al crear usuario: ' + error.message;
-        errorDiv.style.display = 'block';
-      }
+    if (!response.ok) {
+      throw new Error(data.error || 'Error del servidor: ' + response.status);
     }
+
+    document.getElementById('create-user-form').reset();
+    alert('Usuario creado con éxito en Auth0');
+    loadDashboardUsers(); 
+
+  } catch (error) {
+    errorDiv.textContent = 'Error al crear usuario: ' + error.message;
+    errorDiv.style.display = 'block';
+  } finally {
+    if (submitButton) submitButton.disabled = false; // Reactiva el botón al terminar
+  }
+}
 
     // 3. ELIMINAR USUARIO (DELETE)
     async function deleteUser(userId) {
