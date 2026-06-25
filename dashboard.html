@@ -92,7 +92,7 @@
 
   <script>
     // URL de tu API segura desplegada en Vercel
-    const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app/';
+    const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app/api/users';
 
     async function loadDashboardUsers() {
       const loadingDiv = document.getElementById('loading');
@@ -121,7 +121,7 @@
         // Inyectar dinámicamente cada usuario real de Auth0
         users.forEach(user => {
           // Si no tiene foto configurada, asignamos un avatar por defecto
-          const userAvatar = user.picture || 'https://unsplash.com';
+          const userAvatar = user.picture || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=32&h=32&q=80';
           // Convertir fecha de última conexión de forma legible
           const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A';
 
