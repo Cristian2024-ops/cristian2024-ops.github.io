@@ -4,17 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Administración - GitHub Style</title>
-  <link href="Assets/dashboard.ico" rel="icon">
   <style>
     /* Estilos Base Originales */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       background-color: #f6f8fa;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 2rem 0;
       color: #24292f;
     }
 
@@ -26,15 +27,55 @@
       border: 1px solid #d0d7de;
       box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       width: 90%;
-      max-width: 800px;
-      display: none; /* Se muestra solo al cargar los datos */
+      max-width: 850px;
+      display: none; 
+      margin-bottom: 20px;
     }
 
     #loading { font-size: 14px; color: #57606a; }
-    #error-message { font-size: 14px; color: #cf222e; display: none; background: #ffebe9; padding: 10px; border-radius: 6px; border: 1px solid rgba(207,34,46,0.2); margin-bottom: 15px; }
+    #error-message { font-size: 14px; color: #cf222e; display: none; background: #ffebe9; padding: 10px; border-radius: 6px; border: 1px solid rgba(207,34,46,0.2); margin-bottom: 15px; width: 90%; max-width: 850px; }
 
     h1 { font-size: 24px; margin-bottom: 8px; color: #1f2328; }
+    h2 { font-size: 18px; margin-top: 0; margin-bottom: 16px; color: #1f2328; border-bottom: 1px solid #d0d7de; padding-bottom: 8px; }
     p { color: #636e72; margin-bottom: 24px; }
+
+    /* Estilos de Formulario de Creación */
+    .form-container {
+      background: #fafafa;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .form-group-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .form-group {
+      flex: 1;
+      min-width: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #24292f;
+    }
+    .form-group input {
+      padding: 5px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #d0d7de;
+      background: white;
+    }
+    .form-group input:focus {
+      border-color: #0969da;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+    }
 
     /* Estilos de la Tabla */
     .table-container { overflow-x: auto; margin-bottom: 20px; }
@@ -54,6 +95,10 @@
     /* Botones */
     .btn { display: inline-block; padding: 6px 16px; background-color: #0984e3; color: white; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; border: none; }
     .btn:hover { background-color: #076bba; }
+    .btn-create { background-color: #1a7f37; align-self: flex-end; height: 32px; padding: 0 16px; }
+    .btn-create:hover { background-color: #116329; }
+    .btn-delete { background-color: #f6f8fa; color: #cf222e; border: 1px solid #d0d7de; padding: 4px 10px; font-size: 12px; border-radius: 6px; cursor: pointer; }
+    .btn-delete:hover { background-color: #cf222e; color: white; }
     .btn-logout { background-color: #f6f8fa; color: #cf222e; border: 1px solid #d0d7de; margin-left: 10px; }
     .btn-logout:hover { background-color: #cf222e; color: white; }
 
@@ -69,6 +114,29 @@
     <h1>💻 Panel de Control (Vercel Backend)</h1>
     <p>Sesión activa administrando usuarios reales de Auth0</p>
 
+    <!-- FORMULARIO PARA CREAR NUEVO USUARIO -->
+    <div class="form-container">
+      <h2>➕ Crear Nuevo Usuario</h2>
+      <form id="create-user-form" onsubmit="createUser(event)">
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="user-name">Nombre (Opcional)</label>
+            <input type="text" id="user-name" placeholder="Ej. Juan Pérez">
+          </div>
+          <div class="form-group">
+            <label for="user-email">Correo Electrónico</label>
+            <input type="email" id="user-email" placeholder="nombre@correo.com" required>
+          </div>
+          <div class="form-group">
+            <label for="user-password">Contraseña</label>
+            <input type="password" id="user-password" placeholder="Mínimo 8 caracteres" required>
+          </div>
+          <button type="submit" class="btn btn-create">Crear</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- TABLA DE USUARIOS -->
     <div class="table-container">
       <table class="user-table">
         <thead>
@@ -77,6 +145,7 @@
             <th>Identificador Auth0</th>
             <th>Estado</th>
             <th>Última conexión</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="users-table-body">
@@ -92,9 +161,10 @@
   </div>
 
   <script>
-    // URL de tu API segura desplegada en Vercel
-    const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app/api/users';
+    // IMPORTANTE: Reemplaza esta URL con la dirección real de tu API en Vercel
+    const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app/api/users'; 
 
+    // 1. CARGAR LISTA (GET)
     async function loadDashboardUsers() {
       const loadingDiv = document.getElementById('loading');
       const cardDiv = document.getElementById('dashboard-card');
@@ -102,8 +172,8 @@
       const tbody = document.getElementById('users-table-body');
 
       try {
-        // Consultar de forma segura tu backend de Vercel
-        const response = await fetch(VERCEL_API_URL);
+        errorDiv.style.display = 'none';
+        const response = await fetch(`${VERCEL_API_URL}/api/users`); // Ajusta la ruta si tu endpoint cambia
         
         if (!response.ok) {
           throw new Error(`Error en el servidor de Vercel: ${response.status}`);
@@ -111,19 +181,14 @@
 
         const users = await response.json();
 
-        // Validar que la respuesta sea un arreglo válido de usuarios
         if (!Array.isArray(users)) {
           throw new Error("El backend no devolvió una lista válida de usuarios.");
         }
 
-        // Limpiar filas anteriores de la tabla
         tbody.innerHTML = '';
 
-        // Inyectar dinámicamente cada usuario real de Auth0
         users.forEach(user => {
-          // Si no tiene foto configurada, asignamos un avatar por defecto
-          const userAvatar = user.picture || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=32&h=32&q=80';
-          // Convertir fecha de última conexión de forma legible
+          const userAvatar = user.picture || 'https://unsplash.com';
           const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A';
 
           const row = `
@@ -134,35 +199,88 @@
                   <a href="#" class="username">${user.email || user.name || 'Usuario sin email'}</a>
                 </div>
               </td>
-              <td style="color: #57606a; font-family: monospace;">${user.user_id}</td>
+              <td style="color: #57606a; font-family: monospace; font-size: 12px;">${user.user_id}</td>
               <td><span class="status-badge status-active">Activo</span></td>
               <td>${lastLoginDate}</td>
+              <td>
+                <button onclick="deleteUser('${user.user_id}')" class="btn btn-delete">Eliminar</button>
+              </td>
             </tr>
           `;
           tbody.innerHTML += row;
         });
 
-        // Ocultar cargador y mostrar la interfaz completa
         loadingDiv.style.display = 'none';
-        errorDiv.style.display = 'none';
         cardDiv.style.display = 'block';
 
       } catch (error) {
-        console.error("Error cargando el dashboard:", error);
         loadingDiv.style.display = 'none';
-        errorDiv.textContent = `No se pudieron cargar los datos de Auth0: ${error.message}`;
+        errorDiv.textContent = `Error al cargar usuarios: ${error.message}`;
+        errorDiv.style.display = 'block';
+        cardDiv.style.display = 'block'; // Muestra el contenedor para ver el formulario y botones
+      }
+    }
+
+    // 2. CREAR USUARIO (POST)
+    async function createUser(event) {
+      event.preventDefault();
+      const name = document.getElementById('user-name').value;
+      const email = document.getElementById('user-email').value;
+      const password = document.getElementById('user-password').value;
+      const errorDiv = document.getElementById('error-message');
+
+      try {
+        const response = await fetch(`${VERCEL_API_URL}/api/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Error del servidor: ${response.status}`);
+        }
+
+        document.getElementById('create-user-form').reset();
+        alert('Usuario creado con éxito en Auth0');
+        loadDashboardUsers(); // Recarga la tabla
+
+      } catch (error) {
+        errorDiv.textContent = `Error al crear usuario: ${error.message}`;
         errorDiv.style.display = 'block';
       }
     }
 
-    function logout() {
-      // Flujo de redirección para salir del panel
-      window.location.href = 'https://cristian2024-ops.github.io/';
+    // 3. ELIMINAR USUARIO (DELETE)
+    async function deleteUser(userId) {
+      if (!confirm('¿Estás seguro de que deseas eliminar este usuario de Auth0?')) return;
+      const errorDiv = document.getElementById('error-message');
+
+      try {
+        const response = await fetch(`${VERCEL_API_URL}/api/users/${userId}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          throw new Error(`No se pudo eliminar el usuario: ${response.status}`);
+        }
+
+        alert('Usuario eliminado correctamente');
+        loadDashboardUsers(); // Recarga la tabla
+
+      } catch (error) {
+        errorDiv.textContent = `Error al eliminar usuario: ${error.message}`;
+        errorDiv.style.display = 'block';
+      }
     }
 
-    // Ejecutar la petición automática al abrir la página
+        // 4. CERRAR SESIÓN
+    function logout() {
+      alert('Sesión cerrada.');
+    }
+
+    // Inicializar la carga al entrar a la página
     window.onload = loadDashboardUsers;
   </script>
-
 </body>
 </html>
