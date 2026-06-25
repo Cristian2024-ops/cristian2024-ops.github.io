@@ -234,12 +234,7 @@
         errorDiv.style.display = 'none';
         
         // Corrección definitiva usando concatenación tradicional para evitar fallos de comillas
-        const response = await fetch(VERCEL_API_URL + "/api/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password })
-        });
-
+        const response = await fetch(VERCEL_API_URL + "/api/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, password }) });
 
         const data = await response.json();
 
