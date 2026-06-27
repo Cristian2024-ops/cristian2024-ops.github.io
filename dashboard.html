@@ -142,91 +142,108 @@
   <script src="JS/auth0.min.js"></script>
 
   <script>
-    // IMPORTANTE: Reemplaza esta URL con la dirección real de tu API en Vercel
-    const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app'; 
+    // IMPORTANTE: API en Vercel
+const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app'; 
+let auth0Client = null;
 
-    // 1. CARGAR LISTA (GET)
-    async function loadDashboardUsers() {
-      const loadingDiv = document.getElementById('loading');
-      const cardDiv = document.getElementById('dashboard-card');
-      const errorDiv = document.getElementById('error-message');
-      const tbody = document.getElementById('users-table-body');
+// Inicializa el SDK usando las variables globales de tu archivo auth0-config.js
+async function initAuth0Dashboard() {
+  try {
+    auth0Client = await createAuth0Client({
+      domain: window.AUTH0_DOMAIN,
+      client_id: window.AUTH0_CLIENT_ID,
+      cacheLocation: 'localstorage',
+      useRefreshTokens: true
+    });
 
-      try {
-        errorDiv.style.display = 'none';
+    const isAuthenticated = await auth0Client.isAuthenticated();
+    
+    if (isAuthenticated) {
+      await loadDashboardUsers();
+    } else {
+      alert("Por favor, inicia sesión primero.");
+      window.location.href = window.AUTH0_REDIRECT_URI;
+    }
+  } catch (error) {
+    console.error("Error inicializando Auth0:", error);
+    const errorDiv = document.getElementById('error-message');
+    if (errorDiv) {
+      errorDiv.textContent = `Error de autenticación: ${error.message}`;
+      errorDiv.style.display = 'block';
+    }
+  }
+}
+async function loadDashboardUsers() {
+  const loadingDiv = document.getElementById('loading');
+  const cardDiv = document.getElementById('dashboard-card');
+  const errorDiv = document.getElementById('error-message');
+  const tbody = document.getElementById('users-table-body');
 
-        // OBTENER EL TOKEN DESDE EL CLIENTE GLOBAL DE AUTH0
-        const token = await auth0Client.getTokenSilently();
-        
-        // Petición al backend incluyendo la cabecera de Autorización
-        const response = await fetch(`${VERCEL_API_URL}/api/users`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }); 
-        
-        // Validación del estado de administrador devuelto por Vercel (403)
-        if (response.status === 403) {
-          alert("Acceso denegado: No tienes permisos de administrador.");
-          window.location.href = "index.html"; 
-          return;
-        }
+  try {
+    if (errorDiv) errorDiv.style.display = 'none';
+    
+    // Obtener token de forma segura usando el cliente ya inicializado
+    const token = await auth0Client.getTokenSilently();
 
-        if (!response.ok) {
-          throw new Error(`Error en el servidor de Vercel: ${response.status}`);
-        }
-
-        const users = await response.json();
-
-        if (!Array.isArray(users)) {
-          throw new Error("El backend no devolvió una lista válida de usuarios.");
-        }
-
-        tbody.innerHTML = '';
-
-        users.forEach(user => {
-          const userAvatar = user.picture || 'https://cristian2024-ops.github.io/Assets/sin-foto-registrada.ico';
-          const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A';
-
-          const row = `
-            <tr>
-              <td>
-                <div class="user-cell">
-                  <img src="${userAvatar}" class="avatar-mini" alt="Avatar">
-                  <a href="#" class="username">${user.email || user.name || 'Usuario sin email'}</a>
-                </div>
-              </td>
-              <td style="color: #57606a; font-family: monospace; font-size: 12px;">${user.user_id}</td>
-              <td><span class="status-badge status-active">Activo</span></td>
-              <td>${lastLoginDate}</td>
-              <td>
-                <button onclick="deleteUser('${user.user_id}')" class="btn btn-delete">Eliminar</button>
-              </td>
-            </tr>
-          `;
-          tbody.innerHTML += row;
-        });
-
-        loadingDiv.style.display = 'none';
-        cardDiv.style.display = 'block';
-
-      } catch (error) {
-        loadingDiv.style.display = 'none';
-        errorDiv.textContent = `Error al cargar usuarios: ${error.message}`;
-        errorDiv.style.display = 'block';
-        cardDiv.style.display = 'block'; 
+    const response = await fetch(`${VERCEL_API_URL}/api/users`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
+    });
+
+    if (response.status === 403) {
+      alert("Acceso denegado: No tienes permisos de administrador.");
+      window.location.href = "index.html";
+      return;
     }
 
+    if (!response.ok) throw new Error(`Error Vercel: ${response.status}`);
+    const users = await response.json();
+    if (!Array.isArray(users)) throw new Error("Lista inválida.");
+
+    tbody.innerHTML = '';
+    users.forEach(user => {
+      const userAvatar = user.picture || 'https://github.io';
+      const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A';
+
+      tbody.innerHTML += `
+        <tr>
+          <td>
+            <div class="user-cell">
+              <img src="${userAvatar}" class="avatar-mini" alt="Avatar">
+              <a href="#" class="username">${user.email || user.name || 'Sin email'}</a>
+            </div>
+          </td>
+          <td style="color: #57606a; font-family: monospace; font-size: 12px;">${user.user_id}</td>
+          <td><span class="status-badge status-active">Activo</span></td>
+          <td>${lastLoginDate}</td>
+          <td>
+            <button onclick="deleteUser('${user.user_id}')" class="btn btn-delete">Eliminar</button>
+          </td>
+        </tr>`;
+    });
+
+    if (loadingDiv) loadingDiv.style.display = 'none';
+    if (cardDiv) cardDiv.style.display = 'block';
+
+  } catch (error) {
+    if (loadingDiv) loadingDiv.style.display = 'none';
+    if (errorDiv) {
+      errorDiv.textContent = `Error al cargar: ${error.message}`;
+      errorDiv.style.display = 'block';
+    }
+    if (cardDiv) cardDiv.style.display = 'block';
+  }
+}
     // 2. ELIMINAR USUARIO (DELETE)
     async function deleteUser(userId) {
       if (!confirm('¿Estás seguro de que deseas eliminar este usuario de Auth0?')) return;
       const errorDiv = document.getElementById('error-message');
 
       try {
-        // OBTENER EL TOKEN DESDE EL CLIENTE GLOBAL DE AUTH0
+        // Obtener el token de forma segura
         const token = await auth0Client.getTokenSilently();
 
         const response = await fetch(`${VERCEL_API_URL}/api/users?id=${userId}`, {
@@ -237,7 +254,7 @@
         });
 
         if (response.status === 403) {
-          alert("No posees los permisos necesarios para realizar eliminaciones.");
+          alert("No posees los permisos de administrador necesarios para eliminar.");
           return;
         }
 
@@ -246,7 +263,7 @@
         }
 
         alert('Usuario eliminado correctamente');
-        loadDashboardUsers(); 
+        await loadDashboardUsers(); // Recarga la tabla
 
       } catch (error) {
         errorDiv.textContent = `Error al eliminar usuario: ${error.message}`;
@@ -256,11 +273,19 @@
 
     // 3. CERRAR SESIÓN
     function logout() {
-      alert('Sesión cerrada.');
+      if (auth0Client) {
+        auth0Client.logout({
+          logoutParams: {
+            returnTo: window.AUTH0_LOGOUT_REDIRECT_URI
+          }
+        });
+      } else {
+        alert('Sesión cerrada.');
+      }
     }
 
-    // Inicializar la carga al entrar a la página
-    window.onload = loadDashboardUsers;
+    // Inicializar la autenticación segura al entrar a la página
+    window.onload = initAuth0Dashboard;
 </script>
 </body>
 </html>
