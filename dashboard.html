@@ -152,8 +152,26 @@
 
       try {
         errorDiv.style.display = 'none';
-        const response = await fetch(`${VERCEL_API_URL}/api/users`); // Ajusta la ruta si tu endpoint cambia
+
+        // OBTENER EL TOKEN DESDE EL CLIENTE GLOBAL DE AUTH0
+        const token = await auth0Client.getTokenSilently();
         
+        // Petición al backend incluyendo la cabecera de Autorización
+        const response = await fetch(`${VERCEL_API_URL}/api/users`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }); 
+        
+        // Validación del estado de administrador devuelto por Vercel (403)
+        if (response.status === 403) {
+          alert("Acceso denegado: No tienes permisos de administrador.");
+          window.location.href = "index.html"; 
+          return;
+        }
+
         if (!response.ok) {
           throw new Error(`Error en el servidor de Vercel: ${response.status}`);
         }
@@ -196,7 +214,7 @@
         loadingDiv.style.display = 'none';
         errorDiv.textContent = `Error al cargar usuarios: ${error.message}`;
         errorDiv.style.display = 'block';
-        cardDiv.style.display = 'block'; // Muestra el contenedor para ver el formulario y botones
+        cardDiv.style.display = 'block'; 
       }
     }
 
@@ -206,16 +224,27 @@
       const errorDiv = document.getElementById('error-message');
 
       try {
+        // OBTENER EL TOKEN DESDE EL CLIENTE GLOBAL DE AUTH0
+        const token = await auth0Client.getTokenSilently();
+
         const response = await fetch(`${VERCEL_API_URL}/api/users?id=${userId}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
+
+        if (response.status === 403) {
+          alert("No posees los permisos necesarios para realizar eliminaciones.");
+          return;
+        }
 
         if (!response.ok) {
           throw new Error(`No se pudo eliminar el usuario: ${response.status}`);
         }
 
         alert('Usuario eliminado correctamente');
-        loadDashboardUsers(); // Recarga la tabla
+        loadDashboardUsers(); 
 
       } catch (error) {
         errorDiv.textContent = `Error al eliminar usuario: ${error.message}`;
@@ -223,13 +252,13 @@
       }
     }
 
-        // 3. CERRAR SESIÓN
+    // 3. CERRAR SESIÓN
     function logout() {
       alert('Sesión cerrada.');
     }
 
     // Inicializar la carga al entrar a la página
     window.onload = loadDashboardUsers;
-  </script>
+</script>
 </body>
 </html>
