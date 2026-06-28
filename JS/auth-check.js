@@ -2,26 +2,21 @@
 let auth0Client = null;
 
 async function initAuth0() {
-    // Si ya existe, lo devolvemos
     if (auth0Client) return auth0Client;
     
-    // Si la librería no ha cargado, esperamos medio segundo
+    // Esperamos a la librería
     if (typeof auth0 === 'undefined') {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(r => setTimeout(r, 500));
     }
 
-    try {
-        auth0Client = await auth0.createAuth0Client({
-            domain: 'dev-ekkbx30j1ns6gm5g.us.auth0.com',
-            client_id: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC',
-            cacheLocation: 'localstorage'
-        });
-        window.auth0Client = auth0Client;
-        return auth0Client;
-    } catch (e) {
-        console.error("Fallo al inicializar Auth0:", e);
-        return null;
-    }
+    auth0Client = await auth0.createAuth0Client({
+        domain: 'dev-ekkbx30j1ns6gm5g.us.auth0.com',
+        client_id: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC',
+        cacheLocation: 'localstorage'
+    });
+    
+    window.auth0Client = auth0Client;
+    return auth0Client;
 }
 
 async function checkAuth(isProtectedPage = true) {
@@ -31,8 +26,19 @@ async function checkAuth(isProtectedPage = true) {
     // Si volvemos de Auth0 (trae ?code= en la URL)
     const query = window.location.search;
     if (query.includes("code=") && query.includes("state=")) {
-        await client.handleRedirectCallback();
-        window.history.replaceState({}, document.title, window.location.pathname);
+        try {
+            await client.handleRedirectCallback();
+            // Limpiamos la URL y redirigimos a una página limpia para evitar errores de refresco
+            window.history.replaceState({}, document.title, window.location.pathname);
+            window.location.href = window.location.pathname; 
+            return true;
+        } catch (e) {
+            console.error("Error al procesar callback:", e);
+            // Si el estado es inválido, limpiamos todo y forzamos re-login
+            alert("La sesión expiró o es inválida. Iniciando proceso de nuevo...");
+            window.location.href = "login.html";
+            return false;
+        }
     }
 
     const isAuthenticated = await client.isAuthenticated();
