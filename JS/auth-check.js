@@ -2,22 +2,26 @@
 let auth0Client = null;
 
 async function initAuth0() {
+    // Si ya existe, lo devolvemos
     if (auth0Client) return auth0Client;
     
-    // Si la librería no ha cargado, esperamos un poco
+    // Si la librería no ha cargado, esperamos medio segundo
     if (typeof auth0 === 'undefined') {
-        console.error("SDK de Auth0 aún no cargado");
-        return null;
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
 
-    auth0Client = await auth0.createAuth0Client({
-        domain: 'dev-ekkbx30j1ns6gm5g.us.auth0.com',
-        client_id: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC',
-        cacheLocation: 'localstorage'
-    });
-    
-    window.auth0Client = auth0Client;
-    return auth0Client;
+    try {
+        auth0Client = await auth0.createAuth0Client({
+            domain: 'dev-ekkbx30j1ns6gm5g.us.auth0.com',
+            client_id: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC',
+            cacheLocation: 'localstorage'
+        });
+        window.auth0Client = auth0Client;
+        return auth0Client;
+    } catch (e) {
+        console.error("Fallo al inicializar Auth0:", e);
+        return null;
+    }
 }
 
 async function checkAuth(isProtectedPage = true) {
@@ -32,10 +36,8 @@ async function checkAuth(isProtectedPage = true) {
     }
 
     const isAuthenticated = await client.isAuthenticated();
-
     if (!isAuthenticated && isProtectedPage) {
         window.location.href = "login.html";
     }
-
     return isAuthenticated;
 }
