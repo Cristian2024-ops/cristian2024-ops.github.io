@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="CSS/estilos-bb8.css">
     <link rel="stylesheet" href="CSS/estilos-dashboard.css">
     <link href="Assets/favicon.ico" rel="icon">
-    <script src="JS/auth0.min.js"></script>
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js">
+    <script src="JS/auth0-config.js"></script>
+    <script src="JS/auth-check.js"></script>
 </head>
 <body>
     <div id="particles-js"></div>
@@ -229,12 +231,22 @@
             <p>Una página web de una gran variedad de IAs</p>
         </a>
     </main>
-
-    <!-- Configuracion de Auth0 (cargar desde archivo separado en produccion) -->
-    <script src="JS/auth0-config.js"></script>
-
     <!-- Scripts principales -->
     <script src="JS/particles.min.js"></script>
     <script src="JS/dashboard-juegos.js"></script>
+    <script>
+        window.onload = async () => {
+            // Si quieres que esta página sea privada, pon 'true'. 
+            // Si quieres que cualquiera la vea pero que sepa si estás logueado, pon 'false'.
+            const isLogged = await checkAuth(false); 
+            
+            if (isLogged) {
+                console.log("Usuario autenticado en la biblioteca.");
+                // Si quieres mostrar un botón de "Cerrar sesión" en lugar de "Login", 
+                // puedes manipular el DOM aquí:
+                // document.getElementById('login-btn').style.display = 'none';
+            }
+        };
+    </script>
 </body>
 </html>
