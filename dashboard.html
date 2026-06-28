@@ -148,7 +148,8 @@ let auth0Client = null;
 // Inicializa el SDK usando las variables globales de tu archivo auth0-config.js
 async function initAuth0Dashboard() {
   try {
-    auth0Client = await createAuth0Client({
+    // Busca esta parte en tu función initAuth0Dashboard
+      auth0Client = await auth0.createAuth0Client({ 
       domain: window.AUTH0_DOMAIN,
       client_id: window.AUTH0_CLIENT_ID,
       cacheLocation: 'localstorage',
