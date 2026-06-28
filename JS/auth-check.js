@@ -1,42 +1,41 @@
-// auth-check.js
-
+// JS/auth-check.js
 let auth0Client = null;
 
-// Esta función inicializa el cliente y lo guarda en la ventana para que otros scripts lo usen
 async function initAuth0() {
-  if (auth0Client) return auth0Client;
+    if (auth0Client) return auth0Client;
+    
+    // Si la librería no ha cargado, esperamos un poco
+    if (typeof auth0 === 'undefined') {
+        console.error("SDK de Auth0 aún no cargado");
+        return null;
+    }
 
-  auth0Client = await auth0.createAuth0Client({
-    domain: window.AUTH0_DOMAIN,
-    client_id: window.AUTH0_CLIENT_ID,
-    cacheLocation: 'localstorage',
-    useRefreshTokens: true
-  });
-
-  // Guardamos el cliente en window para acceder desde otros archivos
-  window.auth0Client = auth0Client;
-  return auth0Client;
+    auth0Client = await auth0.createAuth0Client({
+        domain: 'dev-ekkbx30j1ns6gm5g.us.auth0.com',
+        client_id: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC',
+        cacheLocation: 'localstorage'
+    });
+    
+    window.auth0Client = auth0Client;
+    return auth0Client;
 }
 
-// Esta función verifica si el usuario está logueado
 async function checkAuth(isProtectedPage = true) {
-  const client = await initAuth0();
+    const client = await initAuth0();
+    if (!client) return false;
 
-  // 1. Manejar el regreso del login (si hay ?code= en la URL)
-  const query = window.location.search;
-  if (query.includes("code=") && query.includes("state=")) {
-    await client.handleRedirectCallback();
-    // Limpiamos la URL para que no quede el código ahí
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
+    // Si volvemos de Auth0 (trae ?code= en la URL)
+    const query = window.location.search;
+    if (query.includes("code=") && query.includes("state=")) {
+        await client.handleRedirectCallback();
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
-  // 2. Verificar sesión
-  const isAuthenticated = await client.isAuthenticated();
+    const isAuthenticated = await client.isAuthenticated();
 
-  // 3. Si no está logueado y la página es protegida, enviarlo a login
-  if (!isAuthenticated && isProtectedPage) {
-    window.location.href = "login.html";
-  }
+    if (!isAuthenticated && isProtectedPage) {
+        window.location.href = "login.html";
+    }
 
-  return isAuthenticated;
+    return isAuthenticated;
 }
