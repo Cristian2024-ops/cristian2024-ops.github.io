@@ -21,16 +21,15 @@ window.onload = async () => {
         
         console.log("Auth0 cliente inicializado:", auth0Client);
 
-        // 3. Botón login
-        document.getElementById('login').onclick = async () => {
-            console.log("Botón login clickeado");
-            try {
-                await auth0Client.loginWithRedirect({
-                    authorizationParams: {
-                        redirect_uri: "https://cristian2024-ops.github.io/juegos.html"
-                    }
-                });
-            } catch (err) {
+        // 3. Manejar el clic de login
+        document.getElementById('login').onclick = () => {
+        auth0Client.loginWithRedirect({
+        authorizationParams: {
+            redirect_uri: "https://cristian2024-ops.github.io/juegos.html",
+            client_id: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC' // Lo forzamos aquí
+                }
+            });
+        }; catch (err) {
                 console.error("Error al redirigir:", err);
                 alert("Error al intentar redirigir a Auth0: " + err.message);
             }
