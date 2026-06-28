@@ -1,10 +1,4 @@
-// Configuracion de Auth0 - Credenciales cargadas desde config
-const AUTH0_CONFIG = {
-    domain: window.AUTH0_DOMAIN || '',
-    clientId: window.AUTH0_CLIENT_ID || '',
-    redirectUri: window.AUTH0_REDIRECT_URI || '',
-    logoutRedirectUri: window.AUTH0_LOGOUT_REDIRECT_URI || ''
-};
+// JS/dashboard-juegos.js
 
 // Variables globales del juego
 let visorLoadTimer = null;
@@ -20,38 +14,18 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Inicializar Auth0 si las credenciales existen
-function initAuth0() {
-    if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId) {
-        console.warn('Auth0 no configurado - falta configuracion');
-        return null;
-    }
+// --- LÓGICA DE USUARIO (INTEGRADA CON AUTH-CHECK.JS) ---
 
-    return new auth0.WebAuth({
-        domain: AUTH0_CONFIG.domain,
-        clientID: AUTH0_CONFIG.clientId,
-        redirectUri: AUTH0_CONFIG.redirectUri,
-        responseType: 'token id_token',
-        scope: 'openid profile email'
-    });
-}
-
-// Verificar si hay una sesion valida (NO redirige: el login es opcional)
-function hasValidSession() {
-    const expiresAt = JSON.parse(sessionStorage.getItem('expires_at') || '0');
-    const accessToken = sessionStorage.getItem('access_token');
-    return !!accessToken && new Date().getTime() < expiresAt;
-}
-
-// Mostrar perfil del usuario
-function displayUserProfile(profile) {
+async function displayUserProfile(profile) {
     if (!profile) return;
-
     const rightContainer = document.getElementById('navbar-right-side');
     if (!rightContainer) return;
 
     const userBar = document.createElement('div');
     userBar.className = 'user-bar';
+    userBar.style.display = 'flex';
+    userBar.style.alignItems = 'center';
+    userBar.style.gap = '10px';
 
     const picture = profile.picture ? `<img src="${escapeHtml(profile.picture)}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid #00bcff;" alt="Avatar">` : '';
     const name = escapeHtml(profile.nickname || profile.name || 'Usuario');
@@ -59,22 +33,21 @@ function displayUserProfile(profile) {
     userBar.innerHTML = `
         ${picture}
         <span class="username">${name}</span>
-        <button class="btn" aria-label="Cerrar sesion" style="padding: 4px 8px; font-size: 12px; background: rgba(255,65,77,0.2); border-color: rgba(255,65,77,0.4);">
+        <button class="btn" style="padding: 4px 8px; font-size: 12px; background: rgba(255,65,77,0.2); border-color: rgba(255,65,77,0.4);">
             Salir
         </button>
     `;
 
-    const logoutBtn = userBar.querySelector('button');
-    logoutBtn.addEventListener('click', function() {
-        sessionStorage.clear();
-        const logoutUrl = `https://${AUTH0_CONFIG.domain}/v2/logout?returnTo=${encodeURIComponent(AUTH0_CONFIG.logoutRedirectUri)}&client_id=${AUTH0_CONFIG.clientId}`;
-        window.location.href = logoutUrl;
+    userBar.querySelector('button').addEventListener('click', function() {
+        // Usamos el cliente global inicializado por auth-check.js
+        window.auth0Client.logout({
+            logoutParams: { returnTo: "https://cristian2024-ops.github.io/" }
+        });
     });
 
     rightContainer.insertBefore(userBar, rightContainer.firstChild);
 }
 
-// Mostrar boton de iniciar sesion cuando NO hay sesion activa
 function displayLoginButton() {
     const rightContainer = document.getElementById('navbar-right-side');
     if (!rightContainer) return;
@@ -82,20 +55,19 @@ function displayLoginButton() {
     const loginBar = document.createElement('div');
     loginBar.className = 'user-bar';
     loginBar.innerHTML = `
-        <button class="btn" aria-label="Iniciar sesion" style="padding: 4px 12px; font-size: 12px; background: rgba(0,188,255,0.2); border-color: rgba(0,188,255,0.4);">
+        <button class="btn" style="padding: 4px 12px; font-size: 12px; background: rgba(0,188,255,0.2); border-color: rgba(0,188,255,0.4);">
             Iniciar sesion
         </button>
     `;
 
-    const loginBtn = loginBar.querySelector('button');
-    loginBtn.addEventListener('click', function() {
+    loginBar.querySelector('button').addEventListener('click', function() {
         window.location.href = 'login.html';
     });
 
     rightContainer.insertBefore(loginBar, rightContainer.firstChild);
 }
 
-// Lanzar juego
+// --- LÓGICA DE JUEGOS (TU CÓDIGO ORIGINAL) ---
 function lanzar(url) {
     currentGameUrl = url;
     const pantalla = document.getElementById('pantalla');
@@ -109,14 +81,11 @@ function lanzar(url) {
         loader.style.opacity = '1';
         loader.style.visibility = 'visible';
     }
-
     pantalla.style.display = 'block';
     visor.style.display = 'block';
     visor.src = url;
-
     if (visorLoadTimer) clearTimeout(visorLoadTimer);
 
-    // Manejar boton de fullscreen para Among Us
     try {
         const isAmongUs = url.includes('impostor-v4') || (url.includes('kbhgames.com') && url.includes('impostor'));
         if (isAmongUs && fsBtn) {
@@ -132,249 +101,119 @@ function lanzar(url) {
             fsBtn.style.display = '';
             fsBtn.disabled = false;
         }
-    } catch (e) {
-        console.warn('Error handling fullscreen toggle:', e);
-    }
+    } catch (e) { console.warn('Error fullscreen:', e); }
 
     visor.onload = function() {
         if (visorLoadTimer) clearTimeout(visorLoadTimer);
-        if (loader) {
-            loader.style.opacity = '0';
-            loader.style.visibility = 'hidden';
-        }
+        if (loader) { loader.style.opacity = '0'; loader.style.visibility = 'hidden'; }
     };
-
     visorLoadTimer = setTimeout(function() {
-        if (loader) {
-            loader.style.opacity = '0';
-            loader.style.visibility = 'hidden';
-        }
+        if (loader) { loader.style.opacity = '0'; loader.style.visibility = 'hidden'; }
         if (errorBox) errorBox.style.display = 'flex';
     }, 120000);
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Cerrar juego
 function cerrarJuego() {
     const pantalla = document.getElementById('pantalla');
     const visor = document.getElementById('visor');
-    const loader = document.getElementById('game-loader');
-    const errorBox = document.getElementById('game-error');
-
     pantalla.style.display = 'none';
     if (visor) visor.src = '';
-    if (visorLoadTimer) {
-        clearTimeout(visorLoadTimer);
-        visorLoadTimer = null;
-    }
-    if (loader) {
-        loader.style.opacity = '0';
-        loader.style.visibility = 'hidden';
-    }
-    if (errorBox) errorBox.style.display = 'none';
+    if (visorLoadTimer) clearTimeout(visorLoadTimer);
     exitFullscreen();
 }
 
-// Pantalla completa
 function pantallaCompleta() {
-    if (isFullscreen()) {
-        exitFullscreen();
-        return;
-    }
+    if (isFullscreen()) { exitFullscreen(); return; }
     const pantalla = document.getElementById('pantalla');
-    const request = pantalla.requestFullscreen || pantalla.webkitRequestFullscreen || pantalla.mozRequestFullScreen || pantalla.msRequestFullscreen;
-    if (request) {
-        request.call(pantalla);
-    }
+    const request = pantalla.requestFullscreen || pantalla.webkitRequestFullscreen;
+    if (request) request.call(pantalla);
 }
 
 function isFullscreen() {
-    return !!(
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
-    );
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
 }
 
 function exitFullscreen() {
-    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-    if (exit) {
-        exit.call(document);
-    }
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (exit) exit.call(document);
 }
 
-// Toggle modo oscuro
 function initDarkMode() {
     const toggle = document.querySelector('.bb8-toggle__checkbox');
     if (!toggle) return;
-
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-        toggle.checked = true;
-    }
-
+    if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); toggle.checked = true; }
     toggle.addEventListener('change', function(e) {
-        if (e.target.checked) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem('theme', 'light');
-        }
+        if (e.target.checked) { document.body.classList.add('dark-mode'); localStorage.setItem('theme', 'dark'); }
+        else { document.body.classList.remove('dark-mode'); localStorage.setItem('theme', 'light'); }
     });
 }
 
-// Estado de red
 function actualizarEstadoRed() {
     const mensaje = document.getElementById('offline-message');
-    if (!mensaje) return;
-
-    if (navigator.onLine) {
-        mensaje.style.display = 'none';
-    } else {
-        mensaje.style.display = 'block';
-    }
+    if (mensaje) mensaje.style.display = navigator.onLine ? 'none' : 'block';
 }
 
-// Filtros de juegos
 function initFilters() {
     const buttons = document.querySelectorAll('.filter-btn');
-
-    function showAll() {
-        document.querySelectorAll('.card-juego').forEach(el => el.style.display = 'block');
-    }
-
+    function showAll() { document.querySelectorAll('.card-juego').forEach(el => el.style.display = 'block'); }
     function filterCategory(cat) {
         document.querySelectorAll('.card-juego').forEach(el => {
             const categories = (el.getAttribute('data-category') || '').trim().split(/\s+/);
-            if (!cat || cat === '') {
-                el.style.display = 'block';
-            } else if (categories.includes(cat)) {
-                el.style.display = 'block';
-            } else {
-                el.style.display = 'none';
-            }
+            el.style.display = (!cat || categories.includes(cat)) ? 'block' : 'none';
         });
     }
-
-    function setActiveButton(btn) {
-        buttons.forEach(b => b.classList.remove('active'));
-        if (btn) btn.classList.add('active');
-    }
-
-    // Restaurar filtro guardado
-    const saved = localStorage.getItem('activeFilter');
-    if (saved !== null) {
-        const btn = Array.from(buttons).find(b => b.getAttribute('data-filter') === saved);
-        if (btn) {
-            setActiveButton(btn);
-            if (saved === '') showAll();
-            else filterCategory(saved);
-        } else {
-            showAll();
-        }
-    } else {
-        showAll();
-    }
-
     buttons.forEach(btn => {
         btn.addEventListener('click', function() {
             const cat = this.getAttribute('data-filter');
-            if (this.classList.contains('active')) {
-                setActiveButton(null);
-                localStorage.removeItem('activeFilter');
-                showAll();
-            } else {
-                setActiveButton(this);
-                if (cat === '') showAll();
-                else filterCategory(cat);
-                localStorage.setItem('activeFilter', cat);
-            }
+            filterCategory(cat);
         });
     });
 }
 
-// Botones de error
 function initErrorButtons() {
     const openBtn = document.getElementById('open-external');
     const retryBtn = document.getElementById('retry-load');
-
-    if (openBtn) {
-        openBtn.addEventListener('click', function() {
-            if (currentGameUrl) window.open(currentGameUrl, '_blank');
-        });
-    }
-
-    if (retryBtn) {
-        retryBtn.addEventListener('click', function() {
-            if (currentGameUrl) lanzar(currentGameUrl);
-        });
-    }
+    if (openBtn) openBtn.addEventListener('click', () => window.open(currentGameUrl, '_blank'));
+    if (retryBtn) retryBtn.addEventListener('click', () => lanzar(currentGameUrl));
 }
 
-// Particulas
 function cargarParticulas(colorParticula) {
-    if (typeof particlesJS === 'undefined') {
-        console.warn('particlesJS no esta disponible');
-        return;
+    if (typeof particlesJS !== 'undefined') {
+        particlesJS('particles-js', {
+            particles: { number: { value: 70 }, color: { value: colorParticula }, size: { value: 4.5 } }
+        });
     }
-
-    particlesJS('particles-js', {
-        particles: {
-            number: { value: 70, density: { enable: true, value_area: 800 } },
-            color: { value: colorParticula },
-            opacity: { value: 0.75 },
-            size: { value: 4.5, random: true },
-            move: { enable: true, speed: 2.2 }
-        }
-    });
 }
 
-// Inicializacion principal
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar Auth0 (opcional: ya NO es obligatorio iniciar sesion)
-    const auth0Instance = initAuth0();
+// --- INICIALIZACIÓN ---
+document.addEventListener('DOMContentLoaded', async function() {
+    // 1. Esperar a Auth0 (máximo 5 segundos)
+    let retries = 0;
+    while (!window.auth0Client && retries < 25) {
+        await new Promise(r => setTimeout(r, 200));
+        retries++;
+    }
 
-    if (auth0Instance && hasValidSession()) {
-        // Hay sesion activa: mostramos el perfil del usuario
-        const accessToken = sessionStorage.getItem('access_token');
-        auth0Instance.client.userInfo(accessToken, function(err, profile) {
-            if (err) {
-                console.error('Error obteniendo perfil:', err);
-                return;
-            }
-            displayUserProfile(profile);
-        });
+    // 2. Verificar sesión
+    if (window.auth0Client && await window.auth0Client.isAuthenticated()) {
+        const user = await window.auth0Client.getUser();
+        displayUserProfile(user);
     } else {
-        // Sin sesion: dejamos entrar igual y ofrecemos un boton para iniciar sesion
         displayLoginButton();
     }
 
-    // Inicializar componentes
+    // 3. Inicializar juegos e interfaz
     initDarkMode();
     initFilters();
     initErrorButtons();
     actualizarEstadoRed();
-
-    // Listeners de red
     window.addEventListener('online', actualizarEstadoRed);
     window.addEventListener('offline', actualizarEstadoRed);
-
-    // Cargar particulas
     cargarParticulas('#ffffff');
-
-    // Recargar particulas al cambiar tema
-    const toggle = document.querySelector('.bb8-toggle__checkbox');
-    if (toggle) {
-        toggle.addEventListener('change', function() {
-            setTimeout(() => cargarParticulas('#ffffff'), 50);
-        });
-    }
 });
 
-// Exponer funciones globales necesarias
+// Exponer funciones globales
 window.lanzar = lanzar;
 window.cerrarJuego = cerrarJuego;
 window.pantallaCompleta = pantallaCompleta;
