@@ -6,6 +6,8 @@
   <title>Panel de Administración - GitHub Style</title>
   <link href="Assets/dashboard.ico" rel="icon">
   <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+  <script src="JS/auth0-config.js"></script>
+  <script src="JS/auth-check.js"></script>
   <style>
     /* Estilos Base Originales */
     body {
@@ -138,161 +140,102 @@
       <button onclick="loadDashboardUsers()" class="btn">Refrescar Lista</button>
       <button onclick="logout()" class="btn btn-logout">Cerrar sesión</button>
     </div>
-  </div>
-  <script src="JS/auth0-config.js"></script>
-  <script>
-    // IMPORTANTE: API en Vercel
-const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app'; 
-let auth0Client = null;
+  </div> 
+<script>
+  // IMPORTANTE: API en Vercel
+  const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app'; 
 
-async function initAuth0Dashboard() {
-  try {
-    auth0Client = await auth0.createAuth0Client({
-      domain: window.AUTH0_DOMAIN,
-      client_id: window.AUTH0_CLIENT_ID,
-      cacheLocation: 'localstorage',
-      useRefreshTokens: true
-    });
-
-    // --- NUEVO: Manejar el regreso del login ---
-    // Si la URL tiene parámetros 'code' y 'state', el SDK debe procesarlos
-    const query = window.location.search;
-    if (query.includes("code=") && query.includes("state=")) {
-      await auth0Client.handleRedirectCallback();
-      // Limpiamos la URL para que no quede el código ahí
-      window.history.replaceState({}, document.title, "/dashboard.html");
-    }
-    // -------------------------------------------
-
-    const isAuthenticated = await auth0Client.isAuthenticated();
+  // Inicializar al cargar
+  window.onload = async () => {
+    // 1. Verificamos sesión y procesamos el callback si regresamos de login
+    const isLogged = await checkAuth(true); 
     
-    if (isAuthenticated) {
+    // 2. Si está logueado, cargamos los datos
+    if (isLogged) {
       await loadDashboardUsers();
-    } else {
-      // Solo redirige si NO estamos en medio de un proceso de callback
-      if (!query.includes("code=")) {
-        alert("Por favor, inicia sesión primero.");
-        // Redirige a tu página de Login que debería tener el botón de "Login con Auth0"
-        window.location.href = "login.html"; 
-      }
     }
-  } catch (error) {
-    console.error("Error inicializando Auth0:", error);
-  }
-}
-async function loadDashboardUsers() {
-  const loadingDiv = document.getElementById('loading');
-  const cardDiv = document.getElementById('dashboard-card');
-  const errorDiv = document.getElementById('error-message');
-  const tbody = document.getElementById('users-table-body');
+  };
 
-  try {
-    if (errorDiv) errorDiv.style.display = 'none';
-    
-    // Obtener token de forma segura usando el cliente ya inicializado
-    const token = await auth0Client.getTokenSilently();
+  async function loadDashboardUsers() {
+    const loadingDiv = document.getElementById('loading');
+    const cardDiv = document.getElementById('dashboard-card');
+    const errorDiv = document.getElementById('error-message');
+    const tbody = document.getElementById('users-table-body');
 
-    const response = await fetch(`${VERCEL_API_URL}/api/users`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    try {
+      if (errorDiv) errorDiv.style.display = 'none';
+      
+      // Usamos el cliente compartido que inicializó auth-check.js
+      const token = await window.auth0Client.getTokenSilently();
+
+      const response = await fetch(`${VERCEL_API_URL}/api/users`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 403) {
+        alert("Acceso denegado: No tienes permisos de administrador.");
+        window.location.href = "index.html";
+        return;
       }
-    });
 
-    if (response.status === 403) {
-      alert("Acceso denegado: No tienes permisos de administrador.");
-      window.location.href = "index.html";
-      return;
-    }
+      if (!response.ok) throw new Error(`Error Vercel: ${response.status}`);
+      const users = await response.json();
 
-    if (!response.ok) throw new Error(`Error Vercel: ${response.status}`);
-    const users = await response.json();
-    if (!Array.isArray(users)) throw new Error("Lista inválida.");
+      tbody.innerHTML = '';
+      users.forEach(user => {
+        const userAvatar = user.picture || 'https://github.io';
+        const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A';
+        tbody.innerHTML += `
+          <tr>
+            <td>
+              <div class="user-cell">
+                <img src="${userAvatar}" class="avatar-mini" alt="Avatar">
+                <a href="#" class="username">${user.email || user.name || 'Sin email'}</a>
+              </div>
+            </td>
+            <td style="color: #57606a; font-family: monospace; font-size: 12px;">${user.user_id}</td>
+            <td><span class="status-badge status-active">Activo</span></td>
+            <td>${lastLoginDate}</td>
+            <td>
+              <button onclick="deleteUser('${user.user_id}')" class="btn btn-delete">Eliminar</button>
+            </td>
+          </tr>`;
+      });
 
-    tbody.innerHTML = '';
-    users.forEach(user => {
-      const userAvatar = user.picture || 'https://github.io';
-      const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A';
+      loadingDiv.style.display = 'none';
+      cardDiv.style.display = 'block';
 
-      tbody.innerHTML += `
-        <tr>
-          <td>
-            <div class="user-cell">
-              <img src="${userAvatar}" class="avatar-mini" alt="Avatar">
-              <a href="#" class="username">${user.email || user.name || 'Sin email'}</a>
-            </div>
-          </td>
-          <td style="color: #57606a; font-family: monospace; font-size: 12px;">${user.user_id}</td>
-          <td><span class="status-badge status-active">Activo</span></td>
-          <td>${lastLoginDate}</td>
-          <td>
-            <button onclick="deleteUser('${user.user_id}')" class="btn btn-delete">Eliminar</button>
-          </td>
-        </tr>`;
-    });
-
-    if (loadingDiv) loadingDiv.style.display = 'none';
-    if (cardDiv) cardDiv.style.display = 'block';
-
-  } catch (error) {
-    if (loadingDiv) loadingDiv.style.display = 'none';
-    if (errorDiv) {
+    } catch (error) {
+      loadingDiv.style.display = 'none';
       errorDiv.textContent = `Error al cargar: ${error.message}`;
       errorDiv.style.display = 'block';
+      cardDiv.style.display = 'block';
     }
-    if (cardDiv) cardDiv.style.display = 'block';
   }
-}
-    // 2. ELIMINAR USUARIO (DELETE)
-    async function deleteUser(userId) {
-      if (!confirm('¿Estás seguro de que deseas eliminar este usuario de Auth0?')) return;
-      const errorDiv = document.getElementById('error-message');
 
-      try {
-        // Obtener el token de forma segura
-        const token = await auth0Client.getTokenSilently();
+  async function deleteUser(userId) {
+    if (!confirm('¿Seguro que deseas eliminar?')) return;
+    try {
+      const token = await window.auth0Client.getTokenSilently();
+      const response = await fetch(`${VERCEL_API_URL}/api/users?id=${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Error al eliminar');
+      alert('Eliminado');
+      await loadDashboardUsers();
+    } catch (e) { alert(e.message); }
+  }
 
-        const response = await fetch(`${VERCEL_API_URL}/api/users?id=${userId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.status === 403) {
-          alert("No posees los permisos de administrador necesarios para eliminar.");
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(`No se pudo eliminar el usuario: ${response.status}`);
-        }
-
-        alert('Usuario eliminado correctamente');
-        await loadDashboardUsers(); // Recarga la tabla
-
-      } catch (error) {
-        errorDiv.textContent = `Error al eliminar usuario: ${error.message}`;
-        errorDiv.style.display = 'block';
-      }
-    }
-
-    // 3. CERRAR SESIÓN
-    function logout() {
-      if (auth0Client) {
-        auth0Client.logout({
-          logoutParams: {
-            returnTo: window.AUTH0_LOGOUT_REDIRECT_URI
-          }
-        });
-      } else {
-        alert('Sesión cerrada.');
-      }
-    }
-
-    // Inicializar la autenticación segura al entrar a la página
-    window.onload = initAuth0Dashboard;
+  function logout() {
+    window.auth0Client.logout({
+      logoutParams: { returnTo: window.AUTH0_LOGOUT_REDIRECT_URI }
+    });
+  }
 </script>
 </body>
 </html>
