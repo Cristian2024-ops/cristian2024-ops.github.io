@@ -233,17 +233,7 @@
     </main>
     <!-- Scripts principales -->
     <script src="JS/particles.min.js"></script>
-    <script>
-      window.onload = async () => {
-        // 1. Primero configuramos Auth0
-        await checkAuth(true);
-    
-        // 2. SOLO CUANDO YA ESTÁ LISTO, cargamos el script de juegos
-        const script = document.createElement('script');
-        script.src = "JS/dashboard-juegos.js";
-        document.body.appendChild(script);
-      };
-    </script>
+    <script src="JS/dashboard-juegos.js"></script>
     <script>
         window.onload = async () => {
             // Si quieres que esta página sea privada, pon 'true'. 
