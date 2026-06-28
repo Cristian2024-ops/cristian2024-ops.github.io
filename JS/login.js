@@ -26,60 +26,54 @@ if (toggleBtn) {
 // ===== Lógica Moderna Auth0 (SDK v2) =====
 let auth0Client = null;
 
+// JS/login.js
 window.onload = async () => {
-    // 1. Inicializar el cliente (usando los datos de auth0-config.js)
-    auth0Client = await auth0.createAuth0Client({
-        domain: window.AUTH0_DOMAIN,
-        client_id: window.AUTH0_CLIENT_ID,
-        cacheLocation: 'localstorage' // ¡IMPORTANTE! Esto permite que juegos.html y dashboard.html vean la sesión
-    });
+    // 1. Inicializar el cliente con valores explícitos (Hardcoded)
+    // Esto descarta cualquier error de carga de variables o caché
+    try {
+        const auth0Client = await auth0.createAuth0Client({
+            domain: 'dev-ekkbx30j1ns6gm5g.us.auth0.com',
+            client_id: 'Qlsh3WVqus5Hwwl4nWp96Uq0yo8gbUnC', 
+            cacheLocation: 'localstorage'
+        });
 
-    // 2. Verificar si el usuario está autenticado
-    const isAuthenticated = await auth0Client.isAuthenticated();
+        // 2. ¿Regresamos de Auth0 con un código?
+        const query = window.location.search;
+        if (query.includes("code=") && query.includes("state=")) {
+            await auth0Client.handleRedirectCallback();
+            window.history.replaceState({}, document.title, window.location.pathname);
+            window.location.href = "juegos.html";
+            return;
+        }
 
-    if (isAuthenticated) {
-        showProfile();
-    } else {
-        showLoggedOut();
+        // 3. Verificar si estamos logueados
+        const isAuthenticated = await auth0Client.isAuthenticated();
+        if (isAuthenticated) {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('logout').style.display = 'block';
+            document.getElementById('auth-msg').innerText = "Ya has iniciado sesión.";
+        } else {
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('logout').style.display = 'none';
+        }
+
+        // 4. Botones
+        document.getElementById('login').onclick = () => {
+            auth0Client.loginWithRedirect({
+                authorizationParams: {
+                    redirect_uri: "https://cristian2024-ops.github.io/juegos.html"
+                }
+            });
+        };
+
+        document.getElementById('logout').onclick = () => {
+            auth0Client.logout({
+                logoutParams: { returnTo: "https://cristian2024-ops.github.io/" }
+            });
+        };
+        
+    } catch (e) {
+        console.error("Error crítico de Auth0:", e);
+        alert("Error de configuración Auth0: " + e.message);
     }
-
-    // 3. Manejar el clic de login
-    document.getElementById('login').onclick = () => {
-        auth0Client.loginWithRedirect({
-            authorizationParams: {
-                redirect_uri: "https://cristian2024-ops.github.io/juegos.html"
-            }
-        });
-    };
-
-    // 4. Manejar el clic de logout
-    document.getElementById('logout').onclick = () => {
-        auth0Client.logout({
-            logoutParams: { returnTo: window.AUTH0_LOGOUT_REDIRECT_URI || window.location.origin }
-        });
-    };
 };
-
-async function showProfile() {
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('logout').style.display = '';
-    document.getElementById('auth-msg').style.display = 'none';
-    
-    // Obtener info del usuario de forma moderna
-    const user = await auth0Client.getUser();
-    if (user) {
-        document.getElementById('user-profile').innerHTML =
-            `<div>
-                <img src="${user.picture}" alt="avatar" style="width:65px;border-radius:50%;margin-bottom:10px;box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><br>
-                <strong style="font-size: 1.2rem; display:block; margin-bottom:2px;">${user.nickname || user.name}</strong>
-                <small style="opacity:0.8;">${user.email || ''}</small>
-            </div>`;
-    }
-}
-
-function showLoggedOut() {
-    document.getElementById('login').style.display = '';
-    document.getElementById('logout').style.display = 'none';
-    document.getElementById('auth-msg').style.display = '';
-    document.getElementById('user-profile').innerHTML = '';
-}
