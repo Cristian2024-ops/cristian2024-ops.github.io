@@ -145,32 +145,39 @@
 const VERCEL_API_URL = 'https://mi-dashboard-next.vercel.app'; 
 let auth0Client = null;
 
-// Inicializa el SDK usando las variables globales de tu archivo auth0-config.js
 async function initAuth0Dashboard() {
   try {
-    // Busca esta parte en tu función initAuth0Dashboard
-      auth0Client = await auth0.createAuth0Client({ 
+    auth0Client = await auth0.createAuth0Client({
       domain: window.AUTH0_DOMAIN,
       client_id: window.AUTH0_CLIENT_ID,
       cacheLocation: 'localstorage',
       useRefreshTokens: true
     });
 
+    // --- NUEVO: Manejar el regreso del login ---
+    // Si la URL tiene parámetros 'code' y 'state', el SDK debe procesarlos
+    const query = window.location.search;
+    if (query.includes("code=") && query.includes("state=")) {
+      await auth0Client.handleRedirectCallback();
+      // Limpiamos la URL para que no quede el código ahí
+      window.history.replaceState({}, document.title, "/dashboard.html");
+    }
+    // -------------------------------------------
+
     const isAuthenticated = await auth0Client.isAuthenticated();
     
     if (isAuthenticated) {
       await loadDashboardUsers();
     } else {
-      alert("Por favor, inicia sesión primero.");
-      window.location.href = window.AUTH0_REDIRECT_URI;
+      // Solo redirige si NO estamos en medio de un proceso de callback
+      if (!query.includes("code=")) {
+        alert("Por favor, inicia sesión primero.");
+        // Redirige a tu página de Login que debería tener el botón de "Login con Auth0"
+        window.location.href = "login.html"; 
+      }
     }
   } catch (error) {
     console.error("Error inicializando Auth0:", error);
-    const errorDiv = document.getElementById('error-message');
-    if (errorDiv) {
-      errorDiv.textContent = `Error de autenticación: ${error.message}`;
-      errorDiv.style.display = 'block';
-    }
   }
 }
 async function loadDashboardUsers() {
