@@ -1,595 +1,301 @@
-<!doctype html>
+```html
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <meta
     name="description"
-    content="Consulta información básica de tu conexión y una ubicación geográfica aproximada basada en tu IP."
+    content="Información técnica de tu dispositivo, navegador y ubicación aproximada."
   >
-
-  <meta name="theme-color" content="#087f7d">
 
   <title>Información de tu dispositivo</title>
 
-  <!--
-    Leaflet 1.9.4 está fijado a una versión concreta.
-    Para producción de alta seguridad, considera alojarlo localmente
-    o utilizar un mecanismo SRI verificado.
-  -->
+  <!-- Leaflet -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIINfQ3E6VQ8c1yJz3L4m8KQh5g8V4xV8Q="
+    crossorigin=""
   >
 
   <style>
     :root {
-      color-scheme: light dark;
-
-      --bg: #f4fbfa;
-      --fg: #102124;
+      --bg: #f4f7fb;
       --card: #ffffff;
-      --muted: #68797b;
-      --border: #d8e5e4;
-
-      --teal: #087f7d;
-      --teal-dark: #07565e;
-
-      --success: #23aa70;
-      --danger: #b42318;
-      --warning: #9a6700;
-
-      --shadow: 0 12px 35px rgba(9, 47, 59, 0.07);
+      --text: #172033;
+      --muted: #667085;
+      --border: #e4e7ec;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --shadow: 0 12px 35px rgba(16, 24, 40, 0.08);
+      --radius: 18px;
     }
 
-    *,
-    *::before,
-    *::after {
+    * {
       box-sizing: border-box;
-    }
-
-    html {
-      min-width: 320px;
-      scroll-behavior: smooth;
     }
 
     body {
       margin: 0;
-      min-width: 320px;
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
       background: var(--bg);
-      color: var(--fg);
-      font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
+      color: var(--text);
     }
 
-    button {
-      font: inherit;
+    .container {
+      width: min(1100px, calc(100% - 32px));
+      margin: 40px auto;
     }
 
-    button:focus-visible {
-      outline: 3px solid rgba(8, 127, 125, 0.35);
-      outline-offset: 3px;
+    header {
+      margin-bottom: 24px;
     }
 
-    .page-shell {
-      min-height: 100vh;
-      padding: 32px 18px;
-
-      background:
-        radial-gradient(
-          circle at 20% 0%,
-          rgba(223, 245, 242, 0.95),
-          transparent 34%
-        ),
-        var(--bg);
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.1;
     }
 
-    .dashboard {
-      width: min(100%, 920px);
-      margin: 0 auto;
-    }
-
-    /* ------------------------------
-       HEADER
-    ------------------------------ */
-
-    .hero {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      margin-bottom: 28px;
-    }
-
-    .brand-mark {
-      width: 44px;
-      height: 44px;
-
-      display: grid;
-      place-items: center;
-
-      flex: 0 0 auto;
-
-      border-radius: 13px;
-
-      background: var(--teal);
-      color: #fff;
-
-      box-shadow: 0 8px 22px rgba(8, 127, 125, 0.22);
-    }
-
-    .brand-mark svg {
-      width: 24px;
-      height: 24px;
-
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .eyebrow {
-      margin: 0 0 4px;
-
-      color: var(--teal);
-
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-    }
-
-    h1,
-    h2 {
+    header p {
       margin: 0;
-      letter-spacing: -0.04em;
-      line-height: 1.15;
-    }
-
-    h1 {
-      font-size: clamp(22px, 4vw, 29px);
-    }
-
-    h2 {
-      font-size: 21px;
-    }
-
-    .system-pill {
-      margin-left: auto;
-
-      display: flex;
-      align-items: center;
-      gap: 7px;
-
-      padding: 8px 11px;
-
-      border: 1px solid var(--border);
-      border-radius: 999px;
-
       color: var(--muted);
-
-      font-size: 12px;
-
-      background: color-mix(
-        in srgb,
-        var(--card) 75%,
-        transparent
-      );
+      font-size: 16px;
     }
 
-    .live-dot {
-      width: 7px;
-      height: 7px;
-
-      flex: 0 0 auto;
-
-      border-radius: 50%;
-
-      background: var(--success);
-      box-shadow: 0 0 0 4px rgba(35, 170, 112, 0.13);
-    }
-
-    /* ------------------------------
-       CARDS
-    ------------------------------ */
-
-    .ip-card,
-    .stat-card,
-    .location-section {
-      border: 1px solid var(--border);
-      border-radius: 20px;
-
+    .card {
       background: var(--card);
-
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 20px;
     }
 
-    .ip-card {
-      padding: 22px;
-
-      color: #fff;
-
-      border: 0;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--teal),
-          var(--teal-dark)
-        );
+    .card h2 {
+      margin: 0 0 18px;
+      font-size: 20px;
     }
 
-    .ip-card-top,
-    .ip-row,
-    .section-heading,
-    .location-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
     }
 
-    .card-label {
-      font-size: 12px;
-      font-weight: 700;
-
-      opacity: 0.82;
-
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .status-label {
-      padding: 5px 9px;
-
-      border-radius: 999px;
-
-      background: rgba(255, 255, 255, 0.11);
-
-      font-size: 11px;
-      white-space: nowrap;
-    }
-
-    .ip-row {
-      margin-top: 20px;
-      align-items: flex-end;
-    }
-
-    .ip-value {
-      min-width: 0;
-
-      overflow-wrap: anywhere;
-
-      font-size: clamp(28px, 6vw, 48px);
-      font-weight: 700;
-      line-height: 1;
-
-      letter-spacing: -0.06em;
-    }
-
-    .copy-button,
-    .location-button {
-      border: 0;
-      border-radius: 10px;
-
-      padding: 10px 14px;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-      transition:
-        filter 0.15s ease,
-        transform 0.15s ease,
-        opacity 0.15s ease;
-    }
-
-    .copy-button:hover,
-    .location-button:hover {
-      filter: brightness(0.94);
-    }
-
-    .copy-button:active,
-    .location-button:active {
-      transform: translateY(1px);
-    }
-
-    .copy-button {
-      flex: 0 0 auto;
-
-      color: var(--teal-dark);
-      background: #fff;
-    }
-
-    .copy-button:disabled,
-    .location-button:disabled {
-      cursor: wait;
-      opacity: 0.6;
-    }
-
-    .card-hint {
-      margin: 14px 0 0;
-
-      font-size: 12px;
-
-      opacity: 0.76;
-    }
-
-    /* ------------------------------
-       STATS
-    ------------------------------ */
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-
-      margin: 12px 0 28px;
-    }
-
-    .stat-card {
-      display: flex;
-      gap: 12px;
-
-      padding: 17px;
-    }
-
-    .stat-icon {
-      flex: 0 0 auto;
-
-      color: var(--teal);
-
-      font-size: 22px;
-      line-height: 1;
-    }
-
-    .stat-label {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 12px;
-    }
-
-    .stat-card strong {
-      display: block;
-
-      margin: 3px 0;
-
-      font-size: 14px;
-
-      overflow-wrap: anywhere;
-    }
-
-    .stat-card small {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 12px;
-    }
-
-    /* ------------------------------
-       LOCATION
-    ------------------------------ */
-
-    .location-section {
-      padding: 22px;
-    }
-
-    .section-heading {
-      margin-bottom: 18px;
-    }
-
-    .map-pin {
-      flex: 0 0 auto;
-
-      color: var(--teal);
-
-      font-size: 28px;
-    }
-
-    .location-meta {
-      margin-bottom: 10px;
-
-      align-items: flex-start;
-
-      font-size: 13px;
-    }
-
-    .location-meta strong {
-      overflow-wrap: anywhere;
-    }
-
-    .location-coordinates {
-      color: var(--muted);
-
-      font-size: 12px;
-
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    .map-shell {
-      height: 310px;
-
-      overflow: hidden;
-
+    .item {
+      padding: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
       border-radius: 14px;
-
-      background: #dbe9e8;
+      min-width: 0;
     }
 
-    .ip-map {
+    .label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .value {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    #map {
       width: 100%;
-      height: 100%;
-      min-height: 260px;
+      height: 400px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
     }
 
-    .map-placeholder {
-      min-height: 180px;
-
-      display: grid;
-      place-items: center;
-
-      padding: 40px;
-
-      color: var(--muted);
-
-      text-align: center;
-    }
-
-    .map-error {
-      color: var(--danger);
-    }
-
-    .map-note {
-      margin: 12px 0;
-
-      color: var(--muted);
-
-      font-size: 12px;
-    }
-
-    .location-button {
-      background: var(--teal);
-      color: #fff;
-    }
-
-    .location-actions {
+    .buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      margin-top: 18px;
     }
 
-    /* ------------------------------
-       STATUS
-    ------------------------------ */
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        opacity 0.15s ease;
+    }
 
-    .status-message {
-      margin: 0;
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
 
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .secondary {
+      background: #eaf0ff;
+      color: #1d4ed8;
+    }
+
+    .success {
+      background: var(--success);
+      color: white;
+    }
+
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #f2f4f7;
       color: var(--muted);
+      font-size: 14px;
+      display: none;
+    }
 
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: #ecfdf3;
+      color: #027a48;
+    }
+
+    .status.error {
+      background: #fef3f2;
+      color: #b42318;
+    }
+
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fafafa;
+    }
+
+    .consent input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+
+    .consent label {
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #344054;
+    }
+
+    .notice {
+      margin-top: 12px;
+      color: var(--muted);
       font-size: 13px;
+      line-height: 1.5;
     }
 
-    .status-message.error {
-      color: var(--danger);
+    .loading {
+      color: var(--muted);
+      font-style: italic;
     }
-
-    /* ------------------------------
-       FOOTER
-    ------------------------------ */
 
     footer {
-      padding: 22px 0 4px;
-
-      color: var(--muted);
-
-      font-size: 12px;
-
       text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 10px 0 30px;
     }
 
-    footer span {
-      padding: 0 7px;
-      color: var(--teal);
-    }
-
-    /* ------------------------------
-       RESPONSIVE
-    ------------------------------ */
-
-    @media (max-width: 650px) {
-      .page-shell {
-        padding: 20px 12px;
+    @media (max-width: 700px) {
+      .container {
+        width: min(100% - 20px, 1100px);
+        margin: 20px auto;
       }
 
-      .stats-grid {
+      .card {
+        padding: 17px;
+        border-radius: 14px;
+      }
+
+      .grid {
         grid-template-columns: 1fr;
       }
 
-      .hero {
-        align-items: flex-start;
+      #map {
+        height: 300px;
       }
 
-      .system-pill {
-        width: 24px;
-        height: 24px;
-
-        justify-content: center;
-
-        padding: 0;
-
-        font-size: 0;
-      }
-
-      .system-pill .live-dot {
-        margin: 0;
-      }
-
-      .ip-row {
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      .copy-button {
-        margin-left: auto;
-      }
-
-      .location-meta {
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .location-coordinates {
-        text-align: left;
-      }
-
-      .map-shell {
-        height: 280px;
+      button {
+        width: 100%;
       }
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #0d1b1e;
-        --fg: #e6f3f1;
-        --card: #142629;
-        --muted: #9ab1b0;
-        --border: #284346;
+        --bg: #0f172a;
+        --card: #111827;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --border: #263244;
+        --shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
       }
 
-      .page-shell {
-        background:
-          radial-gradient(
-            circle at 20% 0%,
-            #123b3b,
-            transparent 34%
-          ),
-          var(--bg);
+      .item {
+        background: #172033;
       }
 
-      .brand-mark {
-        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+      .consent {
+        background: #151c2c;
       }
 
-      .map-shell {
-        background: #203b3e;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
+      .consent label {
+        color: #cbd5e1;
       }
 
-      *,
-      *::before,
-      *::after {
-        transition: none !important;
+      .status {
+        background: #172033;
+      }
+
+      .secondary {
+        background: #172554;
+        color: #93c5fd;
       }
     }
   </style>
@@ -597,1379 +303,1217 @@
 
 <body>
 
-  <main class="page-shell">
-    <section
-      class="dashboard"
-      aria-labelledby="page-title"
-    >
+  <main class="container">
 
-      <!-- HEADER -->
+    <header>
+      <h1>Información de tu dispositivo</h1>
+      <p>
+        Consulta información técnica de tu navegador, dispositivo y ubicación
+        aproximada basada en tu dirección IP.
+      </p>
+    </header>
 
-      <header class="hero">
+    <!-- INFORMACIÓN DE RED -->
+    <section class="card">
+      <h2>🌐 Información de red</h2>
 
-        <div
-          class="brand-mark"
-          aria-hidden="true"
-        >
-          <svg viewBox="0 0 24 24">
-            <path d="M12 3 4.8 6.2v5.1c0 4.5 3 8.5 7.2 9.7 4.2-1.2 7.2-5.2 7.2-9.7V6.2L12 3Z"/>
-            <path d="m8.7 12 2.2 2.2 4.5-4.5"/>
-          </svg>
+      <div class="grid">
+        <div class="item">
+          <span class="label">Dirección IP</span>
+          <span class="value loading" id="ip">Cargando...</span>
         </div>
 
-        <div>
-          <p class="eyebrow">
-            Diagnóstico del navegador
-          </p>
-
-          <h1 id="page-title">
-            Información de tu dispositivo
-          </h1>
+        <div class="item">
+          <span class="label">Ciudad</span>
+          <span class="value loading" id="city">Cargando...</span>
         </div>
 
-        <span
-          class="system-pill"
-          title="Los datos se obtienen automáticamente cuando el navegador lo permite"
-        >
-          <span
-            class="live-dot"
-            aria-hidden="true"
-          ></span>
+        <div class="item">
+          <span class="label">País</span>
+          <span class="value loading" id="country">Cargando...</span>
+        </div>
 
-          <span>Automático</span>
-        </span>
-
-      </header>
-
-
-      <!-- IP -->
-
-      <section
-        class="ip-card"
-        aria-labelledby="ip-heading"
-      >
-
-        <div class="ip-card-top">
-
-          <span
-            id="ip-heading"
-            class="card-label"
-          >
-            Dirección IP pública
+        <div class="item">
+          <span class="label">Ubicación</span>
+          <span class="value" id="locationSource">
+            Basada en IP
           </span>
-
-          <span
-            id="ip-status"
-            class="status-label"
-          >
-            Consultando
-          </span>
-
         </div>
+      </div>
 
-        <div class="ip-row">
-
-          <strong
-            id="ip-value"
-            class="ip-value"
-            aria-live="polite"
-          >
-            Cargando…
-          </strong>
-
-          <button
-            id="copy-ip"
-            class="copy-button"
-            type="button"
-            disabled
-            aria-label="Copiar dirección IP"
-          >
-            <span
-              id="copy-icon"
-              aria-hidden="true"
-            >▣</span>
-
-            <span id="copy-label">
-              Copiar IP
-            </span>
-          </button>
-
-        </div>
-
-        <p class="card-hint">
-          La IP pública se consulta mediante un servicio externo de
-          geolocalización. Esta página no la guarda en almacenamiento local.
-        </p>
-
-      </section>
-
-
-      <!-- STATS -->
-
-      <section
-        class="stats-grid"
-        aria-label="Información del dispositivo"
-      >
-
-        <article class="stat-card">
-
-          <div
-            class="stat-icon"
-            aria-hidden="true"
-          >
-            ▰
-          </div>
-
-          <div>
-            <span class="stat-label">
-              Batería
-            </span>
-
-            <strong id="battery-value">
-              No disponible
-            </strong>
-
-            <small id="battery-note">
-              Limitado por navegador
-            </small>
-          </div>
-
-        </article>
-
-
-        <article class="stat-card">
-
-          <div
-            class="stat-icon"
-            aria-hidden="true"
-          >
-            ▣
-          </div>
-
-          <div>
-            <span class="stat-label">
-              Navegador / SO
-            </span>
-
-            <strong id="platform-value">
-              Detectando…
-            </strong>
-
-            <small id="screen-value">
-              Detectando…
-            </small>
-          </div>
-
-        </article>
-
-
-        <article class="stat-card">
-
-          <div
-            class="stat-icon"
-            aria-hidden="true"
-          >
-            ◷
-          </div>
-
-          <div>
-            <span class="stat-label">
-              Hora local
-            </span>
-
-            <strong
-              id="time-value"
-              aria-live="off"
-            >
-              --:--:--
-            </strong>
-
-            <small id="timezone-value">
-              Detectando zona horaria…
-            </small>
-          </div>
-
-        </article>
-
-      </section>
-
-
-      <!-- LOCATION -->
-
-      <section
-        class="location-section"
-        aria-labelledby="location-title"
-      >
-
-        <div class="section-heading">
-
-          <div>
-
-            <p class="eyebrow">
-              Geolocalización
-            </p>
-
-            <h2 id="location-title">
-              Ubicación aproximada de tu IP
-            </h2>
-
-          </div>
-
-          <span
-            class="map-pin"
-            aria-hidden="true"
-          >
-            ⌖
-          </span>
-
-        </div>
-
-
-        <div
-          id="location-content"
-          aria-live="polite"
+      <div class="buttons">
+        <button
+          type="button"
+          class="secondary"
+          id="copyIpBtn"
         >
-
-          <div class="map-placeholder">
-            <p class="status-message">
-              Consultando ubicación…
-            </p>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- FOOTER -->
-
-      <footer>
-        <span>•</span>
-
-        La página solicita únicamente los permisos necesarios.
-
-        <span>•</span>
-
-        El modo oscuro sigue la configuración del sistema.
-      </footer>
-
+          Copiar IP
+        </button>
+      </div>
     </section>
+
+    <!-- MAPA -->
+    <section class="card">
+      <h2>📍 Ubicación aproximada</h2>
+
+      <div id="map" aria-label="Mapa de ubicación aproximada"></div>
+
+      <div class="buttons">
+        <button
+          type="button"
+          class="secondary"
+          id="gpsBtn"
+        >
+          Usar mi ubicación real
+        </button>
+      </div>
+
+      <p class="notice">
+        La ubicación mostrada inicialmente es una aproximación basada en la
+        dirección IP. Si seleccionas "Usar mi ubicación real", el navegador
+        solicitará permiso para acceder al GPS/ubicación del dispositivo.
+      </p>
+
+      <div
+        id="gpsStatus"
+        class="status"
+        role="status"
+        aria-live="polite"
+      ></div>
+    </section>
+
+    <!-- INFORMACIÓN DEL DISPOSITIVO -->
+    <section class="card">
+      <h2>💻 Información del dispositivo</h2>
+
+      <div class="grid">
+
+        <div class="item">
+          <span class="label">Navegador</span>
+          <span class="value" id="browser">Detectando...</span>
+        </div>
+
+        <div class="item">
+          <span class="label">Sistema operativo</span>
+          <span class="value" id="os">Detectando...</span>
+        </div>
+
+        <div class="item">
+          <span class="label">Resolución</span>
+          <span class="value" id="screen">Detectando...</span>
+        </div>
+
+        <div class="item">
+          <span class="label">Idioma</span>
+          <span class="value" id="language">Detectando...</span>
+        </div>
+
+        <div class="item">
+          <span class="label">Zona horaria</span>
+          <span class="value" id="timezone">Detectando...</span>
+        </div>
+
+        <div class="item">
+          <span class="label">Hora local</span>
+          <span class="value" id="localTime">Detectando...</span>
+        </div>
+
+        <div class="item">
+          <span class="label">Batería</span>
+          <span class="value" id="battery">No disponible</span>
+        </div>
+
+        <div class="item">
+          <span class="label">Estado de batería</span>
+          <span class="value" id="batteryStatus">No disponible</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ENVÍO -->
+    <section class="card">
+      <h2>📨 Enviar información</h2>
+
+      <p>
+        Puedes enviar la información mostrada anteriormente al administrador
+        mediante Google Apps Script.
+      </p>
+
+      <div class="consent">
+        <input
+          type="checkbox"
+          id="consent"
+        >
+
+        <label for="consent">
+          Autorizo el envío de la información mostrada en esta página al
+          administrador.
+        </label>
+      </div>
+
+      <div class="buttons">
+
+        <button
+          type="button"
+          class="success"
+          id="sendBtn"
+          disabled
+        >
+          Enviar información
+        </button>
+
+      </div>
+
+      <div
+        id="sendStatus"
+        class="status"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <p class="notice">
+        La información se enviará mediante una conexión HTTPS a tu Web App de
+        Google Apps Script, que posteriormente puede enviarla a Gmail.
+      </p>
+    </section>
+
   </main>
+
+  <footer>
+    Información técnica del navegador y dispositivo.
+  </footer>
 
 
   <!-- Leaflet -->
-
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
   ></script>
 
 
   <script>
-    (() => {
-      "use strict";
+    "use strict";
+
+
+    /* ============================================================
+       CONFIGURACIÓN
+       ============================================================ */
+
+    const CONFIG = {
 
       /*
-       * ------------------------------------------------------------
-       * CONFIGURACIÓN
-       * ------------------------------------------------------------
-       */
-
-      const CONFIG = Object.freeze({
-        ipApiUrl: "https://ipwho.is/",
-        ipApiTimeout: 8000,
-
-        geolocationTimeout: 10000,
-
-        mapZoomIp: 10,
-        mapZoomDevice: 15
-      });
-
-
-      /*
-       * ------------------------------------------------------------
-       * UTILIDADES DOM
-       * ------------------------------------------------------------
-       */
-
-      const $ = (selector) =>
-        document.querySelector(selector);
-
-
-      /*
-       * Actualiza textContent de forma segura.
-       *
        * IMPORTANTE:
-       * No utilizamos innerHTML con datos procedentes de APIs.
-       */
-
-      const setText = (selector, value) => {
-        const element = $(selector);
-
-        if (element) {
-          element.textContent =
-            value == null ? "" : String(value);
-        }
-      };
-
-
-      /*
-       * ------------------------------------------------------------
-       * ESTADO
-       * ------------------------------------------------------------
-       */
-
-      const state = {
-        ip: "",
-        location: null,
-        source: "ip",
-        map: null
-      };
-
-
-      /*
-       * ------------------------------------------------------------
-       * FORMATEO
-       * ------------------------------------------------------------
-       */
-
-      const formatCoordinate = (value) => {
-        const number = Number(value);
-
-        return Number.isFinite(number)
-          ? number.toFixed(4)
-          : "—";
-      };
-
-
-      /*
-       * ------------------------------------------------------------
-       * DETECCIÓN DE PLATAFORMA
-       * ------------------------------------------------------------
-       */
-
-      function detectPlatform() {
-        const ua = navigator.userAgent || "";
-
-        let os = "Desconocido";
-        let browser = "Navegador";
-
-        /*
-         * Sistema operativo
-         */
-
-        if (/Windows/i.test(ua)) {
-          os = "Windows";
-        } else if (/Android/i.test(ua)) {
-          os = "Android";
-        } else if (
-          /iPhone|iPad|iPod/i.test(ua)
-        ) {
-          os = "iOS / iPadOS";
-        } else if (/Macintosh|Mac OS X/i.test(ua)) {
-          os = "macOS";
-        } else if (/Linux/i.test(ua)) {
-          os = "Linux";
-        }
-
-
-        /*
-         * Navegador
-         */
-
-        if (/Edg\//i.test(ua)) {
-          browser = "Edge";
-        } else if (/OPR\//i.test(ua)) {
-          browser = "Opera";
-        } else if (
-          /Chrome\//i.test(ua) &&
-          !/Edg\//i.test(ua)
-        ) {
-          browser = "Chrome";
-        } else if (/Firefox\//i.test(ua)) {
-          browser = "Firefox";
-        } else if (
-          /Safari\//i.test(ua) &&
-          !/Chrome\//i.test(ua)
-        ) {
-          browser = "Safari";
-        }
-
-
-        return `${browser} (${os})`;
-      }
-
-
-      /*
-       * ------------------------------------------------------------
-       * HORA LOCAL
-       * ------------------------------------------------------------
-       */
-
-      function updateClock() {
-        const now = new Date();
-
-        const locale =
-          navigator.language || "es-ES";
-
-        const formatted =
-          new Intl.DateTimeFormat(
-            locale,
-            {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false
-            }
-          ).format(now);
-
-        setText("#time-value", formatted);
-      }
-
-
-      function updateTimezone() {
-        try {
-          const timezone =
-            Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-          setText(
-            "#timezone-value",
-            timezone || "Zona horaria no disponible"
-          );
-        } catch {
-          setText(
-            "#timezone-value",
-            "Zona horaria no disponible"
-          );
-        }
-      }
-
-
-      /*
-       * ------------------------------------------------------------
-       * BATERÍA
-       * ------------------------------------------------------------
-       */
-
-      async function loadBattery() {
-        const value = $("#battery-value");
-        const note = $("#battery-note");
-
-        if (
-          !value ||
-          !note ||
-          typeof navigator.getBattery !== "function"
-        ) {
-          return;
-        }
-
-        try {
-          const battery =
-            await navigator.getBattery();
-
-          const update = () => {
-            const percentage =
-              Math.round(battery.level * 100);
-
-            value.textContent =
-              `${percentage}%`;
-
-            note.textContent =
-              battery.charging
-                ? "Cargando"
-                : "En uso";
-          };
-
-          update();
-
-          battery.addEventListener(
-            "levelchange",
-            update
-          );
-
-          battery.addEventListener(
-            "chargingchange",
-            update
-          );
-
-        } catch {
-          value.textContent =
-            "No disponible";
-
-          note.textContent =
-            "Bloqueado por navegador";
-        }
-      }
-
-
-      /*
-       * ------------------------------------------------------------
-       * LEAFLET
-       * ------------------------------------------------------------
-       */
-
-      function isLeafletAvailable() {
-        return (
-          typeof window.L !== "undefined" &&
-          typeof window.L.map === "function"
-        );
-      }
-
-
-      function destroyMap() {
-        if (!state.map) {
-          return;
-        }
-
-        try {
-          state.map.remove();
-        } catch {
-          // No hacemos nada si Leaflet ya eliminó el mapa.
-        }
-
-        state.map = null;
-      }
-
-
-      /*
-       * ------------------------------------------------------------
-       * LOCATION UI
-       * ------------------------------------------------------------
-       */
-
-      function showLocationLoading(message) {
-        const container =
-          $("#location-content");
-
-        if (!container) {
-          return;
-        }
-
-        destroyMap();
-
-        container.replaceChildren();
-
-        const placeholder =
-          document.createElement("div");
-
-        placeholder.className =
-          "map-placeholder";
-
-        const messageElement =
-          document.createElement("p");
-
-        messageElement.className =
-          "status-message";
-
-        messageElement.textContent =
-          message;
-
-        placeholder.appendChild(
-          messageElement
-        );
-
-        container.appendChild(
-          placeholder
-        );
-      }
-
-
-      function showLocationError(message) {
-        const container =
-          $("#location-content");
-
-        if (!container) {
-          return;
-        }
-
-        destroyMap();
-
-        container.replaceChildren();
-
-        const placeholder =
-          document.createElement("div");
-
-        placeholder.className =
-          "map-placeholder";
-
-        const messageElement =
-          document.createElement("p");
-
-        messageElement.className =
-          "status-message error";
-
-        messageElement.textContent =
-          message;
-
-        placeholder.appendChild(
-          messageElement
-        );
-
-        container.appendChild(
-          placeholder
-        );
-      }
-
-
-      /*
-       * Construye la sección de ubicación SIN innerHTML.
+       * Sustituye este valor por la URL de tu Web App de Google Apps Script.
        *
-       * Esto evita introducir directamente datos externos
-       * procedentes de la API.
+       * Ejemplo:
+       * https://script.google.com/macros/s/XXXXXXXXXXXX/exec
        */
-
-      function renderLocation() {
-        const container =
-          $("#location-content");
-
-        const title =
-          $("#location-title");
-
-        if (!container || !title) {
-          return;
-        }
-
-        if (!state.location) {
-          showLocationError(
-            "No se pudo obtener la ubicación."
-          );
-
-          return;
-        }
-
-        const {
-          latitude,
-          longitude,
-          city,
-          country
-        } = state.location;
-
-        const lat = Number(latitude);
-        const lng = Number(longitude);
-
-        if (
-          !Number.isFinite(lat) ||
-          !Number.isFinite(lng) ||
-          lat < -90 ||
-          lat > 90 ||
-          lng < -180 ||
-          lng > 180
-        ) {
-          showLocationError(
-            "La ubicación recibida no es válida."
-          );
-
-          return;
-        }
-
-        destroyMap();
-
-        container.replaceChildren();
-
-        /*
-         * Título
-         */
-
-        title.textContent =
-          state.source === "device"
-            ? "Ubicación real del dispositivo"
-            : "Ubicación aproximada de tu IP";
-
-
-        /*
-         * Información textual
-         */
-
-        const meta =
-          document.createElement("div");
-
-        meta.className =
-          "location-meta";
-
-
-        const place =
-          document.createElement("strong");
-
-        const safeCity =
-          city || "Ubicación desconocida";
-
-        const safeCountry =
-          country || "País desconocido";
-
-        place.textContent =
-          `${safeCity}, ${safeCountry}`;
-
-
-        const coordinates =
-          document.createElement("span");
-
-        coordinates.className =
-          "location-coordinates";
-
-        coordinates.textContent =
-          `${formatCoordinate(lat)}, ${formatCoordinate(lng)}`;
-
-
-        meta.appendChild(place);
-        meta.appendChild(coordinates);
-
-
-        /*
-         * Mapa
-         */
-
-        const mapShell =
-          document.createElement("div");
-
-        mapShell.className =
-          "map-shell";
-
-
-        const mapElement =
-          document.createElement("div");
-
-        mapElement.className =
-          "ip-map";
-
-        mapElement.id =
-          "ip-map";
-
-
-        mapElement.setAttribute(
-          "role",
-          "application"
-        );
-
-        mapElement.setAttribute(
-          "aria-label",
-          `Mapa de ${safeCity}, ${safeCountry}`
-        );
-
-
-        mapShell.appendChild(
-          mapElement
-        );
-
-
-        /*
-         * Nota de precisión
-         */
-
-        const note =
-          document.createElement("p");
-
-        note.className =
-          "map-note";
-
-        note.textContent =
-          state.source === "device"
-            ? "Ubicación obtenida mediante el permiso de geolocalización del navegador. La página no la guarda en almacenamiento local."
-            : "La ubicación se estima a partir de la dirección IP y puede representar la ciudad, región o infraestructura de red, no tu posición exacta.";
-
-
-        /*
-         * Acciones
-         */
-
-        const actions =
-          document.createElement("div");
-
-        actions.className =
-          "location-actions";
-
-
-        if (state.source === "ip") {
-          const button =
-            document.createElement("button");
-
-          button.type = "button";
-          button.className =
-            "location-button";
-
-          button.id =
-            "use-location";
-
-          button.textContent =
-            "Usar mi ubicación real";
-
-          button.addEventListener(
-            "click",
-            requestDeviceLocation
-          );
-
-          actions.appendChild(
-            button
-          );
-        }
-
-
-        container.appendChild(meta);
-        container.appendChild(mapShell);
-        container.appendChild(note);
-
-        if (actions.childElementCount) {
-          container.appendChild(actions);
-        }
-
-
-        /*
-         * Leaflet
-         */
-
-        if (!isLeafletAvailable()) {
-          mapElement.replaceChildren();
-
-          const error =
-            document.createElement("p");
-
-          error.className =
-            "status-message error";
-
-          error.style.padding = "30px";
-
-          error.textContent =
-            "El componente del mapa no pudo cargarse.";
-
-          mapElement.appendChild(error);
-
-          return;
-        }
-
-
-        try {
-          state.map =
-            window.L
-              .map(mapElement, {
-                scrollWheelZoom: true,
-                zoomControl: true
-              })
-              .setView(
-                [lat, lng],
-                state.source === "device"
-                  ? CONFIG.mapZoomDevice
-                  : CONFIG.mapZoomIp
-              );
-
-
-          /*
-           * URL oficial de teselas estándar.
-           *
-           * No usar prefetch/bulk downloading.
-           */
-
-          window.L
-            .tileLayer(
-              "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-              {
-                maxZoom: 19,
-
-                attribution:
-                  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>'
-              }
-            )
-            .addTo(state.map);
-
-
-          /*
-           * Marcador
-           */
-
-          window.L
-            .marker([lat, lng])
-            .addTo(state.map)
-            .bindPopup(
-              `${escapeHtml(safeCity)}, ${escapeHtml(safeCountry)}`
-            )
-            .openPopup();
-
-        } catch {
-          showLocationError(
-            "No fue posible inicializar el mapa."
-          );
-        }
-      }
-
+      appsScriptUrl: "TU_URL_DE_GOOGLE_APPS_SCRIPT",
 
       /*
-       * Escapado para contenido que NECESITA HTML.
-       *
-       * El resto de la aplicación utiliza textContent.
+       * API utilizada para obtener la IP pública y una ubicación
+       * aproximada basada en IP.
        */
+      ipApiUrl: "https://ipwho.is/"
+    };
 
-      function escapeHtml(value) {
-        return String(value)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
+
+    /* ============================================================
+       VARIABLES
+       ============================================================ */
+
+    let deviceInfo = {
+      ip: "",
+      city: "",
+      country: "",
+      latitude: null,
+      longitude: null,
+      locationSource: "IP",
+      browser: "",
+      os: "",
+      screen: "",
+      language: "",
+      timezone: "",
+      battery: "",
+      batteryStatus: "",
+      timestamp: ""
+    };
+
+    let map = null;
+    let marker = null;
+
+
+    /* ============================================================
+       UTILIDADES
+       ============================================================ */
+
+    function setText(id, value) {
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.textContent =
+          value === null ||
+          value === undefined ||
+          value === ""
+            ? "No disponible"
+            : String(value);
+      }
+    }
+
+
+    function showStatus(id, message, type = "") {
+      const element = document.getElementById(id);
+
+      if (!element) return;
+
+      element.textContent = message;
+      element.className = "status show";
+
+      if (type) {
+        element.classList.add(type);
+      }
+    }
+
+
+    function formatNumber(value, decimals = 6) {
+      if (
+        typeof value !== "number" ||
+        !Number.isFinite(value)
+      ) {
+        return null;
       }
 
+      return Number(value.toFixed(decimals));
+    }
 
-      /*
-       * ------------------------------------------------------------
-       * GEOLOCALIZACIÓN DEL DISPOSITIVO
-       * ------------------------------------------------------------
-       */
 
-      function getGeolocationErrorMessage(error) {
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            return "El permiso de ubicación fue denegado.";
+    /* ============================================================
+       MAPA
+       ============================================================ */
 
-          case error.POSITION_UNAVAILABLE:
-            return "El navegador no pudo determinar tu ubicación.";
-
-          case error.TIMEOUT:
-            return "La solicitud de ubicación agotó el tiempo de espera.";
-
-          default:
-            return "No fue posible obtener la ubicación.";
-        }
-      }
-
-
-      function requestDeviceLocation() {
-        const button =
-          $("#use-location");
-
-        if (button) {
-          button.disabled = true;
-          button.textContent =
-            "Solicitando permiso…";
-        }
-
-
-        if (!("geolocation" in navigator)) {
-          if (button) {
-            button.disabled = false;
-            button.textContent =
-              "Geolocalización no disponible";
-          }
-
-          return;
-        }
-
-
-        showLocationLoading(
-          "Solicitando permiso de ubicación…"
-        );
-
-
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const {
-              latitude,
-              longitude
-            } = position.coords;
-
-
-            if (
-              !Number.isFinite(latitude) ||
-              !Number.isFinite(longitude)
-            ) {
-              showLocationError(
-                "El navegador devolvió unas coordenadas no válidas."
-              );
-
-              return;
-            }
-
-
-            state.location = {
-              latitude,
-              longitude,
-
-              /*
-               * No inventamos ciudad/país.
-               *
-               * Para obtenerlos a partir de coordenadas habría
-               * que realizar geocodificación inversa mediante
-               * otro servicio.
-               */
-
-              city: "Ubicación actual",
-              country: "Dispositivo"
-            };
-
-            state.source = "device";
-
-            renderLocation();
-          },
-
-
-          (error) => {
-            showLocationError(
-              getGeolocationErrorMessage(error)
-            );
-          },
-
-
-          {
-            enableHighAccuracy: true,
-            timeout: CONFIG.geolocationTimeout,
-            maximumAge: 0
-          }
-        );
-      }
-
-
-      /*
-       * ------------------------------------------------------------
-       * IP
-       * ------------------------------------------------------------
-       */
-
-      async function fetchPublicIp() {
-        const controller =
-          new AbortController();
-
-        const timeoutId =
-          setTimeout(
-            () => controller.abort(),
-            CONFIG.ipApiTimeout
-          );
-
-
-        try {
-          const response =
-            await fetch(
-              CONFIG.ipApiUrl,
-              {
-                method: "GET",
-
-                cache: "no-store",
-
-                signal:
-                  controller.signal,
-
-                headers: {
-                  "Accept":
-                    "application/json"
-                }
-              }
-            );
-
-
-          if (!response.ok) {
-            throw new Error(
-              `HTTP ${response.status}`
-            );
-          }
-
-
-          const data =
-            await response.json();
-
-
-          /*
-           * Validamos explícitamente la respuesta.
-           */
-
-          if (
-            !data ||
-            data.success !== true ||
-            typeof data.ip !== "string"
-          ) {
-            throw new Error(
-              "Respuesta de API no válida"
-            );
-          }
-
-
-          const latitude =
-            Number(data.latitude);
-
-          const longitude =
-            Number(data.longitude);
-
-
-          if (
-            !Number.isFinite(latitude) ||
-            !Number.isFinite(longitude)
-          ) {
-            throw new Error(
-              "Coordenadas no válidas"
-            );
-          }
-
-
-          return {
-            ip: data.ip,
-
-            location: {
-              latitude,
-              longitude,
-
-              city:
-                typeof data.city === "string"
-                  ? data.city
-                  : "Ubicación desconocida",
-
-              country:
-                typeof data.country === "string"
-                  ? data.country
-                  : "País desconocido"
-            }
-          };
-
-        } finally {
-          clearTimeout(timeoutId);
-        }
-      }
-
-
-      /*
-       * ------------------------------------------------------------
-       * CARGAR INFORMACIÓN IP
-       * ------------------------------------------------------------
-       */
-
-      async function loadIpInformation() {
-        setText(
-          "#ip-value",
-          "Cargando…"
-        );
-
-        setText(
-          "#ip-status",
-          "Consultando"
-        );
-
-
-        try {
-          const result =
-            await fetchPublicIp();
-
-
-          state.ip =
-            result.ip;
-
-          state.location =
-            result.location;
-
-          state.source =
-            "ip";
-
-
-          setText(
-            "#ip-value",
-            state.ip
-          );
-
-
-          setText(
-            "#ip-status",
-            "Conectado"
-          );
-
-
-          const copyButton =
-            $("#copy-ip");
-
-          if (copyButton) {
-            copyButton.disabled = false;
-          }
-
-
-          renderLocation();
-
-        } catch (error) {
-          console.error(
-            "No se pudo consultar la IP:",
-            error
-          );
-
-
-          state.ip = "";
-          state.location = null;
-
-
-          setText(
-            "#ip-value",
-            "No disponible"
-          );
-
-
-          setText(
-            "#ip-status",
-            "Sin conexión"
-          );
-
-
-          const copyButton =
-            $("#copy-ip");
-
-          if (copyButton) {
-            copyButton.disabled = true;
-          }
-
-
-          showLocationError(
-            "No fue posible obtener la ubicación mediante la IP."
-          );
-        }
-      }
-
-
-      /*
-       * ------------------------------------------------------------
-       * COPIAR IP
-       * ------------------------------------------------------------
-       */
-
-      async function copyIp() {
-        if (!state.ip) {
-          return;
-        }
-
-
-        const button =
-          $("#copy-ip");
-
-        const icon =
-          $("#copy-icon");
-
-        const label =
-          $("#copy-label");
-
-
-        if (
-          !button ||
-          !icon ||
-          !label
-        ) {
-          return;
-        }
-
-
-        try {
-          if (
-            !navigator.clipboard ||
-            typeof navigator.clipboard.writeText !== "function"
-          ) {
-            throw new Error(
-              "Clipboard API no disponible"
-            );
-          }
-
-
-          await navigator.clipboard.writeText(
-            state.ip
-          );
-
-
-          icon.textContent = "✓";
-          label.textContent = "Copiada";
-
-
-          setTimeout(() => {
-            icon.textContent = "▣";
-            label.textContent = "Copiar IP";
-          }, 1800);
-
-        } catch {
-          label.textContent =
-            "No disponible";
-
-
-          setTimeout(() => {
-            label.textContent =
-              "Copiar IP";
-          }, 1800);
-        }
-      }
-
-
-      /*
-       * ------------------------------------------------------------
-       * INICIALIZACIÓN
-       * ------------------------------------------------------------
-       */
-
-      function initialize() {
-        /*
-         * Plataforma
-         */
-
-        setText(
-          "#platform-value",
-          detectPlatform()
-        );
-
-
-        /*
-         * Pantalla
-         */
-
-        setText(
-          "#screen-value",
-          `${window.screen.width} × ${window.screen.height} px`
-        );
-
-
-        /*
-         * Hora
-         */
-
-        updateClock();
-        updateTimezone();
-
-        setInterval(
-          updateClock,
-          1000
-        );
-
-
-        /*
-         * Batería
-         */
-
-        loadBattery();
-
-
-        /*
-         * Copiar IP
-         */
-
-        const copyButton =
-          $("#copy-ip");
-
-        if (copyButton) {
-          copyButton.addEventListener(
-            "click",
-            copyIp
-          );
-        }
-
-
-        /*
-         * IP + ubicación
-         */
-
-        loadIpInformation();
-      }
-
-
-      /*
-       * Esperamos a que el DOM esté listo.
-       */
+    function initializeMap(latitude, longitude) {
 
       if (
-        document.readyState === "loading"
+        typeof latitude !== "number" ||
+        typeof longitude !== "number" ||
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)
       ) {
-        document.addEventListener(
-          "DOMContentLoaded",
-          initialize,
-          {
-            once: true
-          }
-        );
-      } else {
-        initialize();
+        return;
       }
 
-    })();
+      if (!map) {
+
+        map = L.map("map", {
+          scrollWheelZoom: true
+        }).setView(
+          [latitude, longitude],
+          10
+        );
+
+        L.tileLayer(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            maxZoom: 19,
+            attribution:
+              '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
+          }
+        ).addTo(map);
+
+      } else {
+
+        map.setView(
+          [latitude, longitude],
+          13
+        );
+      }
+
+
+      if (marker) {
+        marker.setLatLng([
+          latitude,
+          longitude
+        ]);
+      } else {
+
+        marker = L.marker([
+          latitude,
+          longitude
+        ]).addTo(map);
+      }
+    }
+
+
+    /* ============================================================
+       IP Y GEOLOCALIZACIÓN POR IP
+       ============================================================ */
+
+    async function loadIpInformation() {
+
+      try {
+
+        const controller = new AbortController();
+
+        const timeout = setTimeout(
+          () => controller.abort(),
+          10000
+        );
+
+
+        const response = await fetch(
+          CONFIG.ipApiUrl,
+          {
+            method: "GET",
+            signal: controller.signal,
+            headers: {
+              "Accept": "application/json"
+            }
+          }
+        );
+
+
+        clearTimeout(timeout);
+
+
+        if (!response.ok) {
+          throw new Error(
+            "No se pudo obtener la información de IP."
+          );
+        }
+
+
+        const data = await response.json();
+
+
+        if (!data.success) {
+          throw new Error(
+            "La API de IP no devolvió información válida."
+          );
+        }
+
+
+        deviceInfo.ip =
+          data.ip || "";
+
+        deviceInfo.city =
+          data.city || "";
+
+        deviceInfo.country =
+          data.country || "";
+
+
+        deviceInfo.latitude =
+          formatNumber(data.latitude);
+
+        deviceInfo.longitude =
+          formatNumber(data.longitude);
+
+        deviceInfo.locationSource =
+          "IP";
+
+
+        setText(
+          "ip",
+          deviceInfo.ip
+        );
+
+        setText(
+          "city",
+          deviceInfo.city
+        );
+
+        setText(
+          "country",
+          deviceInfo.country
+        );
+
+        setText(
+          "locationSource",
+          "Ubicación aproximada por IP"
+        );
+
+
+        initializeMap(
+          deviceInfo.latitude,
+          deviceInfo.longitude
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Error obteniendo IP:",
+          error
+        );
+
+
+        setText(
+          "ip",
+          "No disponible"
+        );
+
+        setText(
+          "city",
+          "No disponible"
+        );
+
+        setText(
+          "country",
+          "No disponible"
+        );
+
+        setText(
+          "locationSource",
+          "No disponible"
+        );
+      }
+    }
+
+
+    /* ============================================================
+       GEOLOCALIZACIÓN REAL
+       ============================================================ */
+
+    function requestRealLocation() {
+
+      if (!("geolocation" in navigator)) {
+
+        showStatus(
+          "gpsStatus",
+          "Este navegador no permite obtener la ubicación.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      showStatus(
+        "gpsStatus",
+        "Solicitando permiso de ubicación..."
+      );
+
+
+      navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+          const latitude =
+            formatNumber(
+              position.coords.latitude
+            );
+
+          const longitude =
+            formatNumber(
+              position.coords.longitude
+            );
+
+
+          deviceInfo.latitude =
+            latitude;
+
+          deviceInfo.longitude =
+            longitude;
+
+          deviceInfo.locationSource =
+            "GPS";
+
+
+          initializeMap(
+            latitude,
+            longitude
+          );
+
+
+          setText(
+            "locationSource",
+            "Ubicación real del dispositivo"
+          );
+
+
+          showStatus(
+            "gpsStatus",
+            "Ubicación real obtenida correctamente.",
+            "success"
+          );
+        },
+
+
+        function(error) {
+
+          let message =
+            "No fue posible obtener la ubicación.";
+
+          switch (error.code) {
+
+            case error.PERMISSION_DENIED:
+              message =
+                "Permiso de ubicación denegado.";
+              break;
+
+            case error.POSITION_UNAVAILABLE:
+              message =
+                "La ubicación no está disponible.";
+              break;
+
+            case error.TIMEOUT:
+              message =
+                "La solicitud de ubicación tardó demasiado.";
+              break;
+          }
+
+
+          showStatus(
+            "gpsStatus",
+            message,
+            "error"
+          );
+        },
+
+
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+      );
+    }
+
+
+    /* ============================================================
+       NAVEGADOR
+       ============================================================ */
+
+    function detectBrowser() {
+
+      const userAgent =
+        navigator.userAgent;
+
+
+      let browser = "Desconocido";
+
+
+      if (
+        userAgent.includes("Edg/")
+      ) {
+        browser = "Microsoft Edge";
+
+      } else if (
+        userAgent.includes("OPR/") ||
+        userAgent.includes("Opera")
+      ) {
+        browser = "Opera";
+
+      } else if (
+        userAgent.includes("Chrome/") &&
+        !userAgent.includes("Edg/")
+      ) {
+        browser = "Google Chrome";
+
+      } else if (
+        userAgent.includes("Firefox/")
+      ) {
+        browser = "Mozilla Firefox";
+
+      } else if (
+        userAgent.includes("Safari/") &&
+        !userAgent.includes("Chrome/")
+      ) {
+        browser = "Safari";
+      }
+
+
+      return browser;
+    }
+
+
+    /* ============================================================
+       SISTEMA OPERATIVO
+       ============================================================ */
+
+    function detectOS() {
+
+      const userAgent =
+        navigator.userAgent;
+
+
+      const platform =
+        navigator.platform || "";
+
+
+      if (
+        /Windows NT/i.test(userAgent)
+      ) {
+        return "Windows";
+
+      }
+
+      if (
+        /Android/i.test(userAgent)
+      ) {
+        return "Android";
+
+      }
+
+      if (
+        /iPhone|iPad|iPod/i.test(userAgent)
+      ) {
+        return "iOS";
+
+      }
+
+      if (
+        /Mac OS X/i.test(userAgent) ||
+        /Macintosh/i.test(userAgent)
+      ) {
+        return "macOS";
+
+      }
+
+      if (
+        /Linux/i.test(userAgent) ||
+        /Linux/i.test(platform)
+      ) {
+        return "Linux";
+      }
+
+
+      return "Desconocido";
+    }
+
+
+    /* ============================================================
+       INFORMACIÓN DEL DISPOSITIVO
+       ============================================================ */
+
+    function loadDeviceInformation() {
+
+      deviceInfo.browser =
+        detectBrowser();
+
+      deviceInfo.os =
+        detectOS();
+
+      deviceInfo.screen =
+        `${window.screen.width} x ${window.screen.height}`;
+
+      deviceInfo.language =
+        navigator.language || "";
+
+      deviceInfo.timezone =
+        Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+
+
+      deviceInfo.timestamp =
+        new Date().toISOString();
+
+
+      setText(
+        "browser",
+        deviceInfo.browser
+      );
+
+      setText(
+        "os",
+        deviceInfo.os
+      );
+
+      setText(
+        "screen",
+        deviceInfo.screen
+      );
+
+      setText(
+        "language",
+        deviceInfo.language
+      );
+
+      setText(
+        "timezone",
+        deviceInfo.timezone
+      );
+
+
+      updateLocalTime();
+
+      setInterval(
+        updateLocalTime,
+        1000
+      );
+    }
+
+
+    /* ============================================================
+       HORA LOCAL
+       ============================================================ */
+
+    function updateLocalTime() {
+
+      const now =
+        new Date();
+
+
+      setText(
+        "localTime",
+        now.toLocaleString(
+          navigator.language || "es",
+          {
+            dateStyle: "medium",
+            timeStyle: "medium"
+          }
+        )
+      );
+    }
+
+
+    /* ============================================================
+       BATERÍA
+       ============================================================ */
+
+    async function loadBatteryInformation() {
+
+      if (
+        !navigator.getBattery
+      ) {
+
+        setText(
+          "battery",
+          "No disponible en este navegador"
+        );
+
+        setText(
+          "batteryStatus",
+          "No disponible"
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const battery =
+          await navigator.getBattery();
+
+
+        function updateBattery() {
+
+          const percentage =
+            Math.round(
+              battery.level * 100
+            );
+
+
+          const charging =
+            battery.charging
+              ? "Cargando"
+              : "No está cargando";
+
+
+          deviceInfo.battery =
+            `${percentage}%`;
+
+          deviceInfo.batteryStatus =
+            charging;
+
+
+          setText(
+            "battery",
+            `${percentage}%`
+          );
+
+          setText(
+            "batteryStatus",
+            charging
+          );
+        }
+
+
+        updateBattery();
+
+
+        battery.addEventListener(
+          "levelchange",
+          updateBattery
+        );
+
+        battery.addEventListener(
+          "chargingchange",
+          updateBattery
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Error obteniendo batería:",
+          error
+        );
+
+        setText(
+          "battery",
+          "No disponible"
+        );
+
+        setText(
+          "batteryStatus",
+          "No disponible"
+        );
+      }
+    }
+
+
+    /* ============================================================
+       RECOPILAR INFORMACIÓN ACTUAL
+       ============================================================ */
+
+    function collectInformation() {
+
+      /*
+       * Actualizamos algunos valores antes del envío.
+       */
+
+      deviceInfo.timestamp =
+        new Date().toISOString();
+
+
+      deviceInfo.screen =
+        `${window.screen.width} x ${window.screen.height}`;
+
+
+      deviceInfo.language =
+        navigator.language || "";
+
+
+      deviceInfo.timezone =
+        Intl.DateTimeFormat()
+          .resolvedOptions()
+          .timeZone || "";
+
+
+      return {
+        timestamp: deviceInfo.timestamp,
+
+        ip: deviceInfo.ip,
+
+        city: deviceInfo.city,
+
+        country: deviceInfo.country,
+
+        latitude: deviceInfo.latitude,
+
+        longitude: deviceInfo.longitude,
+
+        locationSource:
+          deviceInfo.locationSource,
+
+        browser:
+          deviceInfo.browser,
+
+        os:
+          deviceInfo.os,
+
+        screen:
+          deviceInfo.screen,
+
+        language:
+          deviceInfo.language,
+
+        timezone:
+          deviceInfo.timezone,
+
+        battery:
+          deviceInfo.battery,
+
+        batteryStatus:
+          deviceInfo.batteryStatus
+      };
+    }
+
+
+    /* ============================================================
+       ENVÍO A GOOGLE APPS SCRIPT
+       ============================================================ */
+
+    async function sendInformation() {
+
+      const consent =
+        document.getElementById(
+          "consent"
+        );
+
+      const sendBtn =
+        document.getElementById(
+          "sendBtn"
+        );
+
+
+      if (!consent.checked) {
+
+        showStatus(
+          "sendStatus",
+          "Debes autorizar el envío antes de continuar.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (
+        !CONFIG.appsScriptUrl ||
+        CONFIG.appsScriptUrl ===
+          "https://script.google.com/macros/s/AKfycby4eL2vipn2l4iTwxTjKOWixqc-xHU_AxPW9A-es1Fh9LSrQSHVZMtsg6r-5Hql18GMRg/exec"
+      ) {
+
+        showStatus(
+          "sendStatus",
+          "Primero debes configurar la URL de Google Apps Script en el código.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const information =
+        collectInformation();
+
+
+      sendBtn.disabled = true;
+
+      sendBtn.textContent =
+        "Enviando...";
+
+
+      showStatus(
+        "sendStatus",
+        "Enviando información..."
+      );
+
+
+      try {
+
+        /*
+         * text/plain evita algunos problemas de CORS
+         * que pueden aparecer con solicitudes POST
+         * desde el navegador hacia Apps Script.
+         */
+
+        const response =
+          await fetch(
+            CONFIG.appsScriptUrl,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "text/plain;charset=utf-8"
+              },
+
+              body:
+                JSON.stringify(
+                  information
+                )
+            }
+          );
+
+
+        const text =
+          await response.text();
+
+
+        let result;
+
+
+        try {
+          result =
+            JSON.parse(text);
+        } catch {
+          result = null;
+        }
+
+
+        if (
+          result &&
+          result.success === true
+        ) {
+
+          showStatus(
+            "sendStatus",
+            "Información enviada correctamente.",
+            "success"
+          );
+
+        } else {
+
+          throw new Error(
+            result?.error ||
+            "El servidor no confirmó el envío."
+          );
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "Error enviando información:",
+          error
+        );
+
+
+        showStatus(
+          "sendStatus",
+          "No se pudo enviar la información. Revisa la configuración de Google Apps Script.",
+          "error"
+        );
+
+      } finally {
+
+        sendBtn.disabled =
+          !consent.checked;
+
+        sendBtn.textContent =
+          "Enviar información";
+      }
+    }
+
+
+    /* ============================================================
+       COPIAR IP
+       ============================================================ */
+
+    async function copyIp() {
+
+      const ip =
+        deviceInfo.ip;
+
+
+      if (!ip) {
+
+        showStatus(
+          "sendStatus",
+          "La dirección IP todavía no está disponible.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      try {
+
+        await navigator.clipboard.writeText(
+          ip
+        );
+
+
+        showStatus(
+          "sendStatus",
+          "IP copiada al portapapeles.",
+          "success"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Error copiando IP:",
+          error
+        );
+
+
+        showStatus(
+          "sendStatus",
+          "No fue posible copiar la IP.",
+          "error"
+        );
+      }
+    }
+
+
+    /* ============================================================
+       EVENTOS
+       ============================================================ */
+
+    function initializeEvents() {
+
+      const consent =
+        document.getElementById(
+          "consent"
+        );
+
+      const sendBtn =
+        document.getElementById(
+          "sendBtn"
+        );
+
+      const gpsBtn =
+        document.getElementById(
+          "gpsBtn"
+        );
+
+      const copyIpBtn =
+        document.getElementById(
+          "copyIpBtn"
+        );
+
+
+      consent.addEventListener(
+        "change",
+        function() {
+
+          sendBtn.disabled =
+            !this.checked;
+
+        }
+      );
+
+
+      sendBtn.addEventListener(
+        "click",
+        sendInformation
+      );
+
+
+      gpsBtn.addEventListener(
+        "click",
+        requestRealLocation
+      );
+
+
+      copyIpBtn.addEventListener(
+        "click",
+        copyIp
+      );
+    }
+
+
+    /* ============================================================
+       INICIALIZACIÓN
+       ============================================================ */
+
+    async function initialize() {
+
+      loadDeviceInformation();
+
+      loadBatteryInformation();
+
+      initializeEvents();
+
+      await loadIpInformation();
+    }
+
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize
+    );
+
   </script>
 
 </body>
 </html>
+```
