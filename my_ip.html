@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Dirección IP</title>
+    <title>Mi IP y Estado de Batería</title> 
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -25,43 +25,65 @@
         }
         h1 {
             color: #333;
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 22px;
+            margin-bottom: 5px;
+            margin-top: 20px;
         }
-        .ip-box {
-            font-size: 28px;
+        h1:first-child {
+            margin-top: 0;
+        }
+        .info-box {
+            font-size: 24px;
             font-weight: bold;
             color: #007bff;
             background: #e7f3ff;
             padding: 15px;
             border-radius: 8px;
             word-break: break-all;
-            margin-bottom: 15px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .battery-box {
+            color: #28a745;
+            background: #e8f5e9;
         }
         .loading {
             color: #666;
             font-style: italic;
+            font-size: 18px;
+        }
+        .status-text {
+            font-size: 14px;
+            color: #555;
+            font-weight: normal;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Tu Dirección IP Pública es:</h1>
-        <div id="ip" class="ip-box loading">Cargando...</div>
+        <h1>Tu Dirección IP Pública:</h1>
+        <div id="ip" class="info-box loading">Cargando IP...</div>
+
+        <h1>Estado de tu Batería:</h1>
+        <div id="battery-container" class="info-box battery-box loading">
+            <span id="battery-level">Cargando...</span>
+            <div id="battery-status" class="status-text"></div>
+        </div>
     </div>
 
     <script>
+        // --- aquí me dio paja tener que poner codigo entonces use IA xd ---
+        // --- 1. OBTENER LA DIRECCIÓN IP ---
         fetch('https://api64.ipify.org')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta de la red');
-                }
-                return response.text(); // CORREGIDO: Cambiado .json() por .text() (lo corregi porque si no, no funciona xd)
+                if (!response.ok) throw new Error('Error de red');
+                return response.text();
             })
             .then(ip => {
                 const ipElement = document.getElementById('ip');
-                ipElement.innerText = ip; 
+                ipElement.innerText = ip;
                 ipElement.classList.remove('loading');
             })
             .catch(error => {
@@ -71,6 +93,50 @@
                 ipElement.style.color = '#dc3545';
                 ipElement.classList.remove('loading');
             });
+
+        // --- 2. OBTENER EL ESTADO DE LA BATERÍA ---
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(function(battery) {
+                const containerElement = document.getElementById('battery-container');
+                const levelElement = document.getElementById('battery-level');
+                const statusElement = document.getElementById('battery-status');
+
+                // Quitar estado de carga inicial
+                containerElement.classList.remove('loading');
+
+                function actualizarTodoElEstado() {
+                    // El nivel viene en decimal (ej: 0.85), lo multiplicamos por 100
+                    const nivel = Math.round(battery.level * 100);
+                    levelElement.innerText = nivel + '%';
+
+                    // Comprobar si está conectado al cargador
+                    if (battery.charging) {
+                        statusElement.innerText = '🔌 Conectado a la corriente (Cargando)';
+                        containerElement.style.color = '#007bff';
+                        containerElement.style.background = #e7f3ff;
+                    } else {
+                        statusElement.innerText = '🔋 Descargando';
+                        containerElement.style.color = '#28a745';
+                        containerElement.style.background = '#e8f5e9';
+                    }
+                }
+
+                // Ejecutar al cargar la página
+                actualizarTodoElEstado();
+
+                // Escuchar eventos por si cambia el estado en tiempo real
+                battery.addEventListener('levelchange', actualizarTodoElEstado);
+                battery.addEventListener('chargingchange', actualizarTodoElEstado);
+            });
+        } else {
+            // Caso en el que el navegador no soporte la API de batería o esté deshabilitada por privacidad
+            const containerElement = document.getElementById('battery-container');
+            document.getElementById('battery-level').innerText = 'No disponible';
+            document.getElementById('battery-status').innerText = 'Tu navegador bloquea el acceso a la batería';
+            containerElement.style.color = '#6c757d';
+            containerElement.style.background = '#f8f9fa';
+            containerElement.classList.remove('loading');
+        }
     </script>
 
 </body>
