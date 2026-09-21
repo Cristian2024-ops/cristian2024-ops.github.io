@@ -12,14 +12,14 @@
 
   <meta
     name="description"
-    content="Información técnica del dispositivo y ubicación aproximada."
+    content="Información técnica del dispositivo y ubicación."
   >
 
   <title>Información de tu dispositivo</title>
 
 
   <!-- =====================================================
-       LEAFLET CSS
+       LEAFLET
   ====================================================== -->
 
   <link
@@ -34,10 +34,6 @@
   ====================================================== -->
 
   <style>
-
-    /* =====================================================
-       VARIABLES
-    ====================================================== */
 
     :root {
 
@@ -61,10 +57,6 @@
       --radius: 18px;
     }
 
-
-    /* =====================================================
-       RESET
-    ====================================================== */
 
     * {
       box-sizing: border-box;
@@ -90,9 +82,11 @@
         "Segoe UI",
         sans-serif;
 
-      background: var(--background);
+      background:
+        var(--background);
 
-      color: var(--text);
+      color:
+        var(--text);
     }
 
 
@@ -114,9 +108,11 @@
           calc(100% - 32px)
         );
 
-      margin: 0 auto;
+      margin:
+        0 auto;
 
-      padding: 40px 0;
+      padding:
+        40px 0;
     }
 
 
@@ -126,9 +122,11 @@
 
     .header {
 
-      text-align: center;
+      text-align:
+        center;
 
-      margin-bottom: 28px;
+      margin-bottom:
+        28px;
     }
 
 
@@ -144,17 +142,21 @@
           42px
         );
 
-      line-height: 1.1;
+      line-height:
+        1.1;
     }
 
 
     .header p {
 
-      margin: 0;
+      margin:
+        0;
 
-      color: var(--muted);
+      color:
+        var(--muted);
 
-      font-size: 16px;
+      font-size:
+        16px;
     }
 
 
@@ -164,7 +166,8 @@
 
     .grid {
 
-      display: grid;
+      display:
+        grid;
 
       grid-template-columns:
         repeat(
@@ -172,7 +175,8 @@
           minmax(0, 1fr)
         );
 
-      gap: 20px;
+      gap:
+        20px;
     }
 
 
@@ -191,7 +195,8 @@
       border-radius:
         var(--radius);
 
-      padding: 24px;
+      padding:
+        24px;
 
       box-shadow:
         var(--shadow);
@@ -216,7 +221,7 @@
 
 
     /* =====================================================
-       LISTA DE INFORMACIÓN
+       INFORMACIÓN
     ====================================================== */
 
     .info-list {
@@ -294,7 +299,7 @@
         100%;
 
       height:
-        400px;
+        420px;
 
       border-radius:
         14px;
@@ -303,7 +308,25 @@
         hidden;
 
       background:
-        #e2e8f0;
+        #dbeafe;
+    }
+
+
+    /*
+     * Evita problemas visuales con el contenedor
+     * de Leaflet.
+     */
+
+    .leaflet-container {
+
+      width:
+        100%;
+
+      height:
+        100%;
+
+      font-family:
+        inherit;
     }
 
 
@@ -367,7 +390,12 @@
 
       box-shadow:
         0 6px 18px
-        rgba(37, 99, 235, 0.25);
+        rgba(
+          37,
+          99,
+          235,
+          0.25
+        );
     }
 
 
@@ -401,7 +429,7 @@
     .button:disabled {
 
       opacity:
-        0.5;
+        0.55;
 
       cursor:
         not-allowed;
@@ -415,7 +443,7 @@
 
 
     /* =====================================================
-       CHECKBOX ANIMADO
+       CHECKBOX
     ====================================================== */
 
     .consent-container {
@@ -472,12 +500,6 @@
     }
 
 
-    /*
-     * Checkbox real.
-     * Sigue existiendo para mantener
-     * la funcionalidad y accesibilidad.
-     */
-
     .custom-checkbox input {
 
       position:
@@ -496,10 +518,6 @@
         none;
     }
 
-
-    /*
-     * Apariencia visual.
-     */
 
     .checkmark {
 
@@ -529,10 +547,6 @@
     }
 
 
-    /*
-     * Hover.
-     */
-
     .consent-label:hover
     .checkmark {
 
@@ -543,10 +557,6 @@
         scale(1.05);
     }
 
-
-    /*
-     * ✓
-     */
 
     .checkmark::after {
 
@@ -596,10 +606,6 @@
     }
 
 
-    /*
-     * Marcado.
-     */
-
     .custom-checkbox
     input:checked
     + .checkmark {
@@ -631,10 +637,6 @@
     }
 
 
-    /*
-     * Mostrar ✓.
-     */
-
     .custom-checkbox
     input:checked
     + .checkmark::after {
@@ -648,41 +650,29 @@
     }
 
 
-    /*
-     * Animación pop.
-     */
-
     @keyframes checkbox-pop {
 
       0% {
-
         transform:
           scale(0.75);
       }
 
       55% {
-
         transform:
           scale(1.15);
       }
 
       80% {
-
         transform:
           scale(0.96);
       }
 
       100% {
-
         transform:
           scale(1);
       }
     }
 
-
-    /*
-     * Texto.
-     */
 
     .consent-text {
 
@@ -696,10 +686,6 @@
         14px;
     }
 
-
-    /*
-     * Foco de teclado.
-     */
 
     .custom-checkbox
     input:focus-visible
@@ -846,7 +832,7 @@
       #map {
 
         height:
-          320px;
+          340px;
       }
 
 
@@ -857,10 +843,6 @@
       }
     }
 
-
-    /* =====================================================
-       REDUCIR ANIMACIONES
-    ====================================================== */
 
     @media (
       prefers-reduced-motion: reduce
@@ -878,9 +860,6 @@
 
         transition-duration:
           0.01ms !important;
-
-        scroll-behavior:
-          auto !important;
       }
     }
 
@@ -913,15 +892,11 @@
     </header>
 
 
-    <!-- ===================================================
-         CONTENIDO
-    ==================================================== -->
-
     <section class="grid">
 
 
       <!-- =================================================
-           INFORMACIÓN DE RED
+           RED
       ================================================== -->
 
       <article class="card">
@@ -1028,7 +1003,7 @@
 
 
       <!-- =================================================
-           INFORMACIÓN DEL DISPOSITIVO
+           DISPOSITIVO
       ================================================== -->
 
       <article class="card">
@@ -1176,8 +1151,8 @@
 
           La ubicación obtenida mediante IP es aproximada.
           La ubicación real del navegador solo se obtiene
-          después de que el usuario la autorice mediante
-          el permiso del navegador.
+          después de que el usuario autorice el permiso
+          correspondiente.
 
         </p>
 
@@ -1203,21 +1178,17 @@
             for="consent"
           >
 
-
             <span class="custom-checkbox">
-
 
               <input
                 type="checkbox"
                 id="consent"
               >
 
-
               <span
                 class="checkmark"
                 aria-hidden="true"
               ></span>
-
 
             </span>
 
@@ -1229,7 +1200,6 @@
 
             </span>
 
-
           </label>
 
 
@@ -1237,7 +1207,6 @@
 
 
         <div class="button-group">
-
 
           <button
             class="button"
@@ -1247,7 +1216,6 @@
           >
             📤 Enviar información
           </button>
-
 
         </div>
 
@@ -1265,7 +1233,6 @@
           expresamente la casilla de autorización.
 
         </p>
-
 
       </article>
 
@@ -1306,7 +1273,7 @@
     const CONFIG = {
 
       /*
-       * TU URL REAL DE GOOGLE APPS SCRIPT
+       * TU APPS SCRIPT
        */
 
       appsScriptUrl:
@@ -1314,27 +1281,21 @@
 
 
       /*
-       * API utilizada para obtener
-       * la información aproximada de IP.
+       * API DE IP
        */
 
       ipApi:
         "https://ipwho.is/"
-
     };
 
 
     /* =====================================================
-       CORRECCIÓN DEL ICONO DE LEAFLET
-    ===================================================== */
+       CORRECCIÓN DEFINITIVA DE ICONOS LEAFLET
+    ====================================================== */
 
     /*
-     * Leaflet puede intentar resolver automáticamente
-     * la ruta de sus imágenes.
-     *
-     * En GitHub Pages esa detección puede fallar.
-     *
-     * Aquí indicamos directamente las URLs oficiales.
+     * Evitamos que Leaflet intente descubrir
+     * automáticamente dónde están las imágenes.
      */
 
     delete L.Icon.Default.prototype._getIconUrl;
@@ -1356,7 +1317,7 @@
 
     /* =====================================================
        ESTADO
-    ===================================================== */
+    ====================================================== */
 
     const state = {
 
@@ -1391,13 +1352,12 @@
       battery: "",
 
       batteryStatus: ""
-
     };
 
 
     /* =====================================================
-       VARIABLES DEL MAPA
-    ===================================================== */
+       MAPA
+    ====================================================== */
 
     let map = null;
 
@@ -1405,8 +1365,8 @@
 
 
     /* =====================================================
-       ELEMENTOS HTML
-    ===================================================== */
+       ELEMENTOS
+    ====================================================== */
 
     const ipElement =
       document.getElementById("ip");
@@ -1473,8 +1433,8 @@
 
 
     /* =====================================================
-       ESTADO DE MENSAJES
-    ===================================================== */
+       ESTADO VISUAL
+    ====================================================== */
 
     function setStatus(
       message,
@@ -1497,7 +1457,7 @@
 
     /* =====================================================
        COORDENADAS
-    ===================================================== */
+    ====================================================== */
 
     function formatCoordinates(
       latitude,
@@ -1520,8 +1480,8 @@
 
 
     /* =====================================================
-       DETECTAR NAVEGADOR
-    ===================================================== */
+       NAVEGADOR
+    ====================================================== */
 
     function getBrowserName() {
 
@@ -1530,9 +1490,7 @@
 
 
       if (
-        /Edg/i.test(
-          userAgent
-        )
+        /Edg/i.test(userAgent)
       ) {
 
         return "Microsoft Edge";
@@ -1540,12 +1498,8 @@
 
 
       if (
-        /OPR/i.test(
-          userAgent
-        ) ||
-        /Opera/i.test(
-          userAgent
-        )
+        /OPR/i.test(userAgent) ||
+        /Opera/i.test(userAgent)
       ) {
 
         return "Opera";
@@ -1553,12 +1507,8 @@
 
 
       if (
-        /Chrome/i.test(
-          userAgent
-        ) &&
-        !/Edg/i.test(
-          userAgent
-        )
+        /Chrome/i.test(userAgent) &&
+        !/Edg/i.test(userAgent)
       ) {
 
         return "Google Chrome";
@@ -1566,9 +1516,7 @@
 
 
       if (
-        /Firefox/i.test(
-          userAgent
-        )
+        /Firefox/i.test(userAgent)
       ) {
 
         return "Mozilla Firefox";
@@ -1576,12 +1524,8 @@
 
 
       if (
-        /Safari/i.test(
-          userAgent
-        ) &&
-        !/Chrome/i.test(
-          userAgent
-        )
+        /Safari/i.test(userAgent) &&
+        !/Chrome/i.test(userAgent)
       ) {
 
         return "Safari";
@@ -1593,8 +1537,8 @@
 
 
     /* =====================================================
-       DETECTAR SISTEMA OPERATIVO
-    ===================================================== */
+       SISTEMA OPERATIVO
+    ====================================================== */
 
     function getOperatingSystem() {
 
@@ -1603,9 +1547,7 @@
 
 
       if (
-        /Windows NT/i.test(
-          userAgent
-        )
+        /Windows NT/i.test(userAgent)
       ) {
 
         return "Windows";
@@ -1613,9 +1555,7 @@
 
 
       if (
-        /Android/i.test(
-          userAgent
-        )
+        /Android/i.test(userAgent)
       ) {
 
         return "Android";
@@ -1623,9 +1563,7 @@
 
 
       if (
-        /iPhone|iPad|iPod/i.test(
-          userAgent
-        )
+        /iPhone|iPad|iPod/i.test(userAgent)
       ) {
 
         return "iOS";
@@ -1633,9 +1571,7 @@
 
 
       if (
-        /Mac OS X/i.test(
-          userAgent
-        )
+        /Mac OS X/i.test(userAgent)
       ) {
 
         return "macOS";
@@ -1643,9 +1579,7 @@
 
 
       if (
-        /Linux/i.test(
-          userAgent
-        )
+        /Linux/i.test(userAgent)
       ) {
 
         return "Linux";
@@ -1658,7 +1592,7 @@
 
     /* =====================================================
        INFORMACIÓN DEL NAVEGADOR
-    ===================================================== */
+    ====================================================== */
 
     function loadBrowserInformation() {
 
@@ -1708,8 +1642,218 @@
 
 
     /* =====================================================
-       OBTENER INFORMACIÓN DE IP
-    ===================================================== */
+       INICIALIZAR MAPA
+    ====================================================== */
+
+    function initializeMap() {
+
+      console.log(
+        "Inicializando Leaflet..."
+      );
+
+
+      map =
+        L.map(
+          "map"
+        );
+
+
+      L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+
+          maxZoom:
+            19,
+
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+
+        }
+      ).addTo(map);
+
+
+      /*
+       * Vista inicial.
+       */
+
+      map.setView(
+        [
+          -33.4489,
+          -70.6693
+        ],
+        5
+      );
+
+
+      /*
+       * Leaflet necesita recalcular
+       * el tamaño después de cargar
+       * la tarjeta.
+       */
+
+      setTimeout(
+        function() {
+
+          map.invalidateSize();
+
+        },
+        300
+      );
+
+
+      console.log(
+        "Mapa inicializado correctamente."
+      );
+    }
+
+
+    /* =====================================================
+       ACTUALIZAR MAPA
+    ====================================================== */
+
+    function updateMap(
+      latitude,
+      longitude
+    ) {
+
+      if (!map) {
+
+        console.warn(
+          "El mapa todavía no está inicializado."
+        );
+
+        return;
+      }
+
+
+      const lat =
+        Number(latitude);
+
+
+      const lng =
+        Number(longitude);
+
+
+      if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng)
+      ) {
+
+        console.warn(
+          "Coordenadas inválidas:",
+          latitude,
+          longitude
+        );
+
+        return;
+      }
+
+
+      const position =
+        [
+          lat,
+          lng
+        ];
+
+
+      console.log(
+        "Actualizando mapa:",
+        lat,
+        lng
+      );
+
+
+      /*
+       * Crear marcador si todavía no existe.
+       */
+
+      if (!marker) {
+
+        marker =
+          L.marker(
+            position
+          ).addTo(
+            map
+          );
+
+      } else {
+
+        /*
+         * Mover marcador existente.
+         */
+
+        marker.setLatLng(
+          position
+        );
+      }
+
+
+      /*
+       * Popup.
+       */
+
+      marker.bindPopup(
+        `
+          <strong>Ubicación actual</strong><br>
+          Latitud: ${lat}<br>
+          Longitud: ${lng}
+        `
+      );
+
+
+      /*
+       * Forzar actualización
+       * del tamaño del mapa.
+       */
+
+      map.invalidateSize();
+
+
+      /*
+       * Centrar mapa.
+       */
+
+      map.setView(
+        position,
+        16,
+        {
+          animate: true
+        }
+      );
+
+
+      /*
+       * Segundo refresco para evitar
+       * problemas de renderizado.
+       */
+
+      setTimeout(
+        function() {
+
+          map.invalidateSize();
+
+          map.setView(
+            position,
+            16,
+            {
+              animate: true
+            }
+          );
+
+        },
+        300
+      );
+
+
+      console.log(
+        "Mapa actualizado correctamente."
+      );
+    }
+
+
+    /* =====================================================
+       INFORMACIÓN IP
+    ====================================================== */
 
     async function loadIpInformation() {
 
@@ -1721,7 +1865,7 @@
 
         const timeout =
           setTimeout(
-            () => {
+            function() {
 
               controller.abort();
 
@@ -1745,9 +1889,7 @@
         );
 
 
-        if (
-          !response.ok
-        ) {
+        if (!response.ok) {
 
           throw new Error(
             "No se pudo consultar la IP."
@@ -1759,9 +1901,7 @@
           await response.json();
 
 
-        if (
-          !data.success
-        ) {
+        if (!data.success) {
 
           throw new Error(
             data.message ||
@@ -1801,8 +1941,8 @@
 
 
         /*
-         * Inicialmente la ubicación
-         * corresponde a la IP.
+         * La ubicación inicial es
+         * la aproximación por IP.
          */
 
         state.latitude =
@@ -1823,8 +1963,7 @@
 
 
         locationElement.textContent =
-          `${state.city || "No disponible"}, ` +
-          `${state.country || ""}`;
+          `${state.city || "No disponible"}, ${state.country || ""}`;
 
 
         coordinatesElement.textContent =
@@ -1835,10 +1974,22 @@
 
 
         locationSourceElement.textContent =
-          state.locationSource;
+          "IP";
 
+
+        /*
+         * Actualizamos el mapa
+         * con la ubicación IP.
+         */
 
         updateMap(
+          state.latitude,
+          state.longitude
+        );
+
+
+        console.log(
+          "Ubicación IP:",
           state.latitude,
           state.longitude
         );
@@ -1873,125 +2024,8 @@
 
 
     /* =====================================================
-       INICIALIZAR MAPA
-    ===================================================== */
-
-    function initializeMap() {
-
-      map =
-        L.map(
-          "map"
-        );
-
-
-      L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-
-          maxZoom:
-            19,
-
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-
-        }
-      ).addTo(
-        map
-      );
-
-
-      /*
-       * Vista inicial.
-       * Luego será reemplazada por
-       * las coordenadas obtenidas.
-       */
-
-      map.setView(
-        [
-          -33.4489,
-          -70.6693
-        ],
-        5
-      );
-    }
-
-
-    /* =====================================================
-       ACTUALIZAR MAPA
-    ===================================================== */
-
-    function updateMap(
-      latitude,
-      longitude
-    ) {
-
-      if (
-        !map ||
-        latitude === "" ||
-        longitude === ""
-      ) {
-
-        return;
-      }
-
-
-      const lat =
-        Number(
-          latitude
-        );
-
-
-      const lng =
-        Number(
-          longitude
-        );
-
-
-      if (
-        !Number.isFinite(lat) ||
-        !Number.isFinite(lng)
-      ) {
-
-        return;
-      }
-
-
-      const position =
-        [
-          lat,
-          lng
-        ];
-
-
-      map.setView(
-        position,
-        13
-      );
-
-
-      if (
-        marker
-      ) {
-
-        marker.setLatLng(
-          position
-        );
-
-      } else {
-
-        marker =
-          L.marker(
-            position
-          ).addTo(
-            map
-          );
-      }
-    }
-
-
-    /* =====================================================
-       GEOLOCALIZACIÓN REAL
-    ===================================================== */
+       GPS
+    ====================================================== */
 
     function requestRealLocation() {
 
@@ -2013,44 +2047,115 @@
 
 
       locationButton.textContent =
-        "📍 Solicitando ubicación...";
+        "📍 Obteniendo ubicación...";
+
+
+      setStatus(
+        "Solicitando tu ubicación al navegador..."
+      );
+
+
+      console.log(
+        "Solicitando GPS..."
+      );
 
 
       navigator.geolocation.getCurrentPosition(
 
         function(position) {
 
-          state.latitude =
+          /*
+           * Coordenadas reales.
+           */
+
+          const latitude =
             position.coords.latitude;
 
 
-          state.longitude =
+          const longitude =
             position.coords.longitude;
+
+
+          const accuracy =
+            position.coords.accuracy;
+
+
+          console.log(
+            "GPS recibido:",
+            latitude,
+            longitude
+          );
+
+
+          console.log(
+            "Precisión aproximada:",
+            accuracy,
+            "metros"
+          );
+
+
+          /*
+           * Guardar coordenadas.
+           */
+
+          state.latitude =
+            latitude;
+
+
+          state.longitude =
+            longitude;
 
 
           state.locationSource =
             "GPS";
 
 
+          /*
+           * Actualizar texto.
+           */
+
           coordinatesElement.textContent =
             formatCoordinates(
-              state.latitude,
-              state.longitude
+              latitude,
+              longitude
             );
 
 
           locationSourceElement.textContent =
-            state.locationSource;
+            "GPS";
 
+
+          /*
+           * Actualizar mapa.
+           */
 
           updateMap(
-            state.latitude,
-            state.longitude
+            latitude,
+            longitude
+          );
+
+
+          /*
+           * Abrir popup después
+           * de mover el mapa.
+           */
+
+          setTimeout(
+            function() {
+
+              if (marker) {
+
+                marker.openPopup();
+
+              }
+
+            },
+            500
           );
 
 
           setStatus(
-            "Ubicación real obtenida correctamente.",
+            "✓ Ubicación real obtenida y mapa actualizado.",
             "success"
           );
 
@@ -2073,8 +2178,7 @@
 
 
           /*
-           * Si falla GPS,
-           * conservamos la ubicación IP.
+           * Conservamos IP si falla GPS.
            */
 
           state.latitude =
@@ -2116,9 +2220,12 @@
           ) {
 
             message =
-              "Permiso de ubicación rechazado.";
+              "El navegador rechazó el permiso de ubicación.";
 
-          } else if (
+          }
+
+
+          else if (
             error.code ===
             error.POSITION_UNAVAILABLE
           ) {
@@ -2126,7 +2233,10 @@
             message =
               "La ubicación no está disponible.";
 
-          } else if (
+          }
+
+
+          else if (
             error.code ===
             error.TIMEOUT
           ) {
@@ -2161,7 +2271,6 @@
 
           maximumAge:
             0
-
         }
       );
     }
@@ -2169,7 +2278,7 @@
 
     /* =====================================================
        BATERÍA
-    ===================================================== */
+    ====================================================== */
 
     async function loadBattery() {
 
@@ -2269,7 +2378,7 @@
 
     /* =====================================================
        RECOPILAR INFORMACIÓN
-    ===================================================== */
+    ====================================================== */
 
     function collectInformation() {
 
@@ -2325,7 +2434,7 @@
 
     /* =====================================================
        ENVIAR INFORMACIÓN
-    ===================================================== */
+    ====================================================== */
 
     async function sendInformation() {
 
@@ -2347,8 +2456,7 @@
 
 
       /*
-       * Mostrar en consola
-       * exactamente qué se enviará.
+       * Depuración.
        */
 
       console.log(
@@ -2401,18 +2509,9 @@
               JSON.stringify(
                 information
               )
-
           }
         );
 
-
-        /*
-         * no-cors impide leer la respuesta
-         * del servidor desde el navegador.
-         *
-         * El Web App ya ha sido probado
-         * anteriormente y está funcionando.
-         */
 
         setStatus(
           "Información enviada correctamente.",
@@ -2450,13 +2549,11 @@
 
     /* =====================================================
        COPIAR IP
-    ===================================================== */
+    ====================================================== */
 
     async function copyIp() {
 
-      if (
-        !state.ip
-      ) {
+      if (!state.ip) {
 
         setStatus(
           "La IP todavía no está disponible.",
@@ -2506,8 +2603,8 @@
 
 
     /* =====================================================
-       EVENTO CHECKBOX
-    ===================================================== */
+       CHECKBOX
+    ====================================================== */
 
     consentElement.addEventListener(
       "change",
@@ -2517,9 +2614,7 @@
           !this.checked;
 
 
-        if (
-          this.checked
-        ) {
+        if (this.checked) {
 
           setStatus(
             "Autorización concedida. Puedes enviar la información.",
@@ -2537,8 +2632,8 @@
 
 
     /* =====================================================
-       EVENTOS DE BOTONES
-    ===================================================== */
+       EVENTOS
+    ====================================================== */
 
     sendButton.addEventListener(
       "click",
@@ -2559,18 +2654,38 @@
 
 
     /* =====================================================
-       INICIALIZACIÓN
-    ===================================================== */
+       INICIO
+    ====================================================== */
 
     document.addEventListener(
       "DOMContentLoaded",
       function() {
 
+        console.log(
+          "Página iniciada."
+        );
+
+
+        /*
+         * Primero inicializamos Leaflet.
+         */
+
         initializeMap();
+
+
+        /*
+         * Después cargamos información
+         * del dispositivo.
+         */
 
         loadBrowserInformation();
 
         loadBattery();
+
+
+        /*
+         * Finalmente consultamos IP.
+         */
 
         loadIpInformation();
 
