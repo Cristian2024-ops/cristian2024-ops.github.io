@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi IP y Estado de Batería</title> 
+    <title>Información de mi Dispositivo e IP</title>
+    <!-- 
+      ======================================================
+      🤖 CÓDIGO GENERADO TOTALMENTE CON INTELIGENCIA ARTIFICIAL (IA)
+      ======================================================
+    -->
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,8 +16,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .container {
             text-align: center;
@@ -20,12 +27,13 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
+            position: relative;
         }
         h1 {
             color: #333;
-            font-size: 22px;
+            font-size: 20px;
             margin-bottom: 5px;
             margin-top: 20px;
         }
@@ -37,11 +45,11 @@
             font-weight: bold;
             color: #007bff;
             background: #e7f3ff;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             word-break: break-all;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin-top: 8px;
+            margin-bottom: 8px;
         }
         .battery-box {
             color: #28a745;
@@ -58,6 +66,49 @@
             font-weight: normal;
             margin-top: 5px;
         }
+        .details-list {
+            text-align: left;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #495057;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .detail-item:first-child {
+            padding-top: 0;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        .detail-value {
+            font-weight: bold;
+            text-align: right;
+            max-width: 65%;
+            word-break: break-word;
+        }
+        /* Estilos para el distintivo visual de IA */
+        .ai-badge {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #a0aec0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
@@ -71,12 +122,36 @@
             <span id="battery-level">Cargando...</span>
             <div id="battery-status" class="status-text"></div>
         </div>
+
+        <h1>Detalles del Dispositivo:</h1>
+        <div class="details-list">
+            <div class="detail-item">
+                <span class="detail-label">Navegador / SO:</span>
+                <span id="detail-os" class="detail-value">Detectando...</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Resolución:</span>
+                <span id="detail-resolution" class="detail-value">Detectando...</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Hora Local:</span>
+                <span id="detail-time" class="detail-value">Detectando...</span>
+            </div>
+        </div>
+
+        <!-- Crédito visible en la interfaz de la página -->
+        <div class="ai-badge">
+            <span>🤖</span> <span>Código desarrollado de manera inteligente por IA</span>
+        </div>
     </div>
 
     <script>
-        // --- aquí me dio paja tener que poner codigo entonces use IA xd ---
+        /* 
+         * LÓGICA JAVASCRIPT - CREADA POR ASISTENTE DE IA
+         */
+
         // --- 1. OBTENER LA DIRECCIÓN IP ---
-        fetch('https://api64.ipify.org')
+        fetch('https://ipify.org')
             .then(response => {
                 if (!response.ok) throw new Error('Error de red');
                 return response.text();
@@ -101,15 +176,12 @@
                 const levelElement = document.getElementById('battery-level');
                 const statusElement = document.getElementById('battery-status');
 
-                // Quitar estado de carga inicial
                 containerElement.classList.remove('loading');
 
                 function actualizarTodoElEstado() {
-                    // El nivel viene en decimal (ej: 0.85), lo multiplicamos por 100
                     const nivel = Math.round(battery.level * 100);
                     levelElement.innerText = nivel + '%';
 
-                    // Comprobar si está conectado al cargador
                     if (battery.charging) {
                         statusElement.innerText = '🔌 Conectado a la corriente (Cargando)';
                         containerElement.style.color = '#007bff';
@@ -121,22 +193,57 @@
                     }
                 }
 
-                // Ejecutar al cargar la página
                 actualizarTodoElEstado();
-
-                // Escuchar eventos por si cambia el estado en tiempo real
                 battery.addEventListener('levelchange', actualizarTodoElEstado);
                 battery.addEventListener('chargingchange', actualizarTodoElEstado);
             });
         } else {
-            // Caso en el que el navegador no soporte la API de batería o esté deshabilitada por privacidad
             const containerElement = document.getElementById('battery-container');
             document.getElementById('battery-level').innerText = 'No disponible';
-            document.getElementById('battery-status').innerText = 'Tu navegador bloquea el acceso a la batería';
+            document.getElementById('battery-status').innerText = 'Tu navegador limita el acceso a la batería';
             containerElement.style.color = '#6c757d';
             containerElement.style.background = '#f8f9fa';
             containerElement.classList.remove('loading');
         }
+
+        // --- 3. DETECTAR NAVEGADOR Y SISTEMA OPERATIVO BÁSICO ---
+        function obtenerPlataforma() {
+            const userAgent = navigator.userAgent;
+            let os = "Desconocido";
+            let browser = "Desconocido";
+
+            if (userAgent.indexOf("Win") != -1) os = "Windows";
+            else if (userAgent.indexOf("Mac") != -1) os = "MacOS / iOS";
+            else if (userAgent.indexOf("Android") != -1) os = "Android";
+            else if (userAgent.indexOf("Linux") != -1) os = "Linux";
+
+            if (userAgent.indexOf("Chrome") != -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("Edg") == -1) browser = "Chrome";
+            else if (userAgent.indexOf("Safari") != -1 && userAgent.indexOf("Chrome") == -1) browser = "Safari";
+            else if (userAgent.indexOf("Firefox") != -1) browser = "Firefox";
+            else if (userAgent.indexOf("Edge") != -1 || userAgent.indexOf("Edg") != -1) browser = "Edge";
+
+            return `${browser} (${os})`;
+        }
+        document.getElementById('detail-os').innerText = obtenerPlataforma();
+
+        // --- 4. DETECTAR RESOLUCIÓN DE PANTALLA ---
+        const ancho = window.screen.width;
+        const alto = window.screen.height;
+        document.getElementById('detail-resolution').innerText = `${ancho} x ${alto} px`;
+
+        // --- 5. DETECTAR HORA LOCAL ---
+        function actualizarHora() {
+            const ahora = new Date();
+            const horaFormateada = ahora.toLocaleTimeString(navigator.language, {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('detail-time').innerText = horaFormateada;
+        }
+        actualizarHora();
+        setInterval(actualizarHora, 1000);
     </script>
 
 </body>
