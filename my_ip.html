@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -10,26 +12,35 @@
 
   <meta
     name="description"
-    content="Información del dispositivo y ubicación aproximada."
+    content="Información técnica del dispositivo y ubicación aproximada."
   >
 
   <title>Información de tu dispositivo</title>
 
-  <!-- Leaflet -->
+
+  <!-- =====================================================
+       LEAFLET CSS
+  ====================================================== -->
+
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIINfQ3k0Q2xQ7rQ3f8X5jL7x7n8Q5p5k="
     crossorigin=""
   >
 
+
+  <!-- =====================================================
+       ESTILOS
+  ====================================================== -->
+
   <style>
 
-    /* =========================================================
+    /* =====================================================
        VARIABLES
-    ========================================================= */
+    ====================================================== */
 
     :root {
+
       --primary: #2563eb;
       --primary-dark: #1d4ed8;
 
@@ -51,20 +62,24 @@
     }
 
 
-    /* =========================================================
+    /* =====================================================
        RESET
-    ========================================================= */
+    ====================================================== */
 
     * {
       box-sizing: border-box;
     }
 
+
     html {
       scroll-behavior: smooth;
     }
 
+
     body {
+
       margin: 0;
+
       min-height: 100vh;
 
       font-family:
@@ -76,6 +91,7 @@
         sans-serif;
 
       background: var(--background);
+
       color: var(--text);
     }
 
@@ -86,36 +102,54 @@
     }
 
 
-    /* =========================================================
+    /* =====================================================
        CONTENEDOR
-    ========================================================= */
+    ====================================================== */
 
     .container {
-      width: min(1100px, calc(100% - 32px));
+
+      width:
+        min(
+          1100px,
+          calc(100% - 32px)
+        );
+
       margin: 0 auto;
+
       padding: 40px 0;
     }
 
 
-    /* =========================================================
+    /* =====================================================
        ENCABEZADO
-    ========================================================= */
+    ====================================================== */
 
     .header {
+
       text-align: center;
+
       margin-bottom: 28px;
     }
 
+
     .header h1 {
-      margin: 0 0 10px;
+
+      margin:
+        0 0 10px;
 
       font-size:
-        clamp(28px, 5vw, 42px);
+        clamp(
+          28px,
+          5vw,
+          42px
+        );
 
       line-height: 1.1;
     }
 
+
     .header p {
+
       margin: 0;
 
       color: var(--muted);
@@ -124,123 +158,197 @@
     }
 
 
-    /* =========================================================
-       TARJETAS
-    ========================================================= */
+    /* =====================================================
+       GRID
+    ====================================================== */
 
     .grid {
+
       display: grid;
 
       grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
 
       gap: 20px;
     }
 
+
+    /* =====================================================
+       TARJETAS
+    ====================================================== */
+
     .card {
-      background: var(--card);
 
-      border: 1px solid var(--border);
+      background:
+        var(--card);
 
-      border-radius: var(--radius);
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        var(--radius);
 
       padding: 24px;
 
-      box-shadow: var(--shadow);
+      box-shadow:
+        var(--shadow);
     }
+
 
     .card.full {
-      grid-column: 1 / -1;
+
+      grid-column:
+        1 / -1;
     }
+
 
     .card h2 {
-      margin: 0 0 18px;
 
-      font-size: 20px;
+      margin:
+        0 0 18px;
+
+      font-size:
+        20px;
     }
 
 
-    /* =========================================================
-       INFORMACIÓN
-    ========================================================= */
+    /* =====================================================
+       LISTA DE INFORMACIÓN
+    ====================================================== */
 
     .info-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        12px;
     }
 
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
 
-      padding-bottom: 12px;
+    .info-row {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      gap:
+        20px;
+
+      padding-bottom:
+        12px;
 
       border-bottom:
         1px solid var(--border);
     }
 
+
     .info-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
+
+      border-bottom:
+        none;
+
+      padding-bottom:
+        0;
     }
+
 
     .info-label {
-      color: var(--muted);
-      font-weight: 500;
+
+      color:
+        var(--muted);
+
+      font-weight:
+        500;
     }
+
 
     .info-value {
-      text-align: right;
-      font-weight: 600;
 
-      word-break: break-word;
+      text-align:
+        right;
+
+      font-weight:
+        600;
+
+      word-break:
+        break-word;
     }
 
 
-    /* =========================================================
+    /* =====================================================
        MAPA
-    ========================================================= */
+    ====================================================== */
 
     #map {
-      width: 100%;
-      height: 400px;
 
-      border-radius: 14px;
+      width:
+        100%;
 
-      overflow: hidden;
+      height:
+        400px;
 
-      background: #e2e8f0;
+      border-radius:
+        14px;
+
+      overflow:
+        hidden;
+
+      background:
+        #e2e8f0;
     }
 
 
-    /* =========================================================
+    /* =====================================================
        BOTONES
-    ========================================================= */
+    ====================================================== */
 
     .button-group {
-      display: flex;
-      flex-wrap: wrap;
 
-      gap: 12px;
+      display:
+        flex;
 
-      margin-top: 20px;
+      flex-wrap:
+        wrap;
+
+      gap:
+        12px;
+
+      margin-top:
+        20px;
     }
 
+
     .button {
-      border: none;
 
-      border-radius: 12px;
+      border:
+        none;
 
-      padding: 12px 18px;
+      border-radius:
+        12px;
 
-      background: var(--primary);
-      color: white;
+      padding:
+        12px 18px;
 
-      cursor: pointer;
+      background:
+        var(--primary);
 
-      font-weight: 600;
+      color:
+        white;
+
+      cursor:
+        pointer;
+
+      font-weight:
+        600;
 
       transition:
         transform 0.2s ease,
@@ -248,115 +356,170 @@
         box-shadow 0.2s ease;
     }
 
-    .button:hover {
-      background: var(--primary-dark);
 
-      transform: translateY(-1px);
+    .button:hover {
+
+      background:
+        var(--primary-dark);
+
+      transform:
+        translateY(-1px);
 
       box-shadow:
-        0 6px 18px rgba(37, 99, 235, 0.25);
+        0 6px 18px
+        rgba(37, 99, 235, 0.25);
     }
+
 
     .button:active {
-      transform: scale(0.97);
+
+      transform:
+        scale(0.97);
     }
+
 
     .button.secondary {
-      background: #e2e8f0;
-      color: var(--text);
+
+      background:
+        #e2e8f0;
+
+      color:
+        var(--text);
     }
+
 
     .button.secondary:hover {
-      background: #cbd5e1;
-      box-shadow: none;
+
+      background:
+        #cbd5e1;
+
+      box-shadow:
+        none;
     }
+
 
     .button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
 
-      transform: none;
+      opacity:
+        0.5;
 
-      box-shadow: none;
+      cursor:
+        not-allowed;
+
+      transform:
+        none;
+
+      box-shadow:
+        none;
     }
 
 
-    /* =========================================================
+    /* =====================================================
        CHECKBOX ANIMADO
-    ========================================================= */
+    ====================================================== */
 
     .consent-container {
-      margin-top: 24px;
 
-      padding: 18px;
+      margin-top:
+        24px;
+
+      padding:
+        18px;
 
       border:
         1px solid var(--border);
 
-      border-radius: 15px;
+      border-radius:
+        15px;
 
-      background: #f8fafc;
+      background:
+        #f8fafc;
     }
+
 
     .consent-label {
-      display: flex;
 
-      align-items: center;
+      display:
+        flex;
 
-      gap: 13px;
+      align-items:
+        center;
 
-      cursor: pointer;
+      gap:
+        13px;
 
-      user-select: none;
+      cursor:
+        pointer;
+
+      user-select:
+        none;
     }
 
-    /*
-      Contenedor del checkbox.
-    */
 
     .custom-checkbox {
-      position: relative;
 
-      width: 25px;
-      height: 25px;
+      position:
+        relative;
 
-      flex: 0 0 25px;
+      width:
+        25px;
+
+      height:
+        25px;
+
+      flex:
+        0 0 25px;
     }
 
+
     /*
-      Checkbox real.
-      Sigue existiendo para accesibilidad
-      y para que JavaScript pueda utilizarlo.
-    */
+     * Checkbox real.
+     * Sigue existiendo para mantener
+     * la funcionalidad y accesibilidad.
+     */
 
     .custom-checkbox input {
-      position: absolute;
 
-      width: 1px;
-      height: 1px;
+      position:
+        absolute;
 
-      opacity: 0;
+      width:
+        1px;
 
-      pointer-events: none;
+      height:
+        1px;
+
+      opacity:
+        0;
+
+      pointer-events:
+        none;
     }
 
+
     /*
-      Apariencia visual.
-    */
+     * Apariencia visual.
+     */
 
     .checkmark {
-      position: absolute;
 
-      inset: 0;
+      position:
+        absolute;
 
-      display: block;
+      inset:
+        0;
+
+      display:
+        block;
 
       border:
         2px solid #94a3b8;
 
-      border-radius: 8px;
+      border-radius:
+        8px;
 
-      background: white;
+      background:
+        white;
 
       transition:
         background 0.2s ease,
@@ -367,30 +530,43 @@
 
 
     /*
-      Hover.
-    */
+     * Hover.
+     */
 
-    .consent-label:hover .checkmark {
-      border-color: var(--primary);
+    .consent-label:hover
+    .checkmark {
 
-      transform: scale(1.05);
+      border-color:
+        var(--primary);
+
+      transform:
+        scale(1.05);
     }
 
 
     /*
-      El ✓.
-    */
+     * ✓
+     */
 
     .checkmark::after {
-      content: "";
 
-      position: absolute;
+      content:
+        "";
 
-      width: 6px;
-      height: 11px;
+      position:
+        absolute;
 
-      left: 7px;
-      top: 3px;
+      width:
+        6px;
+
+      height:
+        11px;
+
+      left:
+        7px;
+
+      top:
+        3px;
 
       border:
         solid white;
@@ -402,38 +578,62 @@
         rotate(45deg)
         scale(0);
 
-      opacity: 0;
+      opacity:
+        0;
 
       transition:
-        transform 0.22s
-        cubic-bezier(0.2, 0.8, 0.3, 1.4),
+        transform
+        0.22s
+        cubic-bezier(
+          0.2,
+          0.8,
+          0.3,
+          1.4
+        ),
 
-        opacity 0.12s ease;
+        opacity
+        0.12s ease;
     }
 
 
     /*
-      Estado marcado.
-    */
+     * Marcado.
+     */
 
-    .custom-checkbox input:checked + .checkmark {
-      background: var(--primary);
+    .custom-checkbox
+    input:checked
+    + .checkmark {
 
-      border-color: var(--primary);
+      background:
+        var(--primary);
+
+      border-color:
+        var(--primary);
 
       animation:
-        checkbox-pop 0.3s
-        cubic-bezier(0.2, 0.8, 0.3, 1.2);
+        checkbox-pop
+        0.3s
+        cubic-bezier(
+          0.2,
+          0.8,
+          0.3,
+          1.2
+        );
 
       box-shadow:
         0 0 0 5px
-        rgba(37, 99, 235, 0.12);
+        rgba(
+          37,
+          99,
+          235,
+          0.12
+        );
     }
 
 
     /*
-      Mostrar ✓.
-    */
+     * Mostrar ✓.
+     */
 
     .custom-checkbox
     input:checked
@@ -443,65 +643,63 @@
         rotate(45deg)
         scale(1);
 
-      opacity: 1;
+      opacity:
+        1;
     }
 
 
     /*
-      Animación principal.
-    */
+     * Animación pop.
+     */
 
     @keyframes checkbox-pop {
 
       0% {
-        transform: scale(0.75);
+
+        transform:
+          scale(0.75);
       }
 
       55% {
-        transform: scale(1.15);
+
+        transform:
+          scale(1.15);
       }
 
       80% {
-        transform: scale(0.96);
+
+        transform:
+          scale(0.96);
       }
 
       100% {
-        transform: scale(1);
+
+        transform:
+          scale(1);
       }
     }
 
 
     /*
-      Animación del halo.
-    */
-
-    .custom-checkbox
-    input:checked
-    + .checkmark {
-
-      animation:
-        checkbox-pop 0.3s
-        cubic-bezier(0.2, 0.8, 0.3, 1.2);
-
-    }
-
-
-    /*
-      Texto del consentimiento.
-    */
+     * Texto.
+     */
 
     .consent-text {
-      line-height: 1.5;
 
-      color: var(--text);
+      line-height:
+        1.5;
 
-      font-size: 14px;
+      color:
+        var(--text);
+
+      font-size:
+        14px;
     }
 
 
     /*
-      Foco para teclado.
-    */
+     * Foco de teclado.
+     */
 
     .custom-checkbox
     input:focus-visible
@@ -509,138 +707,197 @@
 
       outline:
         3px solid
-        rgba(37, 99, 235, 0.3);
+        rgba(
+          37,
+          99,
+          235,
+          0.3
+        );
 
-      outline-offset: 3px;
+      outline-offset:
+        3px;
     }
 
 
-    /* =========================================================
-       ESTADO DEL ENVÍO
-    ========================================================= */
+    /* =====================================================
+       ESTADO
+    ====================================================== */
 
     .status {
-      margin-top: 15px;
 
-      min-height: 24px;
+      margin-top:
+        15px;
 
-      font-size: 14px;
+      min-height:
+        24px;
 
-      color: var(--muted);
+      font-size:
+        14px;
+
+      color:
+        var(--muted);
     }
+
 
     .status.success {
-      color: var(--success);
+
+      color:
+        var(--success);
     }
+
 
     .status.error {
-      color: var(--danger);
+
+      color:
+        var(--danger);
     }
 
 
-    /* =========================================================
-       AVISO DE PRIVACIDAD
-    ========================================================= */
+    /* =====================================================
+       PRIVACIDAD
+    ====================================================== */
 
     .privacy {
-      margin-top: 18px;
 
-      color: var(--muted);
+      margin-top:
+        18px;
 
-      font-size: 13px;
+      color:
+        var(--muted);
 
-      line-height: 1.6;
+      font-size:
+        13px;
+
+      line-height:
+        1.6;
     }
 
 
-    /* =========================================================
+    /* =====================================================
        FOOTER
-    ========================================================= */
+    ====================================================== */
 
     footer {
-      margin-top: 30px;
 
-      text-align: center;
+      margin-top:
+        30px;
 
-      color: var(--muted);
+      text-align:
+        center;
 
-      font-size: 13px;
+      color:
+        var(--muted);
+
+      font-size:
+        13px;
     }
 
 
-    /* =========================================================
+    /* =====================================================
        RESPONSIVE
-    ========================================================= */
+    ====================================================== */
 
     @media (max-width: 760px) {
 
       .container {
-        width: min(
-          100% - 20px,
-          1100px
-        );
 
-        padding: 25px 0;
+        width:
+          min(
+            100% - 20px,
+            1100px
+          );
+
+        padding:
+          25px 0;
       }
+
 
       .grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+          1fr;
       }
+
 
       .card.full {
-        grid-column: auto;
+
+        grid-column:
+          auto;
       }
+
 
       .info-row {
-        flex-direction: column;
 
-        gap: 4px;
+        flex-direction:
+          column;
+
+        gap:
+          4px;
       }
+
 
       .info-value {
-        text-align: left;
+
+        text-align:
+          left;
       }
+
 
       #map {
-        height: 320px;
+
+        height:
+          320px;
       }
 
+
       .button {
-        width: 100%;
+
+        width:
+          100%;
       }
     }
 
 
-    /* =========================================================
-       REDUCIR ANIMACIONES SI EL USUARIO LO SOLICITA
-    ========================================================= */
+    /* =====================================================
+       REDUCIR ANIMACIONES
+    ====================================================== */
 
-    @media (prefers-reduced-motion: reduce) {
+    @media (
+      prefers-reduced-motion: reduce
+    ) {
 
       *,
       *::before,
       *::after {
-        animation-duration: 0.01ms !important;
 
-        animation-iteration-count: 1 !important;
+        animation-duration:
+          0.01ms !important;
 
-        transition-duration: 0.01ms !important;
+        animation-iteration-count:
+          1 !important;
 
-        scroll-behavior: auto !important;
+        transition-duration:
+          0.01ms !important;
+
+        scroll-behavior:
+          auto !important;
       }
     }
 
   </style>
+
 </head>
 
 
 <body>
 
+
   <main class="container">
 
-    <!-- =====================================================
+
+    <!-- ===================================================
          ENCABEZADO
-    ====================================================== -->
+    ==================================================== -->
 
     <header class="header">
 
@@ -656,16 +913,16 @@
     </header>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          CONTENIDO
-    ====================================================== -->
+    ==================================================== -->
 
     <section class="grid">
 
 
-      <!-- ===================================================
+      <!-- =================================================
            INFORMACIÓN DE RED
-      ==================================================== -->
+      ================================================== -->
 
       <article class="card">
 
@@ -673,9 +930,12 @@
           🌐 Información de red
         </h2>
 
+
         <div class="info-list">
 
+
           <div class="info-row">
+
             <span class="info-label">
               IP pública
             </span>
@@ -686,10 +946,12 @@
             >
               Cargando...
             </span>
+
           </div>
 
 
           <div class="info-row">
+
             <span class="info-label">
               Ubicación
             </span>
@@ -700,10 +962,12 @@
             >
               Cargando...
             </span>
+
           </div>
 
 
           <div class="info-row">
+
             <span class="info-label">
               Coordenadas
             </span>
@@ -714,10 +978,12 @@
             >
               Cargando...
             </span>
+
           </div>
 
 
           <div class="info-row">
+
             <span class="info-label">
               Origen
             </span>
@@ -728,12 +994,15 @@
             >
               IP
             </span>
+
           </div>
+
 
         </div>
 
 
         <div class="button-group">
+
 
           <button
             class="button"
@@ -752,14 +1021,15 @@
             📍 Usar mi ubicación real
           </button>
 
+
         </div>
 
       </article>
 
 
-      <!-- ===================================================
+      <!-- =================================================
            INFORMACIÓN DEL DISPOSITIVO
-      ==================================================== -->
+      ================================================== -->
 
       <article class="card">
 
@@ -767,7 +1037,9 @@
           💻 Información del dispositivo
         </h2>
 
+
         <div class="info-list">
+
 
           <div class="info-row">
 
@@ -880,14 +1152,15 @@
 
           </div>
 
+
         </div>
 
       </article>
 
 
-      <!-- ===================================================
+      <!-- =================================================
            MAPA
-      ==================================================== -->
+      ================================================== -->
 
       <article class="card full">
 
@@ -895,21 +1168,25 @@
           🗺️ Ubicación
         </h2>
 
+
         <div id="map"></div>
 
+
         <p class="privacy">
+
           La ubicación obtenida mediante IP es aproximada.
           La ubicación real del navegador solo se obtiene
           después de que el usuario la autorice mediante
           el permiso del navegador.
+
         </p>
 
       </article>
 
 
-      <!-- ===================================================
+      <!-- =================================================
            ENVÍO
-      ==================================================== -->
+      ================================================== -->
 
       <article class="card full">
 
@@ -920,22 +1197,27 @@
 
         <div class="consent-container">
 
+
           <label
             class="consent-label"
             for="consent"
           >
 
+
             <span class="custom-checkbox">
+
 
               <input
                 type="checkbox"
                 id="consent"
               >
 
+
               <span
                 class="checkmark"
                 aria-hidden="true"
               ></span>
+
 
             </span>
 
@@ -947,12 +1229,15 @@
 
             </span>
 
+
           </label>
+
 
         </div>
 
 
         <div class="button-group">
+
 
           <button
             class="button"
@@ -962,6 +1247,7 @@
           >
             📤 Enviar información
           </button>
+
 
         </div>
 
@@ -980,7 +1266,9 @@
 
         </p>
 
+
       </article>
+
 
     </section>
 
@@ -992,16 +1280,16 @@
 
     </footer>
 
+
   </main>
 
 
-  <!-- =======================================================
-       LEAFLET
-  ======================================================== -->
+  <!-- =====================================================
+       LEAFLET JS
+  ====================================================== -->
 
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
 
@@ -1011,20 +1299,24 @@
     "use strict";
 
 
-    /* =========================================================
+    /* =====================================================
        CONFIGURACIÓN
-    ========================================================= */
+    ===================================================== */
 
     const CONFIG = {
 
       /*
-       * IMPORTANTE:
-       * Mantén aquí la URL actual de tu Web App
-       * de Google Apps Script.
+       * TU URL REAL DE GOOGLE APPS SCRIPT
        */
 
       appsScriptUrl:
         "https://script.google.com/macros/s/AKfycby4eL2vipn2l4iTwxTjKOWixqc-xHU_AxPW9A-es1Fh9LSrQSHVZMtsg6r-5Hql18GMRg/exec",
+
+
+      /*
+       * API utilizada para obtener
+       * la información aproximada de IP.
+       */
 
       ipApi:
         "https://ipwho.is/"
@@ -1032,9 +1324,39 @@
     };
 
 
-    /* =========================================================
+    /* =====================================================
+       CORRECCIÓN DEL ICONO DE LEAFLET
+    ===================================================== */
+
+    /*
+     * Leaflet puede intentar resolver automáticamente
+     * la ruta de sus imágenes.
+     *
+     * En GitHub Pages esa detección puede fallar.
+     *
+     * Aquí indicamos directamente las URLs oficiales.
+     */
+
+    delete L.Icon.Default.prototype._getIconUrl;
+
+
+    L.Icon.Default.mergeOptions({
+
+      iconRetinaUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+
+      iconUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
+
+    });
+
+
+    /* =====================================================
        ESTADO
-    ========================================================= */
+    ===================================================== */
 
     const state = {
 
@@ -1073,94 +1395,133 @@
     };
 
 
+    /* =====================================================
+       VARIABLES DEL MAPA
+    ===================================================== */
+
     let map = null;
 
     let marker = null;
 
 
-    /* =========================================================
-       ELEMENTOS
-    ========================================================= */
+    /* =====================================================
+       ELEMENTOS HTML
+    ===================================================== */
 
     const ipElement =
       document.getElementById("ip");
 
+
     const locationElement =
       document.getElementById("location");
+
 
     const coordinatesElement =
       document.getElementById("coordinates");
 
+
     const locationSourceElement =
       document.getElementById("locationSource");
+
 
     const browserElement =
       document.getElementById("browser");
 
+
     const osElement =
       document.getElementById("os");
+
 
     const screenElement =
       document.getElementById("screen");
 
+
     const languageElement =
       document.getElementById("language");
+
 
     const timezoneElement =
       document.getElementById("timezone");
 
+
     const batteryElement =
       document.getElementById("battery");
+
 
     const batteryStatusElement =
       document.getElementById("batteryStatus");
 
+
     const consentElement =
       document.getElementById("consent");
+
 
     const sendButton =
       document.getElementById("sendButton");
 
+
     const statusElement =
       document.getElementById("status");
 
+
     const copyIpButton =
       document.getElementById("copyIpButton");
+
 
     const locationButton =
       document.getElementById("locationButton");
 
 
-    /* =========================================================
-       UTILIDADES
-    ========================================================= */
+    /* =====================================================
+       ESTADO DE MENSAJES
+    ===================================================== */
 
-    function setStatus(message, type = "") {
+    function setStatus(
+      message,
+      type = ""
+    ) {
 
-      statusElement.textContent = message;
+      statusElement.textContent =
+        message;
+
 
       statusElement.className =
         "status" +
-        (type ? " " + type : "");
+        (
+          type
+            ? " " + type
+            : ""
+        );
     }
 
 
-    function formatCoordinates(latitude, longitude) {
+    /* =====================================================
+       COORDENADAS
+    ===================================================== */
+
+    function formatCoordinates(
+      latitude,
+      longitude
+    ) {
 
       if (
         latitude === "" ||
         longitude === ""
       ) {
+
         return "No disponible";
       }
 
-      return `${latitude}, ${longitude}`;
+
+      return (
+        `${latitude}, ${longitude}`
+      );
     }
 
 
-    /* =========================================================
-       NAVEGADOR
-    ========================================================= */
+    /* =====================================================
+       DETECTAR NAVEGADOR
+    ===================================================== */
 
     function getBrowserName() {
 
@@ -1169,39 +1530,60 @@
 
 
       if (
-        /Edg/i.test(userAgent)
+        /Edg/i.test(
+          userAgent
+        )
       ) {
+
         return "Microsoft Edge";
       }
 
 
       if (
-        /OPR/i.test(userAgent) ||
-        /Opera/i.test(userAgent)
+        /OPR/i.test(
+          userAgent
+        ) ||
+        /Opera/i.test(
+          userAgent
+        )
       ) {
+
         return "Opera";
       }
 
 
       if (
-        /Chrome/i.test(userAgent) &&
-        !/Edg/i.test(userAgent)
+        /Chrome/i.test(
+          userAgent
+        ) &&
+        !/Edg/i.test(
+          userAgent
+        )
       ) {
+
         return "Google Chrome";
       }
 
 
       if (
-        /Firefox/i.test(userAgent)
+        /Firefox/i.test(
+          userAgent
+        )
       ) {
+
         return "Mozilla Firefox";
       }
 
 
       if (
-        /Safari/i.test(userAgent) &&
-        !/Chrome/i.test(userAgent)
+        /Safari/i.test(
+          userAgent
+        ) &&
+        !/Chrome/i.test(
+          userAgent
+        )
       ) {
+
         return "Safari";
       }
 
@@ -1210,9 +1592,9 @@
     }
 
 
-    /* =========================================================
-       SISTEMA OPERATIVO
-    ========================================================= */
+    /* =====================================================
+       DETECTAR SISTEMA OPERATIVO
+    ===================================================== */
 
     function getOperatingSystem() {
 
@@ -1220,29 +1602,52 @@
         navigator.userAgent;
 
 
-      if (/Windows NT/i.test(userAgent)) {
+      if (
+        /Windows NT/i.test(
+          userAgent
+        )
+      ) {
+
         return "Windows";
       }
 
 
-      if (/Android/i.test(userAgent)) {
+      if (
+        /Android/i.test(
+          userAgent
+        )
+      ) {
+
         return "Android";
       }
 
 
       if (
-        /iPhone|iPad|iPod/i.test(userAgent)
+        /iPhone|iPad|iPod/i.test(
+          userAgent
+        )
       ) {
+
         return "iOS";
       }
 
 
-      if (/Mac OS X/i.test(userAgent)) {
+      if (
+        /Mac OS X/i.test(
+          userAgent
+        )
+      ) {
+
         return "macOS";
       }
 
 
-      if (/Linux/i.test(userAgent)) {
+      if (
+        /Linux/i.test(
+          userAgent
+        )
+      ) {
+
         return "Linux";
       }
 
@@ -1251,24 +1656,28 @@
     }
 
 
-    /* =========================================================
+    /* =====================================================
        INFORMACIÓN DEL NAVEGADOR
-    ========================================================= */
+    ===================================================== */
 
     function loadBrowserInformation() {
 
       state.browser =
         getBrowserName();
 
+
       state.os =
         getOperatingSystem();
+
 
       state.screen =
         `${window.screen.width} x ${window.screen.height}`;
 
+
       state.language =
         navigator.language ||
         "No disponible";
+
 
       state.timezone =
         Intl.DateTimeFormat()
@@ -1280,23 +1689,27 @@
       browserElement.textContent =
         state.browser;
 
+
       osElement.textContent =
         state.os;
+
 
       screenElement.textContent =
         state.screen;
 
+
       languageElement.textContent =
         state.language;
+
 
       timezoneElement.textContent =
         state.timezone;
     }
 
 
-    /* =========================================================
-       INFORMACIÓN DE IP
-    ========================================================= */
+    /* =====================================================
+       OBTENER INFORMACIÓN DE IP
+    ===================================================== */
 
     async function loadIpInformation() {
 
@@ -1305,9 +1718,14 @@
         const controller =
           new AbortController();
 
+
         const timeout =
           setTimeout(
-            () => controller.abort(),
+            () => {
+
+              controller.abort();
+
+            },
             10000
           );
 
@@ -1316,15 +1734,21 @@
           await fetch(
             CONFIG.ipApi,
             {
-              signal: controller.signal
+              signal:
+                controller.signal
             }
           );
 
 
-        clearTimeout(timeout);
+        clearTimeout(
+          timeout
+        );
 
 
-        if (!response.ok) {
+        if (
+          !response.ok
+        ) {
+
           throw new Error(
             "No se pudo consultar la IP."
           );
@@ -1335,7 +1759,10 @@
           await response.json();
 
 
-        if (!data.success) {
+        if (
+          !data.success
+        ) {
+
           throw new Error(
             data.message ||
             "La API no pudo obtener la IP."
@@ -1344,34 +1771,47 @@
 
 
         state.ip =
-          data.ip || "";
+          data.ip ||
+          "";
+
 
         state.city =
-          data.city || "";
+          data.city ||
+          "";
+
 
         state.country =
-          data.country || "";
+          data.country ||
+          "";
+
 
         state.region =
-          data.region || "";
+          data.region ||
+          "";
+
 
         state.ipLatitude =
-          data.latitude ?? "";
+          data.latitude ??
+          "";
+
 
         state.ipLongitude =
-          data.longitude ?? "";
+          data.longitude ??
+          "";
 
 
         /*
-         * Inicialmente utilizamos
-         * la ubicación aproximada de la IP.
+         * Inicialmente la ubicación
+         * corresponde a la IP.
          */
 
         state.latitude =
           state.ipLatitude;
 
+
         state.longitude =
           state.ipLongitude;
+
 
         state.locationSource =
           "IP";
@@ -1403,6 +1843,7 @@
           state.longitude
         );
 
+
       } catch (error) {
 
         console.error(
@@ -1431,33 +1872,53 @@
     }
 
 
-    /* =========================================================
-       MAPA
-    ========================================================= */
+    /* =====================================================
+       INICIALIZAR MAPA
+    ===================================================== */
 
     function initializeMap() {
 
       map =
-        L.map("map");
+        L.map(
+          "map"
+        );
 
 
       L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-          maxZoom: 19,
+
+          maxZoom:
+            19,
 
           attribution:
-            '&copy; OpenStreetMap contributors'
-        }
-      ).addTo(map);
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 
+        }
+      ).addTo(
+        map
+      );
+
+
+      /*
+       * Vista inicial.
+       * Luego será reemplazada por
+       * las coordenadas obtenidas.
+       */
 
       map.setView(
-        [-33.4489, -70.6693],
+        [
+          -33.4489,
+          -70.6693
+        ],
         5
       );
     }
 
+
+    /* =====================================================
+       ACTUALIZAR MAPA
+    ===================================================== */
 
     function updateMap(
       latitude,
@@ -1469,27 +1930,37 @@
         latitude === "" ||
         longitude === ""
       ) {
+
         return;
       }
 
 
       const lat =
-        Number(latitude);
+        Number(
+          latitude
+        );
+
 
       const lng =
-        Number(longitude);
+        Number(
+          longitude
+        );
 
 
       if (
         !Number.isFinite(lat) ||
         !Number.isFinite(lng)
       ) {
+
         return;
       }
 
 
       const position =
-        [lat, lng];
+        [
+          lat,
+          lng
+        ];
 
 
       map.setView(
@@ -1498,7 +1969,9 @@
       );
 
 
-      if (marker) {
+      if (
+        marker
+      ) {
 
         marker.setLatLng(
           position
@@ -1507,16 +1980,18 @@
       } else {
 
         marker =
-          L.marker(position)
-            .addTo(map);
-
+          L.marker(
+            position
+          ).addTo(
+            map
+          );
       }
     }
 
 
-    /* =========================================================
+    /* =====================================================
        GEOLOCALIZACIÓN REAL
-    ========================================================= */
+    ===================================================== */
 
     function requestRealLocation() {
 
@@ -1536,6 +2011,7 @@
       locationButton.disabled =
         true;
 
+
       locationButton.textContent =
         "📍 Solicitando ubicación...";
 
@@ -1547,8 +2023,10 @@
           state.latitude =
             position.coords.latitude;
 
+
           state.longitude =
             position.coords.longitude;
+
 
           state.locationSource =
             "GPS";
@@ -1580,6 +2058,7 @@
           locationButton.disabled =
             false;
 
+
           locationButton.textContent =
             "📍 Ubicación actualizada";
         },
@@ -1594,15 +2073,17 @@
 
 
           /*
-           * Si el usuario rechaza GPS,
-           * volvemos a la ubicación por IP.
+           * Si falla GPS,
+           * conservamos la ubicación IP.
            */
 
           state.latitude =
             state.ipLatitude;
 
+
           state.longitude =
             state.ipLongitude;
+
 
           state.locationSource =
             "IP";
@@ -1664,24 +2145,31 @@
           locationButton.disabled =
             false;
 
+
           locationButton.textContent =
             "📍 Usar mi ubicación real";
         },
 
+
         {
-          enableHighAccuracy: true,
 
-          timeout: 15000,
+          enableHighAccuracy:
+            true,
 
-          maximumAge: 0
+          timeout:
+            15000,
+
+          maximumAge:
+            0
+
         }
       );
     }
 
 
-    /* =========================================================
+    /* =====================================================
        BATERÍA
-    ========================================================= */
+    ===================================================== */
 
     async function loadBattery() {
 
@@ -1692,6 +2180,7 @@
         state.battery =
           "No disponible";
 
+
         state.batteryStatus =
           "No disponible";
 
@@ -1699,8 +2188,10 @@
         batteryElement.textContent =
           state.battery;
 
+
         batteryStatusElement.textContent =
           state.batteryStatus;
+
 
         return;
       }
@@ -1729,6 +2220,7 @@
           batteryElement.textContent =
             state.battery;
 
+
           batteryStatusElement.textContent =
             state.batteryStatus;
         }
@@ -1748,6 +2240,7 @@
           updateBattery
         );
 
+
       } catch (error) {
 
         console.error(
@@ -1759,6 +2252,7 @@
         state.battery =
           "No disponible";
 
+
         state.batteryStatus =
           "No disponible";
 
@@ -1766,15 +2260,16 @@
         batteryElement.textContent =
           state.battery;
 
+
         batteryStatusElement.textContent =
           state.batteryStatus;
       }
     }
 
 
-    /* =========================================================
+    /* =====================================================
        RECOPILAR INFORMACIÓN
-    ========================================================= */
+    ===================================================== */
 
     function collectInformation() {
 
@@ -1828,32 +2323,18 @@
     }
 
 
-    /* =========================================================
+    /* =====================================================
        ENVIAR INFORMACIÓN
-    ========================================================= */
+    ===================================================== */
 
     async function sendInformation() {
 
-      if (!consentElement.checked) {
-
-        setStatus(
-          "Debes autorizar el envío primero.",
-          "error"
-        );
-
-        return;
-      }
-
-
       if (
-        !CONFIG.appsScriptUrl ||
-        CONFIG.appsScriptUrl.includes(
-          "TU_URL_DE_GOOGLE_APPS_SCRIPT"
-        )
+        !consentElement.checked
       ) {
 
         setStatus(
-          "Falta configurar la URL de Google Apps Script.",
+          "Debes autorizar el envío primero.",
           "error"
         );
 
@@ -1866,14 +2347,14 @@
 
 
       /*
-       * Puedes abrir F12 → Consola
-       * para comprobar exactamente
-       * qué se está enviando.
+       * Mostrar en consola
+       * exactamente qué se enviará.
        */
 
       console.log(
         "DATOS QUE SE ENVIARÁN:"
       );
+
 
       console.log(
         JSON.stringify(
@@ -1886,6 +2367,7 @@
 
       sendButton.disabled =
         true;
+
 
       sendButton.textContent =
         "📤 Enviando...";
@@ -1901,30 +2383,35 @@
         await fetch(
           CONFIG.appsScriptUrl,
           {
-            method: "POST",
 
-            mode: "no-cors",
+            method:
+              "POST",
+
+            mode:
+              "no-cors",
 
             headers: {
+
               "Content-Type":
                 "text/plain;charset=utf-8"
+
             },
 
             body:
               JSON.stringify(
                 information
               )
+
           }
         );
 
 
         /*
-         * Debido a no-cors,
-         * el navegador no permite
-         * leer la respuesta del servidor.
+         * no-cors impide leer la respuesta
+         * del servidor desde el navegador.
          *
-         * El envío se considera realizado
-         * cuando fetch completa la solicitud.
+         * El Web App ya ha sido probado
+         * anteriormente y está funcionando.
          */
 
         setStatus(
@@ -1954,19 +2441,22 @@
         sendButton.disabled =
           false;
 
+
         sendButton.textContent =
           "📤 Enviar información";
       }
     }
 
 
-    /* =========================================================
+    /* =====================================================
        COPIAR IP
-    ========================================================= */
+    ===================================================== */
 
     async function copyIp() {
 
-      if (!state.ip) {
+      if (
+        !state.ip
+      ) {
 
         setStatus(
           "La IP todavía no está disponible.",
@@ -1989,7 +2479,7 @@
 
 
         setTimeout(
-          () => {
+          function() {
 
             copyIpButton.textContent =
               "📋 Copiar IP";
@@ -2015,9 +2505,9 @@
     }
 
 
-    /* =========================================================
-       EVENTOS
-    ========================================================= */
+    /* =====================================================
+       EVENTO CHECKBOX
+    ===================================================== */
 
     consentElement.addEventListener(
       "change",
@@ -2027,7 +2517,9 @@
           !this.checked;
 
 
-        if (this.checked) {
+        if (
+          this.checked
+        ) {
 
           setStatus(
             "Autorización concedida. Puedes enviar la información.",
@@ -2043,6 +2535,10 @@
       }
     );
 
+
+    /* =====================================================
+       EVENTOS DE BOTONES
+    ===================================================== */
 
     sendButton.addEventListener(
       "click",
@@ -2062,9 +2558,9 @@
     );
 
 
-    /* =========================================================
+    /* =====================================================
        INICIALIZACIÓN
-    ========================================================= */
+    ===================================================== */
 
     document.addEventListener(
       "DOMContentLoaded",
@@ -2084,4 +2580,5 @@
   </script>
 
 </body>
+
 </html>
