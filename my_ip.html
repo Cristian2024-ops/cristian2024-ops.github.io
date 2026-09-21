@@ -10,7 +10,7 @@
 
   <meta
     name="description"
-    content="Información técnica del navegador y dispositivo"
+    content="Información del dispositivo y ubicación aproximada."
   >
 
   <title>Información de tu dispositivo</title>
@@ -19,11 +19,41 @@
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIINfQ3G5Xv7X7Z5Z7mN4J6mD4W6m0M8nY="
+    integrity="sha256-p4NxAoJBhIINfQ3k0Q2xQ7rQ3f8X5jL7x7n8Q5p5k="
     crossorigin=""
   >
 
   <style>
+
+    /* =========================================================
+       VARIABLES
+    ========================================================= */
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+
+      --background: #f1f5f9;
+      --card: #ffffff;
+
+      --text: #0f172a;
+      --muted: #64748b;
+
+      --border: #e2e8f0;
+
+      --success: #16a34a;
+      --danger: #dc2626;
+
+      --shadow:
+        0 10px 30px rgba(15, 23, 42, 0.08);
+
+      --radius: 18px;
+    }
+
+
+    /* =========================================================
+       RESET
+    ========================================================= */
 
     * {
       box-sizing: border-box;
@@ -35,644 +65,940 @@
 
     body {
       margin: 0;
-      padding: 0;
-      background: #0b1220;
-      color: #f8fafc;
+      min-height: 100vh;
+
       font-family:
-        Arial,
-        Helvetica,
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         sans-serif;
-      line-height: 1.5;
+
+      background: var(--background);
+      color: var(--text);
     }
+
+
+    button,
+    input {
+      font: inherit;
+    }
+
+
+    /* =========================================================
+       CONTENEDOR
+    ========================================================= */
 
     .container {
-      width: min(1200px, calc(100% - 30px));
+      width: min(1100px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 35px 0 50px;
+      padding: 40px 0;
     }
 
-    header {
+
+    /* =========================================================
+       ENCABEZADO
+    ========================================================= */
+
+    .header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 28px;
     }
 
-    header h1 {
+    .header h1 {
       margin: 0 0 10px;
-      font-size: clamp(28px, 5vw, 42px);
+
+      font-size:
+        clamp(28px, 5vw, 42px);
+
+      line-height: 1.1;
     }
 
-    header p {
+    .header p {
       margin: 0;
-      color: #94a3b8;
+
+      color: var(--muted);
+
       font-size: 16px;
     }
 
-    .card {
-      background: #111827;
-      border: 1px solid #263449;
-      border-radius: 20px;
-      padding: 25px;
-      margin-bottom: 22px;
-      box-shadow:
-        0 15px 40px rgba(0, 0, 0, 0.20);
-    }
 
-    .card h2 {
-      margin: 0 0 20px;
-      font-size: 22px;
-    }
+    /* =========================================================
+       TARJETAS
+    ========================================================= */
 
     .grid {
       display: grid;
+
       grid-template-columns:
         repeat(2, minmax(0, 1fr));
-      gap: 15px;
+
+      gap: 20px;
     }
 
-    .item {
-      background: #172033;
-      border: 1px solid #293750;
-      border-radius: 15px;
-      padding: 18px;
+    .card {
+      background: var(--card);
+
+      border: 1px solid var(--border);
+
+      border-radius: var(--radius);
+
+      padding: 24px;
+
+      box-shadow: var(--shadow);
     }
 
-    .label {
-      display: block;
-      color: #93a4bd;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 7px;
+    .card.full {
+      grid-column: 1 / -1;
     }
 
-    .value {
-      font-size: 18px;
-      font-weight: 700;
+    .card h2 {
+      margin: 0 0 18px;
+
+      font-size: 20px;
+    }
+
+
+    /* =========================================================
+       INFORMACIÓN
+    ========================================================= */
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+
+      padding-bottom: 12px;
+
+      border-bottom:
+        1px solid var(--border);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .info-value {
+      text-align: right;
+      font-weight: 600;
+
       word-break: break-word;
     }
 
+
+    /* =========================================================
+       MAPA
+    ========================================================= */
+
     #map {
       width: 100%;
-      height: 380px;
-      border-radius: 15px;
+      height: 400px;
+
+      border-radius: 14px;
+
       overflow: hidden;
-      border: 1px solid #293750;
+
+      background: #e2e8f0;
     }
 
-    .buttons {
+
+    /* =========================================================
+       BOTONES
+    ========================================================= */
+
+    .button-group {
       display: flex;
       flex-wrap: wrap;
+
       gap: 12px;
-      margin-top: 18px;
+
+      margin-top: 20px;
     }
 
-    button {
-      border: 0;
+    .button {
+      border: none;
+
       border-radius: 12px;
-      padding: 13px 20px;
-      font-size: 15px;
-      font-weight: 700;
+
+      padding: 12px 18px;
+
+      background: var(--primary);
+      color: white;
+
       cursor: pointer;
+
+      font-weight: 600;
+
       transition:
-        transform 0.15s ease,
-        opacity 0.15s ease;
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
-    button:hover:not(:disabled) {
+    .button:hover {
+      background: var(--primary-dark);
+
       transform: translateY(-1px);
+
+      box-shadow:
+        0 6px 18px rgba(37, 99, 235, 0.25);
     }
 
-    button:disabled {
+    .button:active {
+      transform: scale(0.97);
+    }
+
+    .button.secondary {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .button.secondary:hover {
+      background: #cbd5e1;
+      box-shadow: none;
+    }
+
+    .button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+
+      transform: none;
+
+      box-shadow: none;
     }
 
-    .primary {
-      background: #16a34a;
-      color: white;
-    }
 
-    .secondary {
-      background: #2563eb;
-      color: white;
-    }
+    /* =========================================================
+       CHECKBOX ANIMADO
+    ========================================================= */
 
-    .dark {
-      background: #334155;
-      color: white;
-    }
+    .consent-container {
+      margin-top: 24px;
 
-    .danger {
-      background: #dc2626;
-      color: white;
-    }
-
-    .consent {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      background: #172033;
-      border: 1px solid #293750;
-      border-radius: 15px;
       padding: 18px;
-      margin-top: 15px;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 15px;
+
+      background: #f8fafc;
     }
 
-    .consent input {
-      width: 22px;
-      height: 22px;
-      margin-top: 2px;
+    .consent-label {
+      display: flex;
+
+      align-items: center;
+
+      gap: 13px;
+
       cursor: pointer;
-      flex-shrink: 0;
+
+      user-select: none;
     }
 
-    .consent label {
-      cursor: pointer;
-      color: #dbeafe;
+    /*
+      Contenedor del checkbox.
+    */
+
+    .custom-checkbox {
+      position: relative;
+
+      width: 25px;
+      height: 25px;
+
+      flex: 0 0 25px;
     }
+
+    /*
+      Checkbox real.
+      Sigue existiendo para accesibilidad
+      y para que JavaScript pueda utilizarlo.
+    */
+
+    .custom-checkbox input {
+      position: absolute;
+
+      width: 1px;
+      height: 1px;
+
+      opacity: 0;
+
+      pointer-events: none;
+    }
+
+    /*
+      Apariencia visual.
+    */
+
+    .checkmark {
+      position: absolute;
+
+      inset: 0;
+
+      display: block;
+
+      border:
+        2px solid #94a3b8;
+
+      border-radius: 8px;
+
+      background: white;
+
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.25s ease;
+    }
+
+
+    /*
+      Hover.
+    */
+
+    .consent-label:hover .checkmark {
+      border-color: var(--primary);
+
+      transform: scale(1.05);
+    }
+
+
+    /*
+      El ✓.
+    */
+
+    .checkmark::after {
+      content: "";
+
+      position: absolute;
+
+      width: 6px;
+      height: 11px;
+
+      left: 7px;
+      top: 3px;
+
+      border:
+        solid white;
+
+      border-width:
+        0 2.5px 2.5px 0;
+
+      transform:
+        rotate(45deg)
+        scale(0);
+
+      opacity: 0;
+
+      transition:
+        transform 0.22s
+        cubic-bezier(0.2, 0.8, 0.3, 1.4),
+
+        opacity 0.12s ease;
+    }
+
+
+    /*
+      Estado marcado.
+    */
+
+    .custom-checkbox input:checked + .checkmark {
+      background: var(--primary);
+
+      border-color: var(--primary);
+
+      animation:
+        checkbox-pop 0.3s
+        cubic-bezier(0.2, 0.8, 0.3, 1.2);
+
+      box-shadow:
+        0 0 0 5px
+        rgba(37, 99, 235, 0.12);
+    }
+
+
+    /*
+      Mostrar ✓.
+    */
+
+    .custom-checkbox
+    input:checked
+    + .checkmark::after {
+
+      transform:
+        rotate(45deg)
+        scale(1);
+
+      opacity: 1;
+    }
+
+
+    /*
+      Animación principal.
+    */
+
+    @keyframes checkbox-pop {
+
+      0% {
+        transform: scale(0.75);
+      }
+
+      55% {
+        transform: scale(1.15);
+      }
+
+      80% {
+        transform: scale(0.96);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+
+    /*
+      Animación del halo.
+    */
+
+    .custom-checkbox
+    input:checked
+    + .checkmark {
+
+      animation:
+        checkbox-pop 0.3s
+        cubic-bezier(0.2, 0.8, 0.3, 1.2);
+
+    }
+
+
+    /*
+      Texto del consentimiento.
+    */
+
+    .consent-text {
+      line-height: 1.5;
+
+      color: var(--text);
+
+      font-size: 14px;
+    }
+
+
+    /*
+      Foco para teclado.
+    */
+
+    .custom-checkbox
+    input:focus-visible
+    + .checkmark {
+
+      outline:
+        3px solid
+        rgba(37, 99, 235, 0.3);
+
+      outline-offset: 3px;
+    }
+
+
+    /* =========================================================
+       ESTADO DEL ENVÍO
+    ========================================================= */
 
     .status {
-      display: none;
       margin-top: 15px;
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-weight: 600;
-    }
 
-    .status.show {
-      display: block;
-    }
+      min-height: 24px;
 
-    .status.info {
-      background: #172554;
-      border: 1px solid #1d4ed8;
-      color: #bfdbfe;
+      font-size: 14px;
+
+      color: var(--muted);
     }
 
     .status.success {
-      background: #052e16;
-      border: 1px solid #16a34a;
-      color: #bbf7d0;
+      color: var(--success);
     }
 
     .status.error {
-      background: #450a0a;
-      border: 1px solid #dc2626;
-      color: #fecaca;
+      color: var(--danger);
     }
 
-    .notice {
-      color: #94a3b8;
-      font-size: 14px;
-      margin-top: 15px;
+
+    /* =========================================================
+       AVISO DE PRIVACIDAD
+    ========================================================= */
+
+    .privacy {
+      margin-top: 18px;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      line-height: 1.6;
     }
+
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
 
     footer {
+      margin-top: 30px;
+
       text-align: center;
-      color: #64748b;
-      font-size: 14px;
-      margin-top: 35px;
+
+      color: var(--muted);
+
+      font-size: 13px;
     }
 
-    @media (max-width: 700px) {
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 760px) {
 
       .container {
         width: min(
           100% - 20px,
-          1200px
+          1100px
         );
-        padding-top: 20px;
-      }
 
-      .card {
-        padding: 18px;
-        border-radius: 16px;
+        padding: 25px 0;
       }
 
       .grid {
         grid-template-columns: 1fr;
       }
 
-      #map {
-        height: 300px;
+      .card.full {
+        grid-column: auto;
       }
 
-      .buttons {
+      .info-row {
         flex-direction: column;
+
+        gap: 4px;
       }
 
-      button {
+      .info-value {
+        text-align: left;
+      }
+
+      #map {
+        height: 320px;
+      }
+
+      .button {
         width: 100%;
+      }
+    }
+
+
+    /* =========================================================
+       REDUCIR ANIMACIONES SI EL USUARIO LO SOLICITA
+    ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+
+        scroll-behavior: auto !important;
       }
     }
 
   </style>
 </head>
 
+
 <body>
 
   <main class="container">
 
-    <header>
-      <h1>Información de tu dispositivo</h1>
+    <!-- =====================================================
+         ENCABEZADO
+    ====================================================== -->
+
+    <header class="header">
+
+      <h1>
+        Información de tu dispositivo
+      </h1>
 
       <p>
-        Información técnica del navegador,
-        conexión y dispositivo.
+        Consulta información técnica de este dispositivo
+        y su ubicación aproximada.
       </p>
+
     </header>
 
 
-    <!-- ========================= -->
-    <!-- INFORMACIÓN DE CONEXIÓN -->
-    <!-- ========================= -->
+    <!-- =====================================================
+         CONTENIDO
+    ====================================================== -->
 
-    <section class="card">
+    <section class="grid">
 
-      <h2>🌐 Información de conexión</h2>
 
-      <div class="grid">
+      <!-- ===================================================
+           INFORMACIÓN DE RED
+      ==================================================== -->
 
-        <div class="item">
-          <span class="label">
-            IP pública
-          </span>
+      <article class="card">
 
-          <div
-            class="value"
-            id="ip"
-          >
-            Cargando...
-          </div>
+        <h2>
+          🌐 Información de red
+        </h2>
 
-          <div class="buttons">
-            <button
-              type="button"
-              class="dark"
-              id="copyIpBtn"
+        <div class="info-list">
+
+          <div class="info-row">
+            <span class="info-label">
+              IP pública
+            </span>
+
+            <span
+              class="info-value"
+              id="ip"
             >
-              Copiar IP
-            </button>
+              Cargando...
+            </span>
           </div>
+
+
+          <div class="info-row">
+            <span class="info-label">
+              Ubicación
+            </span>
+
+            <span
+              class="info-value"
+              id="location"
+            >
+              Cargando...
+            </span>
+          </div>
+
+
+          <div class="info-row">
+            <span class="info-label">
+              Coordenadas
+            </span>
+
+            <span
+              class="info-value"
+              id="coordinates"
+            >
+              Cargando...
+            </span>
+          </div>
+
+
+          <div class="info-row">
+            <span class="info-label">
+              Origen
+            </span>
+
+            <span
+              class="info-value"
+              id="locationSource"
+            >
+              IP
+            </span>
+          </div>
+
         </div>
 
 
-        <div class="item">
-          <span class="label">
-            Ciudad
-          </span>
+        <div class="button-group">
 
-          <div
-            class="value"
-            id="city"
+          <button
+            class="button"
+            id="copyIpButton"
+            type="button"
           >
-            Cargando...
-          </div>
-        </div>
+            📋 Copiar IP
+          </button>
 
 
-        <div class="item">
-          <span class="label">
-            País
-          </span>
-
-          <div
-            class="value"
-            id="country"
+          <button
+            class="button secondary"
+            id="locationButton"
+            type="button"
           >
-            Cargando...
-          </div>
+            📍 Usar mi ubicación real
+          </button>
+
         </div>
 
+      </article>
 
-        <div class="item">
-          <span class="label">
-            Región
-          </span>
 
-          <div
-            class="value"
-            id="region"
+      <!-- ===================================================
+           INFORMACIÓN DEL DISPOSITIVO
+      ==================================================== -->
+
+      <article class="card">
+
+        <h2>
+          💻 Información del dispositivo
+        </h2>
+
+        <div class="info-list">
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Navegador
+            </span>
+
+            <span
+              class="info-value"
+              id="browser"
+            >
+              Detectando...
+            </span>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Sistema operativo
+            </span>
+
+            <span
+              class="info-value"
+              id="os"
+            >
+              Detectando...
+            </span>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Pantalla
+            </span>
+
+            <span
+              class="info-value"
+              id="screen"
+            >
+              Detectando...
+            </span>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Idioma
+            </span>
+
+            <span
+              class="info-value"
+              id="language"
+            >
+              Detectando...
+            </span>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Zona horaria
+            </span>
+
+            <span
+              class="info-value"
+              id="timezone"
+            >
+              Detectando...
+            </span>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Batería
+            </span>
+
+            <span
+              class="info-value"
+              id="battery"
+            >
+              Detectando...
+            </span>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Estado de batería
+            </span>
+
+            <span
+              class="info-value"
+              id="batteryStatus"
+            >
+              Detectando...
+            </span>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- ===================================================
+           MAPA
+      ==================================================== -->
+
+      <article class="card full">
+
+        <h2>
+          🗺️ Ubicación
+        </h2>
+
+        <div id="map"></div>
+
+        <p class="privacy">
+          La ubicación obtenida mediante IP es aproximada.
+          La ubicación real del navegador solo se obtiene
+          después de que el usuario la autorice mediante
+          el permiso del navegador.
+        </p>
+
+      </article>
+
+
+      <!-- ===================================================
+           ENVÍO
+      ==================================================== -->
+
+      <article class="card full">
+
+        <h2>
+          📧 Enviar información
+        </h2>
+
+
+        <div class="consent-container">
+
+          <label
+            class="consent-label"
+            for="consent"
           >
-            Cargando...
-          </div>
+
+            <span class="custom-checkbox">
+
+              <input
+                type="checkbox"
+                id="consent"
+              >
+
+              <span
+                class="checkmark"
+                aria-hidden="true"
+              ></span>
+
+            </span>
+
+
+            <span class="consent-text">
+
+              Autorizo el envío de la información
+              mostrada en esta página al administrador.
+
+            </span>
+
+          </label>
+
         </div>
 
-      </div>
 
-    </section>
+        <div class="button-group">
 
-
-    <!-- ========================= -->
-    <!-- UBICACIÓN -->
-    <!-- ========================= -->
-
-    <section class="card">
-
-      <h2>📍 Ubicación</h2>
-
-      <div class="grid">
-
-        <div class="item">
-
-          <span class="label">
-            Coordenadas
-          </span>
-
-          <div
-            class="value"
-            id="coordinates"
+          <button
+            class="button"
+            id="sendButton"
+            type="button"
+            disabled
           >
-            Cargando...
-          </div>
+            📤 Enviar información
+          </button>
 
         </div>
 
 
-        <div class="item">
+        <div
+          class="status"
+          id="status"
+          aria-live="polite"
+        ></div>
 
-          <span class="label">
-            Origen de ubicación
-          </span>
 
-          <div
-            class="value"
-            id="locationSource"
-          >
-            Ubicación aproximada por IP
-          </div>
+        <p class="privacy">
 
-        </div>
+          El envío se realiza únicamente después de marcar
+          expresamente la casilla de autorización.
 
-      </div>
+        </p>
 
-
-      <div class="buttons">
-
-        <button
-          type="button"
-          class="secondary"
-          id="gpsBtn"
-        >
-          📍 Usar mi ubicación real
-        </button>
-
-      </div>
-
-
-      <div
-        id="gpsStatus"
-        class="status"
-        role="status"
-        aria-live="polite"
-      ></div>
-
-
-      <p class="notice">
-
-        La ubicación por IP es aproximada.
-        La ubicación real del dispositivo solamente
-        se solicita si pulsas el botón y aceptas
-        el permiso del navegador.
-
-      </p>
-
-
-      <div id="map"></div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- NAVEGADOR Y SISTEMA -->
-    <!-- ========================= -->
-
-    <section class="card">
-
-      <h2>💻 Navegador y sistema</h2>
-
-      <div class="grid">
-
-        <div class="item">
-
-          <span class="label">
-            Navegador
-          </span>
-
-          <div
-            class="value"
-            id="browser"
-          >
-            Detectando...
-          </div>
-
-        </div>
-
-
-        <div class="item">
-
-          <span class="label">
-            Sistema operativo
-          </span>
-
-          <div
-            class="value"
-            id="os"
-          >
-            Detectando...
-          </div>
-
-        </div>
-
-
-        <div class="item">
-
-          <span class="label">
-            Pantalla
-          </span>
-
-          <div
-            class="value"
-            id="screen"
-          >
-            Detectando...
-          </div>
-
-        </div>
-
-
-        <div class="item">
-
-          <span class="label">
-            Idioma
-          </span>
-
-          <div
-            class="value"
-            id="language"
-          >
-            Detectando...
-          </div>
-
-        </div>
-
-
-        <div class="item">
-
-          <span class="label">
-            Zona horaria
-          </span>
-
-          <div
-            class="value"
-            id="timezone"
-          >
-            Detectando...
-          </div>
-
-        </div>
-
-
-        <div class="item">
-
-          <span class="label">
-            Fecha y hora local
-          </span>
-
-          <div
-            class="value"
-            id="localTime"
-          >
-            Detectando...
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- BATERÍA -->
-    <!-- ========================= -->
-
-    <section class="card">
-
-      <h2>🔋 Batería</h2>
-
-      <div class="grid">
-
-        <div class="item">
-
-          <span class="label">
-            Batería
-          </span>
-
-          <div
-            class="value"
-            id="battery"
-          >
-            No disponible
-          </div>
-
-        </div>
-
-
-        <div class="item">
-
-          <span class="label">
-            Estado de batería
-          </span>
-
-          <div
-            class="value"
-            id="batteryStatus"
-          >
-            No disponible
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- ENVÍO -->
-    <!-- ========================= -->
-
-    <section class="card">
-
-      <h2>📨 Enviar información</h2>
-
-      <p>
-        Puedes enviar la información mostrada
-        anteriormente al administrador mediante
-        Google Apps Script.
-      </p>
-
-
-      <div class="consent">
-
-        <input
-          type="checkbox"
-          id="consent"
-        >
-
-        <label for="consent">
-
-          Autorizo el envío de la información
-          mostrada en esta página al administrador.
-
-        </label>
-
-      </div>
-
-
-      <div class="buttons">
-
-        <button
-          type="button"
-          class="primary"
-          id="sendBtn"
-          disabled
-        >
-          Enviar información
-        </button>
-
-      </div>
-
-
-      <div
-        id="sendStatus"
-        class="status"
-        role="status"
-        aria-live="polite"
-      ></div>
-
-
-      <p class="notice">
-
-        La información se enviará mediante una
-        conexión HTTPS a tu Web App de Google
-        Apps Script, que posteriormente puede
-        enviarla a Gmail.
-
-      </p>
+      </article>
 
     </section>
 
 
     <footer>
-      Información técnica del navegador y dispositivo.
+
+      Información del dispositivo · Uso transparente
+      y con autorización del usuario.
+
     </footer>
 
   </main>
 
 
-  <!-- Leaflet -->
+  <!-- =======================================================
+       LEAFLET
+  ======================================================== -->
+
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -682,35 +1008,33 @@
 
   <script>
 
-    /*
-     * =====================================================
-     * CONFIGURACIÓN
-     * =====================================================
-     *
-     * PEGA AQUÍ LA URL DE TU GOOGLE APPS SCRIPT.
-     *
-     * Ejemplo:
-     *
-     * appsScriptUrl:
-     * "https://script.google.com/macros/s/XXXXXXXX/exec"
-     */
+    "use strict";
+
+
+    /* =========================================================
+       CONFIGURACIÓN
+    ========================================================= */
 
     const CONFIG = {
+
+      /*
+       * IMPORTANTE:
+       * Mantén aquí la URL actual de tu Web App
+       * de Google Apps Script.
+       */
 
       appsScriptUrl:
         "https://script.google.com/macros/s/AKfycby4eL2vipn2l4iTwxTjKOWixqc-xHU_AxPW9A-es1Fh9LSrQSHVZMtsg6r-5Hql18GMRg/exec",
 
-      ipApiUrl:
+      ipApi:
         "https://ipwho.is/"
 
     };
 
 
-    /*
-     * =====================================================
-     * ESTADO DE LA APLICACIÓN
-     * =====================================================
-     */
+    /* =========================================================
+       ESTADO
+    ========================================================= */
 
     const state = {
 
@@ -726,8 +1050,7 @@
 
       longitude: "",
 
-      locationSource:
-        "IP",
+      locationSource: "IP",
 
       ipLatitude: "",
 
@@ -755,146 +1078,171 @@
     let marker = null;
 
 
-    /*
-     * =====================================================
-     * FUNCIONES AUXILIARES
-     * =====================================================
-     */
+    /* =========================================================
+       ELEMENTOS
+    ========================================================= */
 
-    function setText(
-      id,
-      value
-    ) {
+    const ipElement =
+      document.getElementById("ip");
 
-      const element =
-        document.getElementById(id);
+    const locationElement =
+      document.getElementById("location");
 
-      if (!element) {
-        return;
-      }
+    const coordinatesElement =
+      document.getElementById("coordinates");
 
-      element.textContent =
-        value || "No disponible";
+    const locationSourceElement =
+      document.getElementById("locationSource");
+
+    const browserElement =
+      document.getElementById("browser");
+
+    const osElement =
+      document.getElementById("os");
+
+    const screenElement =
+      document.getElementById("screen");
+
+    const languageElement =
+      document.getElementById("language");
+
+    const timezoneElement =
+      document.getElementById("timezone");
+
+    const batteryElement =
+      document.getElementById("battery");
+
+    const batteryStatusElement =
+      document.getElementById("batteryStatus");
+
+    const consentElement =
+      document.getElementById("consent");
+
+    const sendButton =
+      document.getElementById("sendButton");
+
+    const statusElement =
+      document.getElementById("status");
+
+    const copyIpButton =
+      document.getElementById("copyIpButton");
+
+    const locationButton =
+      document.getElementById("locationButton");
+
+
+    /* =========================================================
+       UTILIDADES
+    ========================================================= */
+
+    function setStatus(message, type = "") {
+
+      statusElement.textContent = message;
+
+      statusElement.className =
+        "status" +
+        (type ? " " + type : "");
     }
 
 
-    function showStatus(
-      id,
-      message,
-      type = "info"
-    ) {
+    function formatCoordinates(latitude, longitude) {
 
-      const element =
-        document.getElementById(id);
-
-      if (!element) {
-        return;
+      if (
+        latitude === "" ||
+        longitude === ""
+      ) {
+        return "No disponible";
       }
 
-      element.textContent =
-        message;
-
-      element.className =
-        `status show ${type}`;
-
+      return `${latitude}, ${longitude}`;
     }
 
 
-    /*
-     * =====================================================
-     * NAVEGADOR
-     * =====================================================
-     */
+    /* =========================================================
+       NAVEGADOR
+    ========================================================= */
 
     function getBrowserName() {
 
-      const ua =
+      const userAgent =
         navigator.userAgent;
 
+
       if (
-        /Edg\//i.test(ua)
+        /Edg/i.test(userAgent)
       ) {
         return "Microsoft Edge";
       }
 
+
       if (
-        /OPR\//i.test(ua)
+        /OPR/i.test(userAgent) ||
+        /Opera/i.test(userAgent)
       ) {
         return "Opera";
       }
 
-      if (
-        /Firefox\//i.test(ua)
-      ) {
-        return "Mozilla Firefox";
-      }
 
       if (
-        /Chrome\//i.test(ua) &&
-        !/Edg\//i.test(ua)
+        /Chrome/i.test(userAgent) &&
+        !/Edg/i.test(userAgent)
       ) {
         return "Google Chrome";
       }
 
+
       if (
-        /Safari\//i.test(ua) &&
-        !/Chrome\//i.test(ua)
+        /Firefox/i.test(userAgent)
+      ) {
+        return "Mozilla Firefox";
+      }
+
+
+      if (
+        /Safari/i.test(userAgent) &&
+        !/Chrome/i.test(userAgent)
       ) {
         return "Safari";
       }
+
 
       return "Navegador desconocido";
     }
 
 
-    /*
-     * =====================================================
-     * SISTEMA OPERATIVO
-     * =====================================================
-     */
+    /* =========================================================
+       SISTEMA OPERATIVO
+    ========================================================= */
 
     function getOperatingSystem() {
 
-      const ua =
+      const userAgent =
         navigator.userAgent;
 
-      const platform =
-        navigator.platform || "";
 
-
-      if (
-        /Windows NT/i.test(ua)
-      ) {
+      if (/Windows NT/i.test(userAgent)) {
         return "Windows";
       }
 
 
-      if (
-        /Android/i.test(ua)
-      ) {
+      if (/Android/i.test(userAgent)) {
         return "Android";
       }
 
 
       if (
-        /iPhone|iPad|iPod/i.test(ua)
+        /iPhone|iPad|iPod/i.test(userAgent)
       ) {
         return "iOS";
       }
 
 
-      if (
-        /Mac OS X/i.test(ua) ||
-        /Macintosh/i.test(ua)
-      ) {
+      if (/Mac OS X/i.test(userAgent)) {
         return "macOS";
       }
 
 
-      if (
-        /Linux/i.test(ua) ||
-        /Linux/i.test(platform)
-      ) {
+      if (/Linux/i.test(userAgent)) {
         return "Linux";
       }
 
@@ -903,82 +1251,59 @@
     }
 
 
-    /*
-     * =====================================================
-     * MAPA
-     * =====================================================
-     */
+    /* =========================================================
+       INFORMACIÓN DEL NAVEGADOR
+    ========================================================= */
 
-    function initializeMap(
-      latitude,
-      longitude
-    ) {
+    function loadBrowserInformation() {
 
-      if (
-        !Number.isFinite(latitude) ||
-        !Number.isFinite(longitude)
-      ) {
-        return;
-      }
+      state.browser =
+        getBrowserName();
 
+      state.os =
+        getOperatingSystem();
 
-      if (!map) {
+      state.screen =
+        `${window.screen.width} x ${window.screen.height}`;
 
-        map =
-          L.map("map");
+      state.language =
+        navigator.language ||
+        "No disponible";
 
-        L.tileLayer(
-          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          {
-            maxZoom: 19,
-
-            attribution:
-              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          }
-        ).addTo(map);
-
-      }
+      state.timezone =
+        Intl.DateTimeFormat()
+          .resolvedOptions()
+          .timeZone ||
+        "No disponible";
 
 
-      map.setView(
-        [latitude, longitude],
-        12
-      );
+      browserElement.textContent =
+        state.browser;
 
+      osElement.textContent =
+        state.os;
 
-      if (marker) {
-        marker.remove();
-      }
+      screenElement.textContent =
+        state.screen;
 
+      languageElement.textContent =
+        state.language;
 
-      marker =
-        L.marker(
-          [latitude, longitude]
-        ).addTo(map);
-
+      timezoneElement.textContent =
+        state.timezone;
     }
 
 
-    /*
-     * =====================================================
-     * INFORMACIÓN DE IP
-     * =====================================================
-     */
+    /* =========================================================
+       INFORMACIÓN DE IP
+    ========================================================= */
 
     async function loadIpInformation() {
 
       try {
 
-        showStatus(
-          "gpsStatus",
-          "Obteniendo información de conexión...",
-          "info"
-        );
-
-
         const controller =
           new AbortController();
-
 
         const timeout =
           setTimeout(
@@ -989,12 +1314,9 @@
 
         const response =
           await fetch(
-            CONFIG.ipApiUrl,
+            CONFIG.ipApi,
             {
-              method: "GET",
-
-              signal:
-                controller.signal
+              signal: controller.signal
             }
           );
 
@@ -1004,7 +1326,7 @@
 
         if (!response.ok) {
           throw new Error(
-            "No se pudo consultar la API de IP."
+            "No se pudo consultar la IP."
           );
         }
 
@@ -1015,14 +1337,11 @@
 
         if (!data.success) {
           throw new Error(
-            "La API no devolvió información válida."
+            data.message ||
+            "La API no pudo obtener la IP."
           );
         }
 
-
-        /*
-         * Guardar información.
-         */
 
         state.ip =
           data.ip || "";
@@ -1037,130 +1356,167 @@
           data.region || "";
 
         state.ipLatitude =
-          data.latitude || "";
+          data.latitude ?? "";
 
         state.ipLongitude =
-          data.longitude || "";
+          data.longitude ?? "";
+
+
+        /*
+         * Inicialmente utilizamos
+         * la ubicación aproximada de la IP.
+         */
 
         state.latitude =
-          data.latitude || "";
+          state.ipLatitude;
 
         state.longitude =
-          data.longitude || "";
+          state.ipLongitude;
 
         state.locationSource =
           "IP";
 
 
-        /*
-         * Mostrar información.
-         */
+        ipElement.textContent =
+          state.ip ||
+          "No disponible";
 
-        setText(
-          "ip",
-          state.ip
+
+        locationElement.textContent =
+          `${state.city || "No disponible"}, ` +
+          `${state.country || ""}`;
+
+
+        coordinatesElement.textContent =
+          formatCoordinates(
+            state.latitude,
+            state.longitude
+          );
+
+
+        locationSourceElement.textContent =
+          state.locationSource;
+
+
+        updateMap(
+          state.latitude,
+          state.longitude
         );
-
-        setText(
-          "city",
-          state.city
-        );
-
-        setText(
-          "country",
-          state.country
-        );
-
-        setText(
-          "region",
-          state.region
-        );
-
-
-        setText(
-          "coordinates",
-          `${state.latitude}, ${state.longitude}`
-        );
-
-
-        setText(
-          "locationSource",
-          "Ubicación aproximada por IP"
-        );
-
-
-        /*
-         * Mapa.
-         */
-
-        const lat =
-          Number(state.latitude);
-
-        const lng =
-          Number(state.longitude);
-
-
-        initializeMap(
-          lat,
-          lng
-        );
-
-
-        showStatus(
-          "gpsStatus",
-          "Información de conexión obtenida correctamente.",
-          "success"
-        );
-
 
       } catch (error) {
 
         console.error(
-          "Error IP:",
+          "Error obteniendo IP:",
           error
         );
 
 
-        setText(
-          "ip",
-          "No disponible"
-        );
+        ipElement.textContent =
+          "No disponible";
 
 
-        setText(
-          "city",
-          "No disponible"
-        );
+        locationElement.textContent =
+          "No disponible";
 
 
-        setText(
-          "country",
-          "No disponible"
-        );
+        coordinatesElement.textContent =
+          "No disponible";
 
 
-        setText(
-          "region",
-          "No disponible"
-        );
-
-
-        showStatus(
-          "gpsStatus",
-          "No se pudo obtener la información de IP.",
+        setStatus(
+          "No fue posible obtener la información de IP.",
           "error"
         );
-
       }
-
     }
 
 
-    /*
-     * =====================================================
-     * GEOLOCALIZACIÓN REAL
-     * =====================================================
-     */
+    /* =========================================================
+       MAPA
+    ========================================================= */
+
+    function initializeMap() {
+
+      map =
+        L.map("map");
+
+
+      L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+
+          attribution:
+            '&copy; OpenStreetMap contributors'
+        }
+      ).addTo(map);
+
+
+      map.setView(
+        [-33.4489, -70.6693],
+        5
+      );
+    }
+
+
+    function updateMap(
+      latitude,
+      longitude
+    ) {
+
+      if (
+        !map ||
+        latitude === "" ||
+        longitude === ""
+      ) {
+        return;
+      }
+
+
+      const lat =
+        Number(latitude);
+
+      const lng =
+        Number(longitude);
+
+
+      if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng)
+      ) {
+        return;
+      }
+
+
+      const position =
+        [lat, lng];
+
+
+      map.setView(
+        position,
+        13
+      );
+
+
+      if (marker) {
+
+        marker.setLatLng(
+          position
+        );
+
+      } else {
+
+        marker =
+          L.marker(position)
+            .addTo(map);
+
+      }
+    }
+
+
+    /* =========================================================
+       GEOLOCALIZACIÓN REAL
+    ========================================================= */
 
     function requestRealLocation() {
 
@@ -1168,8 +1524,7 @@
         !navigator.geolocation
       ) {
 
-        showStatus(
-          "gpsStatus",
+        setStatus(
           "Este navegador no admite geolocalización.",
           "error"
         );
@@ -1178,70 +1533,101 @@
       }
 
 
-      showStatus(
-        "gpsStatus",
-        "Solicitando permiso para obtener tu ubicación real...",
-        "info"
-      );
+      locationButton.disabled =
+        true;
+
+      locationButton.textContent =
+        "📍 Solicitando ubicación...";
 
 
       navigator.geolocation.getCurrentPosition(
 
         function(position) {
 
-          const latitude =
+          state.latitude =
             position.coords.latitude;
 
-          const longitude =
-            position.coords.longitude;
-
-
-          /*
-           * Actualizamos las coordenadas
-           * utilizadas para el envío.
-           */
-
-          state.latitude =
-            latitude;
-
           state.longitude =
-            longitude;
+            position.coords.longitude;
 
           state.locationSource =
             "GPS";
 
 
-          setText(
-            "coordinates",
-            `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+          coordinatesElement.textContent =
+            formatCoordinates(
+              state.latitude,
+              state.longitude
+            );
+
+
+          locationSourceElement.textContent =
+            state.locationSource;
+
+
+          updateMap(
+            state.latitude,
+            state.longitude
           );
 
 
-          setText(
-            "locationSource",
-            "GPS del dispositivo (autorizado)"
-          );
-
-
-          initializeMap(
-            latitude,
-            longitude
-          );
-
-
-          showStatus(
-            "gpsStatus",
+          setStatus(
             "Ubicación real obtenida correctamente.",
             "success"
           );
 
+
+          locationButton.disabled =
+            false;
+
+          locationButton.textContent =
+            "📍 Ubicación actualizada";
         },
 
 
         function(error) {
 
+          console.error(
+            "Error de geolocalización:",
+            error
+          );
+
+
+          /*
+           * Si el usuario rechaza GPS,
+           * volvemos a la ubicación por IP.
+           */
+
+          state.latitude =
+            state.ipLatitude;
+
+          state.longitude =
+            state.ipLongitude;
+
+          state.locationSource =
+            "IP";
+
+
+          coordinatesElement.textContent =
+            formatCoordinates(
+              state.latitude,
+              state.longitude
+            );
+
+
+          locationSourceElement.textContent =
+            "IP";
+
+
+          updateMap(
+            state.latitude,
+            state.longitude
+          );
+
+
           let message =
-            "No se pudo obtener la ubicación.";
+            "No se pudo obtener la ubicación real.";
+
 
           if (
             error.code ===
@@ -1249,11 +1635,9 @@
           ) {
 
             message =
-              "El permiso de ubicación fue rechazado.";
+              "Permiso de ubicación rechazado.";
 
-          }
-
-          else if (
+          } else if (
             error.code ===
             error.POSITION_UNAVAILABLE
           ) {
@@ -1261,27 +1645,28 @@
             message =
               "La ubicación no está disponible.";
 
-          }
-
-          else if (
+          } else if (
             error.code ===
             error.TIMEOUT
           ) {
 
             message =
               "La solicitud de ubicación tardó demasiado.";
-
           }
 
 
-          showStatus(
-            "gpsStatus",
+          setStatus(
             message,
             "error"
           );
 
-        },
 
+          locationButton.disabled =
+            false;
+
+          locationButton.textContent =
+            "📍 Usar mi ubicación real";
+        },
 
         {
           enableHighAccuracy: true,
@@ -1289,19 +1674,14 @@
           timeout: 15000,
 
           maximumAge: 0
-
         }
-
       );
-
     }
 
 
-    /*
-     * =====================================================
-     * BATERÍA
-     * =====================================================
-     */
+    /* =========================================================
+       BATERÍA
+    ========================================================= */
 
     async function loadBattery() {
 
@@ -1310,20 +1690,17 @@
       ) {
 
         state.battery =
-          "";
+          "No disponible";
 
         state.batteryStatus =
           "No disponible";
 
-        setText(
-          "battery",
-          "No disponible"
-        );
 
-        setText(
-          "batteryStatus",
-          "No disponible"
-        );
+        batteryElement.textContent =
+          state.battery;
+
+        batteryStatusElement.textContent =
+          state.batteryStatus;
 
         return;
       }
@@ -1337,14 +1714,10 @@
 
         function updateBattery() {
 
-          const percentage =
+          state.battery =
             Math.round(
               battery.level * 100
-            );
-
-
-          state.battery =
-            `${percentage}%`;
+            ) + "%";
 
 
           state.batteryStatus =
@@ -1353,17 +1726,11 @@
               : "No está cargando";
 
 
-          setText(
-            "battery",
-            state.battery
-          );
+          batteryElement.textContent =
+            state.battery;
 
-
-          setText(
-            "batteryStatus",
-            state.batteryStatus
-          );
-
+          batteryStatusElement.textContent =
+            state.batteryStatus;
         }
 
 
@@ -1381,125 +1748,33 @@
           updateBattery
         );
 
-
       } catch (error) {
 
         console.error(
-          "Error batería:",
+          "Error obteniendo batería:",
           error
         );
 
-        setText(
-          "battery",
-          "No disponible"
-        );
 
-        setText(
-          "batteryStatus",
-          "No disponible"
-        );
+        state.battery =
+          "No disponible";
 
+        state.batteryStatus =
+          "No disponible";
+
+
+        batteryElement.textContent =
+          state.battery;
+
+        batteryStatusElement.textContent =
+          state.batteryStatus;
       }
-
     }
 
 
-    /*
-     * =====================================================
-     * INFORMACIÓN DEL NAVEGADOR
-     * =====================================================
-     */
-
-    function loadBrowserInformation() {
-
-      state.browser =
-        getBrowserName();
-
-
-      state.os =
-        getOperatingSystem();
-
-
-      state.screen =
-        `${window.screen.width} x ${window.screen.height}`;
-
-
-      state.language =
-        navigator.language || "";
-
-
-      state.timezone =
-        Intl.DateTimeFormat()
-          .resolvedOptions()
-          .timeZone || "";
-
-
-      setText(
-        "browser",
-        state.browser
-      );
-
-
-      setText(
-        "os",
-        state.os
-      );
-
-
-      setText(
-        "screen",
-        state.screen
-      );
-
-
-      setText(
-        "language",
-        state.language
-      );
-
-
-      setText(
-        "timezone",
-        state.timezone
-      );
-
-
-      updateLocalTime();
-
-    }
-
-
-    /*
-     * =====================================================
-     * HORA LOCAL
-     * =====================================================
-     */
-
-    function updateLocalTime() {
-
-      const now =
-        new Date();
-
-
-      setText(
-        "localTime",
-        now.toLocaleString(
-          "es-CL",
-          {
-            dateStyle: "medium",
-            timeStyle: "medium"
-          }
-        )
-      );
-
-    }
-
-
-    /*
-     * =====================================================
-     * RECOPILAR INFORMACIÓN
-     * =====================================================
-     */
+    /* =========================================================
+       RECOPILAR INFORMACIÓN
+    ========================================================= */
 
     function collectInformation() {
 
@@ -1509,105 +1784,80 @@
           new Date().toISOString(),
 
         ip:
-          state.ip || "",
+          state.ip,
 
         city:
-          state.city || "",
+          state.city,
 
         country:
-          state.country || "",
+          state.country,
+
+        region:
+          state.region,
 
         latitude:
-          state.latitude || "",
+          state.latitude,
 
         longitude:
-          state.longitude || "",
+          state.longitude,
 
         locationSource:
-          state.locationSource || "IP",
+          state.locationSource,
 
         browser:
-          state.browser || getBrowserName(),
+          state.browser,
 
         os:
-          state.os || getOperatingSystem(),
+          state.os,
 
         screen:
-          state.screen ||
-          `${window.screen.width} x ${window.screen.height}`,
+          state.screen,
 
         language:
-          state.language ||
-          navigator.language ||
-          "",
+          state.language,
 
         timezone:
-          state.timezone ||
-          Intl.DateTimeFormat()
-            .resolvedOptions()
-            .timeZone ||
-          "",
+          state.timezone,
 
         battery:
-          state.battery || "",
+          state.battery,
 
         batteryStatus:
-          state.batteryStatus || ""
-
+          state.batteryStatus
       };
-
     }
 
 
-    /*
-     * =====================================================
-     * ENVIAR INFORMACIÓN
-     * =====================================================
-     */
+    /* =========================================================
+       ENVIAR INFORMACIÓN
+    ========================================================= */
 
     async function sendInformation() {
 
-      const consent =
-        document.getElementById(
-          "consent"
-        );
+      if (!consentElement.checked) {
 
-
-      const sendBtn =
-        document.getElementById(
-          "sendBtn"
-        );
-
-
-      if (
-        !consent.checked
-      ) {
-
-        showStatus(
-          "sendStatus",
-          "Debes autorizar el envío antes de continuar.",
+        setStatus(
+          "Debes autorizar el envío primero.",
           "error"
         );
 
         return;
-
       }
 
 
       if (
         !CONFIG.appsScriptUrl ||
-        CONFIG.appsScriptUrl ===
-        "TU_URL_DE_GOOGLE_APPS_SCRIPT"
+        CONFIG.appsScriptUrl.includes(
+          "TU_URL_DE_GOOGLE_APPS_SCRIPT"
+        )
       ) {
 
-        showStatus(
-          "sendStatus",
-          "La URL de Google Apps Script no está configurada.",
+        setStatus(
+          "Falta configurar la URL de Google Apps Script.",
           "error"
         );
 
         return;
-
       }
 
 
@@ -1615,30 +1865,38 @@
         collectInformation();
 
 
-      sendBtn.disabled =
+      /*
+       * Puedes abrir F12 → Consola
+       * para comprobar exactamente
+       * qué se está enviando.
+       */
+
+      console.log(
+        "DATOS QUE SE ENVIARÁN:"
+      );
+
+      console.log(
+        JSON.stringify(
+          information,
+          null,
+          2
+        )
+      );
+
+
+      sendButton.disabled =
         true;
 
-      sendBtn.textContent =
-        "Enviando...";
+      sendButton.textContent =
+        "📤 Enviando...";
 
 
-      showStatus(
-        "sendStatus",
-        "Enviando información...",
-        "info"
+      setStatus(
+        "Enviando información..."
       );
 
 
       try {
-
-        /*
-         * Google Apps Script puede realizar
-         * una redirección.
-         *
-         * no-cors permite realizar el POST
-         * sin que el navegador bloquee la
-         * solicitud por CORS.
-         */
 
         await fetch(
           CONFIG.appsScriptUrl,
@@ -1656,67 +1914,66 @@
               JSON.stringify(
                 information
               )
-
           }
         );
 
 
         /*
-         * Con no-cors no podemos leer
-         * response.json().
+         * Debido a no-cors,
+         * el navegador no permite
+         * leer la respuesta del servidor.
+         *
+         * El envío se considera realizado
+         * cuando fetch completa la solicitud.
          */
 
-        showStatus(
-          "sendStatus",
-          "Información enviada. Revisa tu Gmail para confirmar la recepción.",
+        setStatus(
+          "Información enviada correctamente.",
           "success"
         );
+
+
+        sendButton.textContent =
+          "✓ Información enviada";
 
 
       } catch (error) {
 
         console.error(
-          "Error enviando:",
+          "Error enviando información:",
           error
         );
 
 
-        showStatus(
-          "sendStatus",
-          "No se pudo realizar el envío. Comprueba la URL de Google Apps Script.",
+        setStatus(
+          "No fue posible enviar la información.",
           "error"
         );
 
+
+        sendButton.disabled =
+          false;
+
+        sendButton.textContent =
+          "📤 Enviar información";
       }
-
-
-      sendBtn.disabled =
-        !consent.checked;
-
-      sendBtn.textContent =
-        "Enviar información";
-
     }
 
 
-    /*
-     * =====================================================
-     * COPIAR IP
-     * =====================================================
-     */
+    /* =========================================================
+       COPIAR IP
+    ========================================================= */
 
     async function copyIp() {
 
       if (!state.ip) {
 
-        showStatus(
-          "sendStatus",
-          "Todavía no se ha obtenido la IP.",
+        setStatus(
+          "La IP todavía no está disponible.",
           "error"
         );
 
         return;
-
       }
 
 
@@ -1727,96 +1984,101 @@
         );
 
 
-        showStatus(
-          "sendStatus",
-          "IP copiada al portapapeles.",
-          "success"
+        copyIpButton.textContent =
+          "✓ IP copiada";
+
+
+        setTimeout(
+          () => {
+
+            copyIpButton.textContent =
+              "📋 Copiar IP";
+
+          },
+          1800
         );
 
 
       } catch (error) {
 
         console.error(
+          "Error copiando IP:",
           error
         );
 
 
-        showStatus(
-          "sendStatus",
+        setStatus(
           "No se pudo copiar la IP.",
           "error"
         );
-
       }
-
     }
 
 
-    /*
-     * =====================================================
-     * EVENTOS
-     * =====================================================
-     */
+    /* =========================================================
+       EVENTOS
+    ========================================================= */
 
-    document
-      .getElementById("gpsBtn")
-      .addEventListener(
-        "click",
-        requestRealLocation
-      );
+    consentElement.addEventListener(
+      "change",
+      function() {
+
+        sendButton.disabled =
+          !this.checked;
 
 
-    document
-      .getElementById("copyIpBtn")
-      .addEventListener(
-        "click",
-        copyIp
-      );
+        if (this.checked) {
 
+          setStatus(
+            "Autorización concedida. Puedes enviar la información.",
+            "success"
+          );
 
-    document
-      .getElementById("sendBtn")
-      .addEventListener(
-        "click",
-        sendInformation
-      );
+        } else {
 
-
-    document
-      .getElementById("consent")
-      .addEventListener(
-        "change",
-        function() {
-
-          document
-            .getElementById("sendBtn")
-            .disabled =
-              !this.checked;
-
+          setStatus(
+            "El envío está desactivado hasta autorizarlo."
+          );
         }
-      );
+      }
+    );
 
 
-    /*
-     * =====================================================
-     * INICIALIZACIÓN
-     * =====================================================
-     */
-
-    loadBrowserInformation();
-
-    loadBattery();
-
-    loadIpInformation();
+    sendButton.addEventListener(
+      "click",
+      sendInformation
+    );
 
 
-    /*
-     * Actualizar hora cada segundo.
-     */
+    copyIpButton.addEventListener(
+      "click",
+      copyIp
+    );
 
-    setInterval(
-      updateLocalTime,
-      1000
+
+    locationButton.addEventListener(
+      "click",
+      requestRealLocation
+    );
+
+
+    /* =========================================================
+       INICIALIZACIÓN
+    ========================================================= */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      function() {
+
+        initializeMap();
+
+        loadBrowserInformation();
+
+        loadBattery();
+
+        loadIpInformation();
+
+      }
     );
 
   </script>
