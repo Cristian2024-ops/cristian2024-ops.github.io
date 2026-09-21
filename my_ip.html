@@ -48,22 +48,28 @@
 
     <div class="container">
         <h1>Tu Dirección IP Pública es:</h1>
-        <div id="ip" class="ip-box class loading">Cargando...</div>
+        <div id="ip" class="ip-box loading">Cargando...</div>
     </div>
 
     <script>
-        // Llamada a la API gratuita de ipify para obtener la IP en formato JSON
         fetch('https://api64.ipify.org')
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la red');
+                }
+                return response.text(); // CORREGIDO: Cambiado .json() por .text() (lo corregi porque si no, no funciona xd)
+            })
+            .then(ip => {
                 const ipElement = document.getElementById('ip');
-                ipElement.innerText = data.ip;
+                ipElement.innerText = ip; 
                 ipElement.classList.remove('loading');
             })
             .catch(error => {
                 console.error('Error al obtener la IP:', error);
-                document.getElementById('ip').innerText = 'No se pudo cargar la IP';
-                document.getElementById('ip').style.color = '#dc3545';
+                const ipElement = document.getElementById('ip');
+                ipElement.innerText = 'No se pudo cargar la IP';
+                ipElement.style.color = '#dc3545';
+                ipElement.classList.remove('loading');
             });
     </script>
 
