@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Dirección IP</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .ip-box {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all;
+            margin-bottom: 15px;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Tu Dirección IP Pública es:</h1>
+        <div id="ip" class="ip-box class loading">Cargando...</div>
+    </div>
+
+    <script>
+        // Llamada a la API gratuita de ipify para obtener la IP en formato JSON
+        fetch('https://ipify.org')
+            .then(response => response.json())
+            .then(data => {
+                const ipElement = document.getElementById('ip');
+                ipElement.innerText = data.ip;
+                ipElement.classList.remove('loading');
+            })
+            .catch(error => {
+                console.error('Error al obtener la IP:', error);
+                document.getElementById('ip').innerText = 'No se pudo cargar la IP';
+                document.getElementById('ip').style.color = '#dc3545';
+            });
+    </script>
+
+</body>
+</html>
