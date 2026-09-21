@@ -8,7 +8,12 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Información de tu dispositivo</title>
+  <meta
+    name="description"
+    content="Información y diagnóstico del dispositivo"
+  >
+
+  <title>Mi información del dispositivo</title>
 
   <!-- Leaflet -->
   <link
@@ -17,1940 +22,2113 @@
   >
 
   <style>
-
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    }
+
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --border: #dbe3ef;
+      --shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+    }
+
+    body.dark {
+      --bg: #0f172a;
+      --card: #172033;
+      --text: #f8fafc;
+      --muted: #a8b3c7;
+      --border: #29364d;
+      --shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
+      margin: 0;
       min-height: 100vh;
       font-family:
+        "Plus Jakarta Sans",
         Arial,
-        Helvetica,
         sans-serif;
-
-      background:
-        radial-gradient(
-          circle at top,
-          #18345f 0%,
-          #0b1426 45%,
-          #050914 100%
-        );
-
-      color: #ffffff;
-      padding: 30px 15px;
+      background: var(--bg);
+      color: var(--text);
+      transition:
+        background 0.25s ease,
+        color 0.25s ease;
     }
 
     .container {
-      width: 100%;
-      max-width: 1100px;
-      margin: auto;
+      width: min(1100px, calc(100% - 30px));
+      margin: 0 auto;
+      padding: 30px 0 60px;
     }
 
-    .header {
+    header {
+      margin-bottom: 25px;
       text-align: center;
-      margin-bottom: 30px;
     }
 
-    .header h1 {
-      font-size: clamp(28px, 5vw, 46px);
-      margin-bottom: 10px;
+    header h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 5vw, 42px);
     }
 
-    .header p {
-      color: #b9c7dd;
-      font-size: 16px;
-      line-height: 1.6;
+    header p {
+      margin: 0 auto;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.7;
     }
 
-    .card {
-      background: rgba(15, 27, 48, 0.90);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 22px;
-      box-shadow:
-        0 15px 40px rgba(0,0,0,0.30);
-      backdrop-filter: blur(10px);
-    }
-
-    .card h2 {
-      margin-bottom: 18px;
-      font-size: 23px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns:
-        repeat(auto-fit, minmax(230px, 1fr));
-      gap: 14px;
-    }
-
-    .info-item {
-      background: rgba(255,255,255,0.05);
-      border-radius: 14px;
-      padding: 15px;
-      border: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .info-label {
-      display: block;
-      color: #8fa5c4;
-      font-size: 13px;
-      margin-bottom: 7px;
-    }
-
-    .info-value {
-      display: block;
-      font-size: 16px;
-      font-weight: bold;
-      word-break: break-word;
-    }
-
-    #map {
-      width: 100%;
-      height: 420px;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-top: 15px;
-      background: #101827;
-    }
-
-    .map-status {
-      margin-top: 12px;
-      color: #b9c7dd;
-      font-size: 14px;
-    }
-
-    .buttons {
+    .top-buttons {
       display: flex;
+      justify-content: center;
+      gap: 10px;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 18px;
+      margin-top: 20px;
     }
 
     button,
-    .btn {
-      border: none;
-      text-decoration: none;
-      cursor: pointer;
-      padding: 13px 18px;
+    .button,
+    .download-button {
+      border: 0;
       border-radius: 12px;
-      font-weight: bold;
-      font-size: 15px;
+      padding: 12px 18px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
       transition:
-        transform 0.2s,
-        opacity 0.2s;
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
     }
 
     button:hover,
-    .btn:hover {
+    .button:hover,
+    .download-button:hover {
       transform: translateY(-2px);
-      opacity: 0.9;
     }
 
-    .btn-primary {
-      background: #287cff;
+    .button-primary,
+    .download-button {
       color: white;
+      background: var(--primary);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
     }
 
-    .btn-secondary {
-      background: #263752;
-      color: white;
+    .button-primary:hover,
+    .download-button:hover {
+      background: var(--primary-dark);
     }
 
-    .btn-success {
-      background: #159447;
-      color: white;
+    .button-secondary {
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
     }
 
-    .diagnostico-estado {
-      padding: 18px;
-      border-radius: 14px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      line-height: 1.5;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
     }
 
-    .correcto {
-      background: rgba(21, 148, 71, 0.15);
-      border: 1px solid rgba(21, 148, 71, 0.45);
-      color: #67e69a;
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow);
     }
 
-    .advertencia {
-      background: rgba(245, 166, 35, 0.14);
-      border: 1px solid rgba(245, 166, 35, 0.45);
-      color: #ffd27b;
+    .card.full {
+      grid-column: 1 / -1;
     }
 
-    .diagnostico-lista {
-      list-style: none;
+    .card h2 {
+      margin: 0 0 15px;
+      font-size: 20px;
+    }
+
+    .card p {
+      line-height: 1.65;
+    }
+
+    .info-list {
       display: grid;
       gap: 10px;
     }
 
-    .diagnostico-lista li {
-      padding: 14px;
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-row:last-child {
+      border-bottom: 0;
+    }
+
+    .info-label {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .info-value {
+      text-align: right;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .status.success {
+      background: rgba(22, 163, 74, 0.12);
+      color: var(--success);
+    }
+
+    .status.warning {
+      background: rgba(217, 119, 6, 0.12);
+      color: var(--warning);
+    }
+
+    .status.danger {
+      background: rgba(220, 38, 38, 0.12);
+      color: var(--danger);
+    }
+
+    .status.info {
+      background: rgba(37, 99, 235, 0.12);
+      color: var(--primary);
+    }
+
+    #map {
+      width: 100%;
+      height: 400px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .map-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .diagnostic-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .diagnostic-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 13px;
       border-radius: 12px;
-      background: rgba(255,255,255,0.05);
-      border-left: 4px solid #f5a623;
+      background: rgba(100, 116, 139, 0.08);
+    }
+
+    .diagnostic-icon {
+      flex: 0 0 auto;
+    }
+
+    .diagnostic-text {
       line-height: 1.5;
     }
 
-    .diagnostico-lista li::before {
-      content: "⚠️ ";
+    .windows-app {
+      border: 1px solid #bfdbfe;
+      background:
+        linear-gradient(
+          135deg,
+          #eff6ff,
+          #ffffff
+        );
+    }
+
+    body.dark .windows-app {
+      background:
+        linear-gradient(
+          135deg,
+          #172554,
+          #172033
+        );
+      border-color: #31548c;
+    }
+
+    .app-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.12);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .app-features {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 20px;
+      padding-left: 22px;
+      line-height: 1.6;
+    }
+
+    .download-button {
+      min-width: 270px;
+      margin-top: 8px;
+    }
+
+    .download-note {
+      color: var(--muted);
+      font-size: 13px;
     }
 
     .consent-box {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 16px;
-      padding: 18px;
-      margin-top: 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 17px;
+      margin-top: 15px;
+      background: rgba(100, 116, 139, 0.05);
     }
 
     .consent-label {
       display: flex;
-      gap: 12px;
       align-items: flex-start;
+      gap: 10px;
       cursor: pointer;
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
     .consent-label input {
-      width: 20px;
-      height: 20px;
-      margin-top: 2px;
-      cursor: pointer;
-      accent-color: #287cff;
-      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      flex: 0 0 auto;
     }
 
-    .consent-text {
-      color: #d5deeb;
+    .send-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
     }
 
     .send-status {
-      margin-top: 15px;
-      min-height: 22px;
-      font-weight: bold;
-    }
-
-    .loading {
-      color: #9db6da;
-    }
-
-    .success {
-      color: #67e69a;
-    }
-
-    .error {
-      color: #ff8080;
-    }
-
-    .warning {
-      color: #ffd27b;
+      margin-top: 14px;
+      min-height: 24px;
+      font-weight: 600;
     }
 
     .small {
       font-size: 13px;
-      color: #899bb5;
-      line-height: 1.6;
-      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    .loading {
+      color: var(--muted);
+    }
+
+    .error-text {
+      color: var(--danger);
     }
 
     footer {
       text-align: center;
-      color: #71839f;
-      font-size: 13px;
+      color: var(--muted);
       margin-top: 30px;
+      font-size: 13px;
       line-height: 1.6;
     }
 
-    @media (max-width: 600px) {
+    [hidden] {
+      display: none !important;
+    }
 
-      body {
-        padding: 18px 10px;
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
       }
 
-      .card {
-        padding: 18px;
-        border-radius: 16px;
+      .card.full {
+        grid-column: auto;
       }
 
-      #map {
-        height: 330px;
-      }
-
-      .buttons {
-        flex-direction: column;
-      }
-
-      button,
-      .btn {
-        width: 100%;
-        text-align: center;
+      .app-features {
+        grid-template-columns: 1fr;
       }
     }
 
+    @media (max-width: 550px) {
+      .container {
+        width: min(100% - 20px, 1100px);
+        padding-top: 20px;
+      }
+
+      .card {
+        padding: 17px;
+      }
+
+      .info-row {
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .info-value {
+        text-align: left;
+      }
+
+      #map {
+        height: 320px;
+      }
+
+      .download-button {
+        width: 100%;
+        min-width: 0;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-<div class="container">
+  <main class="container">
 
-  <header class="header">
+    <header>
+      <h1>🖥️ Información de mi dispositivo</h1>
 
-    <h1>🖥️ Información de tu dispositivo</h1>
+      <p>
+        Esta página muestra información que tu navegador puede proporcionar
+        sobre el dispositivo, conexión, ubicación aproximada y entorno.
+      </p>
 
-    <p>
-      Consulta información técnica de tu dispositivo,
-      conexión y ubicación.
-    </p>
-
-  </header>
-
-
-  <!-- INFORMACIÓN GENERAL -->
-
-  <section class="card">
-
-    <h2>🌐 Información de conexión</h2>
-
-    <div class="info-grid">
-
-      <div class="info-item">
-        <span class="info-label">IP pública</span>
-        <span
-          class="info-value"
-          id="ip"
+      <div class="top-buttons">
+        <button
+          id="refreshButton"
+          class="button-primary"
+          type="button"
         >
-          Cargando...
-        </span>
-      </div>
+          🔄 Actualizar información
+        </button>
 
-      <div class="info-item">
-        <span class="info-label">Ciudad</span>
-        <span
-          class="info-value"
-          id="city"
+        <button
+          id="themeButton"
+          class="button-secondary"
+          type="button"
         >
-          Cargando...
-        </span>
+          🌙 Cambiar tema
+        </button>
       </div>
+    </header>
 
-      <div class="info-item">
-        <span class="info-label">País</span>
-        <span
-          class="info-value"
-          id="country"
+
+    <!-- INFORMACIÓN GENERAL -->
+    <div class="grid">
+
+      <section class="card">
+        <h2>🌐 Conexión</h2>
+
+        <div class="info-list">
+
+          <div class="info-row">
+            <span class="info-label">IP pública</span>
+            <span
+              id="ip"
+              class="info-value loading"
+            >
+              Cargando...
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Ciudad</span>
+            <span
+              id="city"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Región</span>
+            <span
+              id="region"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">País</span>
+            <span
+              id="country"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Estado de conexión</span>
+            <span
+              id="onlineStatus"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- NAVEGADOR -->
+      <section class="card">
+        <h2>🌎 Navegador</h2>
+
+        <div class="info-list">
+
+          <div class="info-row">
+            <span class="info-label">Navegador</span>
+            <span
+              id="browser"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Sistema operativo</span>
+            <span
+              id="os"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Arquitectura</span>
+            <span
+              id="architecture"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Idioma</span>
+            <span
+              id="language"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Zona horaria</span>
+            <span
+              id="timezone"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- PANTALLA -->
+      <section class="card">
+        <h2>🖥️ Pantalla</h2>
+
+        <div class="info-list">
+
+          <div class="info-row">
+            <span class="info-label">Resolución</span>
+            <span
+              id="screen"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Área disponible</span>
+            <span
+              id="availableScreen"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Pixel ratio</span>
+            <span
+              id="pixelRatio"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Orientación</span>
+            <span
+              id="orientation"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- BATERÍA -->
+      <section class="card">
+        <h2>🔋 Batería</h2>
+
+        <div class="info-list">
+
+          <div class="info-row">
+            <span class="info-label">Nivel</span>
+            <span
+              id="battery"
+              class="info-value"
+            >
+              Consultando...
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Estado</span>
+            <span
+              id="batteryStatus"
+              class="info-value"
+            >
+              Consultando...
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">API disponible</span>
+            <span
+              id="batteryApi"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- MAPA -->
+      <section class="card full">
+        <h2>📍 Ubicación</h2>
+
+        <div class="info-list">
+
+          <div class="info-row">
+            <span class="info-label">Fuente</span>
+            <span
+              id="locationSource"
+              class="info-value"
+            >
+              IP
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Latitud</span>
+            <span
+              id="latitude"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Longitud</span>
+            <span
+              id="longitude"
+              class="info-value"
+            >
+              —
+            </span>
+          </div>
+
+        </div>
+
+        <br>
+
+        <div id="map"></div>
+
+        <p class="map-note">
+          La ubicación por IP es aproximada. Si autorizas el GPS del navegador,
+          la página puede intentar obtener una ubicación más precisa.
+        </p>
+
+        <button
+          id="gpsButton"
+          class="button-primary"
+          type="button"
         >
-          Cargando...
-        </span>
-      </div>
+          📍 Intentar obtener ubicación GPS
+        </button>
 
-      <div class="info-item">
-        <span class="info-label">Región</span>
-        <span
-          class="info-value"
-          id="region"
+        <p
+          id="gpsStatus"
+          class="small"
+        ></p>
+      </section>
+
+
+      <!-- DIAGNÓSTICO DEL NAVEGADOR -->
+      <section class="card full">
+        <h2>🩺 Diagnóstico del navegador</h2>
+
+        <p class="small">
+          Esta comprobación revisa únicamente funciones que el navegador
+          permite consultar. No constituye un diagnóstico físico completo
+          del equipo.
+        </p>
+
+        <div
+          id="diagnosticList"
+          class="diagnostic-list"
         >
-          Cargando...
-        </span>
-      </div>
+          <div class="diagnostic-item">
+            <span class="diagnostic-icon">⏳</span>
+            <span class="diagnostic-text">
+              Ejecutando diagnóstico...
+            </span>
+          </div>
+        </div>
+      </section>
 
-    </div>
 
-  </section>
-
-
-  <!-- MAPA -->
-
-  <section class="card">
-
-    <h2>📍 Ubicación</h2>
-
-    <div class="info-grid">
-
-      <div class="info-item">
-        <span class="info-label">
-          Latitud
-        </span>
-
-        <span
-          class="info-value"
-          id="latitude"
-        >
-          No disponible
-        </span>
-      </div>
-
-      <div class="info-item">
-        <span class="info-label">
-          Longitud
-        </span>
-
-        <span
-          class="info-value"
-          id="longitude"
-        >
-          No disponible
-        </span>
-      </div>
-
-      <div class="info-item">
-        <span class="info-label">
-          Fuente
-        </span>
-
-        <span
-          class="info-value"
-          id="locationSource"
-        >
-          IP
-        </span>
-      </div>
-
-    </div>
-
-    <div id="map"></div>
-
-    <div
-      class="map-status"
-      id="mapStatus"
-    >
-      Cargando mapa...
-    </div>
-
-    <div class="buttons">
-
-      <button
-        type="button"
-        class="btn-primary"
-        id="gpsButton"
+      <!-- WINDOWS -->
+      <section
+        id="windowsAppCard"
+        class="card full windows-app"
+        hidden
       >
-        📍 Actualizar ubicación GPS
-      </button>
 
-    </div>
+        <div class="app-badge">
+          🪟 Windows detectado
+        </div>
 
-  </section>
+        <h2>🩺 Diagnóstico más completo</h2>
 
+        <p>
+          Estás utilizando Windows. Puedes descargar nuestra aplicación
+          para realizar comprobaciones adicionales que un navegador web
+          no puede realizar directamente.
+        </p>
 
-  <!-- INFORMACIÓN DEL DISPOSITIVO -->
+        <ul class="app-features">
 
-  <section class="card">
+          <li>CPU y uso aproximado</li>
+          <li>Memoria RAM</li>
+          <li>Almacenamiento</li>
+          <li>Batería</li>
+          <li>Estado de red</li>
+          <li>GPU</li>
+          <li>Discos</li>
+          <li>Informe local</li>
 
-    <h2>💻 Información del dispositivo</h2>
+        </ul>
 
-    <div class="info-grid">
+        <div class="top-buttons">
+          <a
+            id="windowsDownloadBtn"
+            class="download-button"
+            href="Downloads/DiagnosticoDispositivo.exe"
+            download
+          >
+            📥 Descargar diagnóstico para Windows
+          </a>
+        </div>
 
-      <div class="info-item">
-        <span class="info-label">
-          Navegador
-        </span>
+        <p class="download-note">
+          La aplicación funciona localmente y no envía automáticamente
+          el diagnóstico a Internet. El ejecutable está preparado para
+          Windows x64.
+        </p>
 
-        <span
-          class="info-value"
-          id="browser"
-        >
-          Cargando...
-        </span>
-      </div>
-
-      <div class="info-item">
-        <span class="info-label">
-          Sistema operativo
-        </span>
-
-        <span
-          class="info-value"
-          id="os"
-        >
-          Cargando...
-        </span>
-      </div>
-
-      <div class="info-item">
-        <span class="info-label">
-          Pantalla
-        </span>
-
-        <span
-          class="info-value"
-          id="screen"
-        >
-          Cargando...
-        </span>
-      </div>
-
-      <div class="info-item">
-        <span class="info-label">
-          Idioma
-        </span>
-
-        <span
-          class="info-value"
-          id="language"
-        >
-          Cargando...
-        </span>
-      </div>
-
-      <div class="info-item">
-        <span class="info-label">
-          Zona horaria
-        </span>
-
-        <span
-          class="info-value"
-          id="timezone"
-        >
-          Cargando...
-        </span>
-      </div>
-
-      <div class="info-item">
-        <span class="info-label">
-          Batería
-        </span>
-
-        <span
-          class="info-value"
-          id="battery"
-        >
-          Cargando...
-        </span>
-      </div>
-
-      <div class="info-item">
-        <span class="info-label">
-          Estado de batería
-        </span>
-
-        <span
-          class="info-value"
-          id="batteryStatus"
-        >
-          Cargando...
-        </span>
-      </div>
-
-    </div>
-
-  </section>
+      </section>
 
 
-  <!-- DIAGNÓSTICO -->
-
-  <section class="card">
-
-    <h2>🩺 Diagnóstico del dispositivo</h2>
-
-    <div
-      id="diagnosticoEstado"
-      class="diagnostico-estado loading"
-    >
-      🔄 Analizando el dispositivo...
-    </div>
-
-    <ul
-      id="diagnosticoLista"
-      class="diagnostico-lista"
-    ></ul>
-
-    <p class="small">
-      Este diagnóstico solamente comprueba funciones que
-      el navegador permite consultar. No puede determinar
-      por sí solo si existe una falla física interna del
-      dispositivo.
-    </p>
-
-  </section>
-
-
-  <!-- ENVÍO -->
-
-  <section class="card">
-
-    <h2>📧 Enviar información</h2>
-
-    <p class="small">
-      Puedes autorizar el envío de la información mostrada
-      en esta página al administrador.
-    </p>
-
-    <div class="consent-box">
-
-      <label
-        class="consent-label"
-        for="consent"
+      <!-- NO WINDOWS -->
+      <section
+        id="notWindowsCard"
+        class="card full"
+        hidden
       >
 
-        <input
-          type="checkbox"
-          id="consent"
-        >
+        <h2>🩺 Aplicación de diagnóstico</h2>
 
-        <span class="consent-text">
-          Autorizo el envío de la información mostrada
-          en esta página al administrador.
-        </span>
+        <p>
+          La aplicación de diagnóstico disponible actualmente está
+          preparada para Windows. En este dispositivo puedes continuar
+          utilizando las comprobaciones disponibles directamente desde
+          esta página.
+        </p>
 
-      </label>
+      </section>
+
+
+      <!-- ENVÍO -->
+      <section class="card full">
+
+        <h2>📨 Enviar información</h2>
+
+        <p>
+          Si quieres recibir este reporte por correo electrónico, puedes
+          autorizar explícitamente el envío de la información mostrada
+          anteriormente.
+        </p>
+
+        <div class="consent-box">
+
+          <label class="consent-label">
+
+            <input
+              id="consentCheckbox"
+              type="checkbox"
+            >
+
+            <span>
+              Autorizo explícitamente el envío de la información mostrada
+              en esta página a través del sistema de correo configurado.
+              Entiendo que la información incluye datos como IP pública,
+              ubicación, navegador, sistema operativo, pantalla, idioma,
+              zona horaria y batería cuando estén disponibles.
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="send-actions">
+
+          <button
+            id="sendButton"
+            class="button-primary"
+            type="button"
+          >
+            📧 Enviar información
+          </button>
+
+        </div>
+
+        <div
+          id="sendStatus"
+          class="send-status"
+        ></div>
+
+      </section>
 
     </div>
 
-    <div class="buttons">
 
-      <button
-        type="button"
-        class="btn-success"
-        id="sendButton"
-      >
-        📧 Enviar información
-      </button>
+    <footer>
+      <p>
+        La información mostrada depende de las capacidades y permisos
+        disponibles en tu navegador.
+      </p>
 
-    </div>
+      <p>
+        © Mi Web
+      </p>
+    </footer>
 
-    <div
-      id="sendStatus"
-      class="send-status"
-    ></div>
-
-  </section>
+  </main>
 
 
-  <footer>
-
-    Información obtenida mediante funciones disponibles
-    en el navegador.<br>
-
-    La ubicación GPS requiere autorización del visitante.
-
-  </footer>
-
-</div>
+  <!-- Leaflet -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  ></script>
 
 
-<!-- Leaflet -->
+  <script>
 
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-></script>
+    "use strict";
 
 
-<script>
+    /* =========================================================
+       CONFIGURACIÓN
+       ========================================================= */
 
-"use strict";
+    const CONFIG = {
 
+      appsScriptUrl:
+        "https://script.google.com/macros/s/AKfycby4eL2vipn2l4iTwxTjKOWixqc-xHU_AxPW9A-es1Fh9LSrQSHVZMtsg6r-5Hql18GMRg/exec",
 
-/* =========================================================
-   CONFIGURACIÓN
-========================================================= */
+      ipApi:
+        "https://ipwho.is/"
 
-const CONFIG = {
-
-  appsScriptUrl:
-    "https://script.google.com/macros/s/AKfycby4eL2vipn2l4iTwxTjKOWixqc-xHU_AxPW9A-es1Fh9LSrQSHVZMtsg6r-5Hql18GMRg/exec",
-
-  ipApi:
-    "https://ipwho.is/"
-
-};
+    };
 
 
-/* =========================================================
-   ESTADO
-========================================================= */
+    /* =========================================================
+       ESTADO
+       ========================================================= */
 
-const state = {
+    const state = {
 
-  ip: "",
-  city: "",
-  country: "",
-  region: "",
+      ip: "",
+      city: "",
+      country: "",
+      region: "",
 
-  latitude: "",
-  longitude: "",
+      latitude: "",
+      longitude: "",
 
-  locationSource: "IP",
+      locationSource: "IP",
 
-  ipLatitude: "",
-  ipLongitude: "",
+      ipLatitude: "",
+      ipLongitude: "",
 
-  browser: "",
-  os: "",
-  screen: "",
-  language: "",
-  timezone: "",
+      browser: "",
+      os: "",
+      architecture: "",
 
-  battery: "",
-  batteryStatus: ""
+      screen: "",
 
-};
+      language: "",
+      timezone: "",
 
+      battery: "",
+      batteryStatus: ""
 
-/* =========================================================
-   MAPA
-========================================================= */
-
-let map = null;
-let marker = null;
+    };
 
 
-/*
- * Corregimos las rutas de los iconos de Leaflet.
- */
-
-delete L.Icon.Default.prototype._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-
-  iconUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-
-  shadowUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
-
-});
+    let map = null;
+    let marker = null;
+    let batteryObject = null;
 
 
-function initializeMap() {
+    /* =========================================================
+       ELEMENTOS
+       ========================================================= */
 
-  map = L.map("map");
+    const $ = (id) => document.getElementById(id);
 
-  L.tileLayer(
-    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-      maxZoom: 19,
 
-      attribution:
-        '&copy; OpenStreetMap contributors'
+    /* =========================================================
+       LEAFLET ICONOS
+       ========================================================= */
+
+    if (
+      typeof L !== "undefined" &&
+      L.Icon &&
+      L.Icon.Default
+    ) {
+
+      delete L.Icon.Default.prototype._getIconUrl;
+
+      L.Icon.Default.mergeOptions({
+
+        iconRetinaUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+
+        iconUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
+
+      });
+
     }
-  ).addTo(map);
 
 
-  /*
-   * Vista inicial.
-   */
+    /* =========================================================
+       ESCAPE HTML
+       ========================================================= */
 
-  map.setView(
-    [20, 0],
-    2
-  );
+    function escapeHtml(value) {
 
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
-  /*
-   * Soluciona problemas de tamaño cuando
-   * Leaflet se inicializa dentro de un contenedor.
-   */
-
-  setTimeout(() => {
-
-    map.invalidateSize();
-
-  }, 300);
-
-}
-
-
-function updateMap(
-  latitude,
-  longitude,
-  source
-) {
-
-  if (!map) {
-    return;
-  }
-
-
-  const lat =
-    Number(latitude);
-
-  const lon =
-    Number(longitude);
-
-
-  if (
-    !Number.isFinite(lat) ||
-    !Number.isFinite(lon)
-  ) {
-
-    return;
-  }
-
-
-  const position = [
-    lat,
-    lon
-  ];
-
-
-  if (!marker) {
-
-    marker =
-      L.marker(position)
-        .addTo(map);
-
-  } else {
-
-    marker.setLatLng(position);
-
-  }
-
-
-  marker.bindPopup(
-    `
-      <strong>Ubicación detectada</strong><br>
-      Fuente: ${escapeHtml(source || "Desconocida")}<br>
-      Latitud: ${lat}<br>
-      Longitud: ${lon}
-    `
-  );
-
-
-  map.setView(
-    position,
-    16,
-    {
-      animate: true
     }
-  );
 
 
-  map.invalidateSize();
+    /* =========================================================
+       MAPA
+       ========================================================= */
 
+    function initializeMap() {
 
-  setTimeout(() => {
+      if (
+        typeof L === "undefined" ||
+        !$("map")
+      ) {
+        return;
+      }
 
-    map.invalidateSize();
+      map = L.map("map");
 
-  }, 300);
+      L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+          attribution:
+            "&copy; OpenStreetMap contributors"
+        }
+      ).addTo(map);
 
-
-  marker.openPopup();
-
-
-  document.getElementById(
-    "mapStatus"
-  ).textContent =
-    "📍 Ubicación actualizada mediante " +
-    source + ".";
-
-}
-
-
-/* =========================================================
-   INFORMACIÓN IP
-========================================================= */
-
-async function loadIpInformation() {
-
-  try {
-
-    const response =
-      await fetch(
-        CONFIG.ipApi
+      map.setView(
+        [20, 0],
+        2
       );
 
-
-    if (!response.ok) {
-      throw new Error(
-        "No se pudo consultar la IP."
-      );
-    }
-
-
-    const data =
-      await response.json();
-
-
-    if (!data.success) {
-
-      throw new Error(
-        "El servicio de IP devolvió un error."
+      setTimeout(
+        () => map.invalidateSize(),
+        300
       );
 
     }
 
 
-    state.ip =
-      data.ip || "";
-
-    state.city =
-      data.city || "";
-
-    state.country =
-      data.country || "";
-
-    state.region =
-      data.region || "";
-
-    state.ipLatitude =
-      data.latitude || "";
-
-    state.ipLongitude =
-      data.longitude || "";
-
-
-    state.latitude =
-      state.ipLatitude;
-
-    state.longitude =
-      state.ipLongitude;
-
-    state.locationSource =
-      "IP";
-
-
-    document.getElementById(
-      "ip"
-    ).textContent =
-      state.ip || "No disponible";
-
-
-    document.getElementById(
-      "city"
-    ).textContent =
-      state.city || "No disponible";
-
-
-    document.getElementById(
-      "country"
-    ).textContent =
-      state.country || "No disponible";
-
-
-    document.getElementById(
-      "region"
-    ).textContent =
-      state.region || "No disponible";
-
-
-    updateLocationDisplay();
-
-
-    updateMap(
-      state.ipLatitude,
-      state.ipLongitude,
-      "IP"
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "Error obteniendo IP:",
-      error
-    );
-
-
-    document.getElementById(
-      "ip"
-    ).textContent =
-      "No disponible";
-
-
-    document.getElementById(
-      "city"
-    ).textContent =
-      "No disponible";
-
-
-    document.getElementById(
-      "country"
-    ).textContent =
-      "No disponible";
-
-
-    document.getElementById(
-      "region"
-    ).textContent =
-      "No disponible";
-
-
-    document.getElementById(
-      "mapStatus"
-    ).textContent =
-      "⚠️ No fue posible obtener la ubicación por IP.";
-
-  }
-
-}
-
-
-/* =========================================================
-   GPS
-========================================================= */
-
-function requestRealLocation() {
-
-  if (
-    !navigator.geolocation
-  ) {
-
-    alert(
-      "⚠️ Este navegador no permite obtener la ubicación GPS."
-    );
-
-    return;
-
-  }
-
-
-  const button =
-    document.getElementById(
-      "gpsButton"
-    );
-
-
-  button.disabled = true;
-
-  button.textContent =
-    "📍 Obteniendo ubicación...";
-
-
-  document.getElementById(
-    "mapStatus"
-  ).textContent =
-    "Solicitando permiso de ubicación...";
-
-
-  navigator.geolocation.getCurrentPosition(
-
-    function(position) {
-
-      const latitude =
-        position.coords.latitude;
-
-      const longitude =
-        position.coords.longitude;
-
-
-      console.log(
-        "GPS:",
-        latitude,
-        longitude
-      );
-
-
-      state.latitude =
-        latitude;
-
-      state.longitude =
-        longitude;
-
-      state.locationSource =
-        "GPS";
-
-
-      updateLocationDisplay();
-
-
-      updateMap(
-        latitude,
-        longitude,
-        "GPS"
-      );
-
-
-      button.disabled = false;
-
-      button.textContent =
-        "📍 Actualizar ubicación GPS";
-
-    },
-
-
-    function(error) {
-
-      console.warn(
-        "Error GPS:",
-        error
-      );
-
-
-      let message =
-        "No fue posible obtener la ubicación GPS.";
-
-
-      if (error.code === 1) {
-
-        message =
-          "Permiso de ubicación denegado.";
-
-      } else if (error.code === 2) {
-
-        message =
-          "La ubicación no está disponible.";
-
-      } else if (error.code === 3) {
-
-        message =
-          "La solicitud de ubicación tardó demasiado.";
+    function updateMap(
+      latitude,
+      longitude,
+      source
+    ) {
+
+      if (!map) {
+        return;
+      }
+
+      const lat = Number(latitude);
+      const lon = Number(longitude);
+
+      if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lon)
+      ) {
+        return;
+      }
+
+      const position = [
+        lat,
+        lon
+      ];
+
+      if (!marker) {
+
+        marker =
+          L.marker(position)
+            .addTo(map);
+
+      } else {
+
+        marker.setLatLng(position);
 
       }
 
+      marker.bindPopup(`
+        <strong>Ubicación detectada</strong><br>
+        Fuente:
+        ${escapeHtml(source || "Desconocida")}
+        <br>
+        Latitud:
+        ${lat}
+        <br>
+        Longitud:
+        ${lon}
+      `);
 
-      document.getElementById(
-        "mapStatus"
-      ).textContent =
-        "⚠️ " + message;
+      map.setView(
+        position,
+        source === "GPS" ? 16 : 8,
+        {
+          animate: true
+        }
+      );
 
+      map.invalidateSize();
 
-      button.disabled = false;
+      setTimeout(
+        () => map.invalidateSize(),
+        300
+      );
 
-      button.textContent =
-        "📍 Actualizar ubicación GPS";
-
-    },
-
-    {
-
-      enableHighAccuracy: true,
-
-      timeout: 15000,
-
-      maximumAge: 0
+      marker.openPopup();
 
     }
 
-  );
 
-}
+    /* =========================================================
+       IP
+       ========================================================= */
 
+    async function loadIpInformation() {
 
-function updateLocationDisplay() {
+      try {
 
-  document.getElementById(
-    "latitude"
-  ).textContent =
-    state.latitude ||
-    "No disponible";
+        const response =
+          await fetch(CONFIG.ipApi, {
+            cache: "no-store"
+          });
 
+        if (!response.ok) {
+          throw new Error(
+            "No se pudo consultar la IP."
+          );
+        }
 
-  document.getElementById(
-    "longitude"
-  ).textContent =
-    state.longitude ||
-    "No disponible";
+        const data =
+          await response.json();
 
+        if (
+          !data ||
+          data.success === false
+        ) {
+          throw new Error(
+            "El servicio de IP no devolvió información válida."
+          );
+        }
 
-  document.getElementById(
-    "locationSource"
-  ).textContent =
-    state.locationSource ||
-    "No disponible";
+        state.ip =
+          data.ip || "";
 
-}
+        state.city =
+          data.city || "";
 
+        state.country =
+          data.country || "";
 
-/* =========================================================
-   NAVEGADOR Y SISTEMA OPERATIVO
-========================================================= */
+        state.region =
+          data.region || "";
 
-function loadBrowserInformation() {
+        state.ipLatitude =
+          data.latitude ?? "";
 
-  const ua =
-    navigator.userAgent;
+        state.ipLongitude =
+          data.longitude ?? "";
 
+        state.latitude =
+          state.ipLatitude;
 
-  let browser =
-    "Navegador desconocido";
+        state.longitude =
+          state.ipLongitude;
 
+        state.locationSource =
+          "IP";
 
-  if (
-    ua.includes("Edg/")
-  ) {
+        updateLocationDisplay();
 
-    browser =
-      "Microsoft Edge";
+        if (
+          state.ipLatitude !== "" &&
+          state.ipLongitude !== ""
+        ) {
 
-  } else if (
-    ua.includes("OPR/")
-  ) {
+          updateMap(
+            state.ipLatitude,
+            state.ipLongitude,
+            "IP"
+          );
 
-    browser =
-      "Opera";
+        }
 
-  } else if (
-    ua.includes("Chrome/")
-  ) {
+      } catch (error) {
 
-    browser =
-      "Google Chrome";
+        console.error(
+          "Error obteniendo IP:",
+          error
+        );
 
-  } else if (
-    ua.includes("Firefox/")
-  ) {
+        $("ip").textContent =
+          "No disponible";
 
-    browser =
-      "Mozilla Firefox";
+        $("city").textContent =
+          "No disponible";
 
-  } else if (
-    ua.includes("Safari/")
-  ) {
+        $("country").textContent =
+          "No disponible";
 
-    browser =
-      "Safari";
+      }
 
-  }
+    }
 
 
-  let os =
-    "Sistema operativo desconocido";
+    /* =========================================================
+       UBICACIÓN
+       ========================================================= */
 
+    function updateLocationDisplay() {
 
-  if (
-    /Windows/i.test(ua)
-  ) {
+      $("city").textContent =
+        state.city || "No disponible";
 
-    os =
-      "Windows";
+      $("region").textContent =
+        state.region || "No disponible";
 
-  } else if (
-    /Android/i.test(ua)
-  ) {
+      $("country").textContent =
+        state.country || "No disponible";
 
-    os =
-      "Android";
+      $("ip").textContent =
+        state.ip || "No disponible";
 
-  } else if (
-    /iPhone|iPad|iPod/i.test(ua)
-  ) {
+      $("latitude").textContent =
+        state.latitude !== ""
+          ? state.latitude
+          : "No disponible";
 
-    os =
-      "iOS";
+      $("longitude").textContent =
+        state.longitude !== ""
+          ? state.longitude
+          : "No disponible";
 
-  } else if (
-    /Mac OS X/i.test(ua)
-  ) {
+      $("locationSource").textContent =
+        state.locationSource || "No disponible";
 
-    os =
-      "macOS";
+    }
 
-  } else if (
-    /Linux/i.test(ua)
-  ) {
 
-    os =
-      "Linux";
+    function requestGps() {
 
-  }
+      const status =
+        $("gpsStatus");
 
+      if (
+        !navigator.geolocation
+      ) {
 
-  state.browser =
-    browser;
+        status.textContent =
+          "❌ Este navegador no permite obtener ubicación GPS.";
 
+        status.className =
+          "small error-text";
 
-  state.os =
-    os;
+        return;
 
+      }
 
-  state.screen =
-    `${window.screen.width} x ${window.screen.height}`;
+      status.textContent =
+        "📍 Solicitando permiso de ubicación...";
 
+      status.className =
+        "small";
 
-  state.language =
-    navigator.language ||
-    "No disponible";
+      navigator.geolocation.getCurrentPosition(
 
+        function(position) {
 
-  try {
+          const latitude =
+            position.coords.latitude;
 
-    state.timezone =
-      Intl.DateTimeFormat()
-        .resolvedOptions()
-        .timeZone ||
-      "No disponible";
+          const longitude =
+            position.coords.longitude;
 
-  } catch {
+          state.latitude =
+            latitude;
 
-    state.timezone =
-      "No disponible";
+          state.longitude =
+            longitude;
 
-  }
+          state.locationSource =
+            "GPS";
 
+          updateLocationDisplay();
 
-  document.getElementById(
-    "browser"
-  ).textContent =
-    state.browser;
+          updateMap(
+            latitude,
+            longitude,
+            "GPS"
+          );
 
+          status.textContent =
+            "✅ Ubicación GPS obtenida correctamente.";
 
-  document.getElementById(
-    "os"
-  ).textContent =
-    state.os;
+        },
 
+        function(error) {
 
-  document.getElementById(
-    "screen"
-  ).textContent =
-    state.screen;
+          console.warn(
+            "Geolocation:",
+            error
+          );
 
+          let message =
+            "No fue posible obtener la ubicación GPS.";
 
-  document.getElementById(
-    "language"
-  ).textContent =
-    state.language;
+          if (error.code === 1) {
+            message =
+              "Permiso de ubicación denegado.";
+          }
 
+          if (error.code === 2) {
+            message =
+              "La ubicación no está disponible.";
+          }
 
-  document.getElementById(
-    "timezone"
-  ).textContent =
-    state.timezone;
+          if (error.code === 3) {
+            message =
+              "La solicitud de ubicación tardó demasiado.";
+          }
 
-}
+          status.textContent =
+            "⚠️ " + message;
 
+          status.className =
+            "small error-text";
 
-/* =========================================================
-   BATERÍA
-========================================================= */
+        },
 
-async function loadBattery() {
+        {
 
-  if (
-    !navigator.getBattery
-  ) {
+          enableHighAccuracy: true,
 
-    state.battery =
-      "No compatible";
+          timeout: 15000,
 
-    state.batteryStatus =
-      "No compatible";
+          maximumAge: 0
 
+        }
 
-    document.getElementById(
-      "battery"
-    ).textContent =
-      state.battery;
+      );
 
+    }
 
-    document.getElementById(
-      "batteryStatus"
-    ).textContent =
-      state.batteryStatus;
 
+    /* =========================================================
+       NAVEGADOR
+       ========================================================= */
 
-    return;
+    function detectBrowser() {
 
-  }
+      const ua =
+        navigator.userAgent || "";
 
+      let browser =
+        "Desconocido";
 
-  try {
+      if (/Edg\//i.test(ua)) {
+        browser = "Microsoft Edge";
+      } else if (/OPR\//i.test(ua)) {
+        browser = "Opera";
+      } else if (/Chrome\//i.test(ua)) {
+        browser = "Google Chrome";
+      } else if (/Firefox\//i.test(ua)) {
+        browser = "Mozilla Firefox";
+      } else if (/Safari\//i.test(ua)) {
+        browser = "Safari";
+      }
 
-    const battery =
-      await navigator.getBattery();
+      state.browser =
+        browser;
+
+      $("browser").textContent =
+        browser;
+
+    }
+
+
+    function detectOS() {
+
+      const ua =
+        navigator.userAgent || "";
+
+      let os =
+        "Desconocido";
+
+      if (/Windows NT 10.0/i.test(ua)) {
+        os = "Windows 10/11";
+      } else if (/Windows NT 6.3/i.test(ua)) {
+        os = "Windows 8.1";
+      } else if (/Windows NT 6.2/i.test(ua)) {
+        os = "Windows 8";
+      } else if (/Windows NT 6.1/i.test(ua)) {
+        os = "Windows 7";
+      } else if (/Android/i.test(ua)) {
+        os = "Android";
+      } else if (/iPhone|iPad|iPod/i.test(ua)) {
+        os = "iOS";
+      } else if (/Mac OS X/i.test(ua)) {
+        os = "macOS";
+      } else if (/Linux/i.test(ua)) {
+        os = "Linux";
+      }
+
+      state.os =
+        os;
+
+      $("os").textContent =
+        os;
+
+      const architecture =
+        navigator.userAgentData?.architecture ||
+        navigator.platform ||
+        "No disponible";
+
+      state.architecture =
+        architecture;
+
+      $("architecture").textContent =
+        architecture;
+
+    }
+
+
+    /* =========================================================
+       PANTALLA
+       ========================================================= */
+
+    function loadScreenInformation() {
+
+      state.screen =
+        `${screen.width} x ${screen.height}`;
+
+      $("screen").textContent =
+        state.screen;
+
+      $("availableScreen").textContent =
+        `${screen.availWidth} x ${screen.availHeight}`;
+
+      $("pixelRatio").textContent =
+        window.devicePixelRatio || 1;
+
+      let orientation =
+        "No disponible";
+
+      if (
+        screen.orientation &&
+        screen.orientation.type
+      ) {
+
+        orientation =
+          screen.orientation.type;
+
+      } else if (
+        window.innerWidth >
+        window.innerHeight
+      ) {
+
+        orientation =
+          "landscape";
+
+      } else {
+
+        orientation =
+          "portrait";
+
+      }
+
+      $("orientation").textContent =
+        orientation;
+
+    }
+
+
+    /* =========================================================
+       IDIOMA / ZONA HORARIA
+       ========================================================= */
+
+    function loadLanguageInformation() {
+
+      state.language =
+        navigator.language ||
+        "No disponible";
+
+      state.timezone =
+        Intl.DateTimeFormat()
+          .resolvedOptions()
+          .timeZone ||
+        "No disponible";
+
+      $("language").textContent =
+        state.language;
+
+      $("timezone").textContent =
+        state.timezone;
+
+    }
+
+
+    /* =========================================================
+       BATERÍA
+       ========================================================= */
+
+    async function loadBatteryInformation() {
+
+      if (
+        !("getBattery" in navigator)
+      ) {
+
+        state.battery =
+          "";
+
+        state.batteryStatus =
+          "API no disponible";
+
+        $("battery").textContent =
+          "No disponible";
+
+        $("batteryStatus").textContent =
+          "API no disponible";
+
+        $("batteryApi").textContent =
+          "No";
+
+        return;
+
+      }
+
+      try {
+
+        batteryObject =
+          await navigator.getBattery();
+
+        $("batteryApi").textContent =
+          "Sí";
+
+        updateBattery();
+
+        batteryObject.addEventListener(
+          "levelchange",
+          updateBattery
+        );
+
+        batteryObject.addEventListener(
+          "chargingchange",
+          updateBattery
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "Battery API:",
+          error
+        );
+
+        $("battery").textContent =
+          "No disponible";
+
+        $("batteryStatus").textContent =
+          "No disponible";
+
+        $("batteryApi").textContent =
+          "Error";
+
+      }
+
+    }
 
 
     function updateBattery() {
 
-      state.battery =
-        Math.round(
-          battery.level * 100
-        ) + "%";
+      if (!batteryObject) {
+        return;
+      }
 
+      const level =
+        Math.round(
+          batteryObject.level * 100
+        );
+
+      const charging =
+        batteryObject.charging;
+
+      state.battery =
+        `${level}%`;
 
       state.batteryStatus =
-        battery.charging
+        charging
           ? "Cargando"
           : "No está cargando";
 
-
-      document.getElementById(
-        "battery"
-      ).textContent =
+      $("battery").textContent =
         state.battery;
 
-
-      document.getElementById(
-        "batteryStatus"
-      ).textContent =
+      $("batteryStatus").textContent =
         state.batteryStatus;
 
     }
 
 
-    updateBattery();
+    /* =========================================================
+       ESTADO DE INTERNET
+       ========================================================= */
 
+    function updateOnlineStatus() {
 
-    battery.addEventListener(
-      "levelchange",
-      updateBattery
-    );
+      if (navigator.onLine) {
 
+        $("onlineStatus").innerHTML =
+          '<span class="status success">🟢 Conectado</span>';
 
-    battery.addEventListener(
-      "chargingchange",
-      updateBattery
-    );
+      } else {
 
-
-  } catch (error) {
-
-    console.warn(
-      "No se pudo obtener la batería:",
-      error
-    );
-
-
-    state.battery =
-      "No disponible";
-
-    state.batteryStatus =
-      "No disponible";
-
-
-    document.getElementById(
-      "battery"
-    ).textContent =
-      state.battery;
-
-
-    document.getElementById(
-      "batteryStatus"
-    ).textContent =
-      state.batteryStatus;
-
-  }
-
-}
-
-
-/* =========================================================
-   DIAGNÓSTICO
-========================================================= */
-
-const diagnosticProblems = [];
-
-
-function addDiagnosticProblem(
-  message
-) {
-
-  if (
-    !diagnosticProblems.includes(message)
-  ) {
-
-    diagnosticProblems.push(message);
-
-  }
-
-}
-
-
-function checkInternet() {
-
-  if (!navigator.onLine) {
-
-    addDiagnosticProblem(
-      "El dispositivo parece estar sin conexión a Internet."
-    );
-
-  }
-
-}
-
-
-function checkGeolocation() {
-
-  if (
-    !("geolocation" in navigator)
-  ) {
-
-    addDiagnosticProblem(
-      "El navegador no admite geolocalización."
-    );
-
-  }
-
-}
-
-
-function checkScreen() {
-
-  if (
-    window.innerWidth < 320
-  ) {
-
-    addDiagnosticProblem(
-      "La pantalla tiene un ancho muy pequeño y algunos elementos podrían no mostrarse correctamente."
-    );
-
-  }
-
-}
-
-
-function checkBatteryDiagnostic() {
-
-  if (
-    !navigator.getBattery
-  ) {
-
-    /*
-     * Esto NO se considera una falla.
-     * Simplemente el navegador no expone la API.
-     */
-
-    return;
-
-  }
-
-
-  navigator.getBattery()
-
-    .then(
-      function(battery) {
-
-        if (
-          battery.level <= 0.20 &&
-          !battery.charging
-        ) {
-
-          addDiagnosticProblem(
-            "La batería está por debajo del 20% y no está cargando."
-          );
-
-        }
-
-
-        if (
-          battery.level <= 0.05 &&
-          !battery.charging
-        ) {
-
-          addDiagnosticProblem(
-            "La batería está críticamente baja."
-          );
-
-        }
-
-
-        renderDiagnostic();
+        $("onlineStatus").innerHTML =
+          '<span class="status danger">🔴 Sin conexión</span>';
 
       }
-    )
-
-    .catch(
-      function() {
-
-        /*
-         * No asumimos que existe una falla.
-         */
-
-        renderDiagnostic();
-
-      }
-    );
-
-}
-
-
-function checkBrowserFeatures() {
-
-  if (
-    !window.fetch
-  ) {
-
-    addDiagnosticProblem(
-      "El navegador no admite correctamente las funciones de conexión utilizadas por esta página."
-    );
-
-  }
-
-
-  if (
-    !window.Promise
-  ) {
-
-    addDiagnosticProblem(
-      "El navegador no admite algunas funciones modernas necesarias para la página."
-    );
-
-  }
-
-}
-
-
-function renderDiagnostic() {
-
-  const status =
-    document.getElementById(
-      "diagnosticoEstado"
-    );
-
-
-  const list =
-    document.getElementById(
-      "diagnosticoLista"
-    );
-
-
-  list.innerHTML = "";
-
-
-  if (
-    diagnosticProblems.length === 0
-  ) {
-
-    status.className =
-      "diagnostico-estado correcto";
-
-
-    status.textContent =
-      "✅ No se detectaron problemas importantes en las funciones comprobadas.";
-
-
-    return;
-
-  }
-
-
-  status.className =
-    "diagnostico-estado advertencia";
-
-
-  status.textContent =
-    "⚠️ Se detectaron posibles problemas o limitaciones.";
-
-
-  diagnosticProblems.forEach(
-    function(problem) {
-
-      const li =
-        document.createElement(
-          "li"
-        );
-
-
-      li.textContent =
-        problem;
-
-
-      list.appendChild(li);
 
     }
-  );
 
-}
 
+    /* =========================================================
+       WINDOWS
+       ========================================================= */
 
-function ejecutarDiagnostico() {
+    function detectWindows() {
 
-  diagnosticProblems.length = 0;
+      const userAgent =
+        navigator.userAgent || "";
 
+      const platform =
+        navigator.userAgentData?.platform ||
+        navigator.platform ||
+        "";
 
-  checkInternet();
+      return (
+        /Windows/i.test(userAgent) ||
+        /Win32|Win64|Windows/i.test(platform)
+      );
 
-  checkGeolocation();
+    }
 
-  checkScreen();
 
-  checkBrowserFeatures();
+    function setupWindowsDownload() {
 
-  checkBatteryDiagnostic();
+      const windowsCard =
+        $("windowsAppCard");
 
+      const notWindowsCard =
+        $("notWindowsCard");
 
-  renderDiagnostic();
+      if (
+        !windowsCard ||
+        !notWindowsCard
+      ) {
+        return;
+      }
 
-}
+      if (detectWindows()) {
 
+        windowsCard.hidden =
+          false;
 
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
+        notWindowsCard.hidden =
+          true;
 
-function escapeHtml(value) {
+      } else {
 
-  return String(value)
+        windowsCard.hidden =
+          true;
 
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
-}
-
-
-/* =========================================================
-   RECOPILAR INFORMACIÓN
-========================================================= */
-
-function collectInformation() {
-
-  return {
-
-    timestamp:
-      new Date().toISOString(),
-
-    ip:
-      state.ip,
-
-    city:
-      state.city,
-
-    country:
-      state.country,
-
-    latitude:
-      state.latitude,
-
-    longitude:
-      state.longitude,
-
-    locationSource:
-      state.locationSource,
-
-    browser:
-      state.browser,
-
-    os:
-      state.os,
-
-    screen:
-      state.screen,
-
-    language:
-      state.language,
-
-    timezone:
-      state.timezone,
-
-    battery:
-      state.battery,
-
-    batteryStatus:
-      state.batteryStatus
-
-  };
-
-}
-
-
-/* =========================================================
-   ENVIAR INFORMACIÓN
-========================================================= */
-
-async function sendInformation() {
-
-  const consent =
-    document.getElementById(
-      "consent"
-    );
-
-
-  const status =
-    document.getElementById(
-      "sendStatus"
-    );
-
-
-  const button =
-    document.getElementById(
-      "sendButton"
-    );
-
-
-  if (!consent.checked) {
-
-    status.className =
-      "send-status warning";
-
-
-    status.textContent =
-      "⚠️ Debes autorizar el envío marcando la casilla.";
-
-
-    return;
-
-  }
-
-
-  const information =
-    collectInformation();
-
-
-  console.log(
-    "Información que será enviada:",
-    information
-  );
-
-
-  button.disabled = true;
-
-  button.textContent =
-    "📧 Enviando...";
-
-
-  status.className =
-    "send-status loading";
-
-
-  status.textContent =
-    "Enviando información...";
-
-
-  try {
-
-    await fetch(
-
-      CONFIG.appsScriptUrl,
-
-      {
-
-        method:
-          "POST",
-
-        mode:
-          "no-cors",
-
-        headers:
-          {
-            "Content-Type":
-              "text/plain;charset=utf-8"
-          },
-
-        body:
-          JSON.stringify(
-            information
-          )
+        notWindowsCard.hidden =
+          false;
 
       }
 
+    }
+
+
+    /* =========================================================
+       DIAGNÓSTICO
+       ========================================================= */
+
+    function runDiagnostics() {
+
+      const results = [];
+
+      /* Internet */
+
+      if (navigator.onLine) {
+
+        results.push({
+          icon: "✅",
+          text:
+            "La conexión de red del navegador está disponible."
+        });
+
+      } else {
+
+        results.push({
+          icon: "⚠️",
+          text:
+            "El navegador indica que actualmente no hay conexión a Internet."
+        });
+
+      }
+
+
+      /* Geolocation */
+
+      if (
+        "geolocation" in navigator
+      ) {
+
+        results.push({
+          icon: "✅",
+          text:
+            "El navegador permite solicitar ubicación geográfica."
+        });
+
+      } else {
+
+        results.push({
+          icon: "⚠️",
+          text:
+            "El navegador no proporciona la API de geolocalización."
+        });
+
+      }
+
+
+      /* Battery */
+
+      if (
+        "getBattery" in navigator
+      ) {
+
+        results.push({
+          icon: "✅",
+          text:
+            "La información de batería está disponible para este navegador."
+        });
+
+      } else {
+
+        results.push({
+          icon: "ℹ️",
+          text:
+            "Este navegador no permite consultar la batería mediante la Battery API."
+        });
+
+      }
+
+
+      /* Screen */
+
+      if (
+        screen.width < 800 ||
+        screen.height < 600
+      ) {
+
+        results.push({
+          icon: "ℹ️",
+          text:
+            `La resolución detectada es ${screen.width} x ${screen.height}.`
+        });
+
+      } else {
+
+        results.push({
+          icon: "✅",
+          text:
+            `La pantalla reporta una resolución de ${screen.width} x ${screen.height}.`
+        });
+
+      }
+
+
+      /* IP */
+
+      if (state.ip) {
+
+        results.push({
+          icon: "✅",
+          text:
+            "La IP pública pudo ser consultada correctamente."
+        });
+
+      } else {
+
+        results.push({
+          icon: "⚠️",
+          text:
+            "No fue posible obtener la IP pública."
+        });
+
+      }
+
+
+      /* Battery warning */
+
+      if (batteryObject) {
+
+        const level =
+          Math.round(
+            batteryObject.level * 100
+          );
+
+        if (
+          level <= 20 &&
+          !batteryObject.charging
+        ) {
+
+          results.push({
+            icon: "⚠️",
+            text:
+              `La batería está al ${level}% y no está cargando.`
+          });
+
+        }
+
+      }
+
+
+      const list =
+        $("diagnosticList");
+
+      list.innerHTML = "";
+
+      results.forEach(
+        result => {
+
+          const item =
+            document.createElement(
+              "div"
+            );
+
+          item.className =
+            "diagnostic-item";
+
+          item.innerHTML = `
+            <span class="diagnostic-icon">
+              ${result.icon}
+            </span>
+
+            <span class="diagnostic-text">
+              ${escapeHtml(result.text)}
+            </span>
+          `;
+
+          list.appendChild(item);
+
+        }
+      );
+
+    }
+
+
+    /* =========================================================
+       TEMA
+       ========================================================= */
+
+    function setupTheme() {
+
+      const saved =
+        localStorage.getItem(
+          "device-page-theme"
+        );
+
+      if (saved === "dark") {
+
+        document.body.classList.add(
+          "dark"
+        );
+
+      }
+
+      $("themeButton").addEventListener(
+        "click",
+        () => {
+
+          document.body.classList.toggle(
+            "dark"
+          );
+
+          localStorage.setItem(
+            "device-page-theme",
+            document.body.classList.contains(
+              "dark"
+            )
+              ? "dark"
+              : "light"
+          );
+
+        }
+      );
+
+    }
+
+
+    /* =========================================================
+       RECOPILAR DATOS
+       ========================================================= */
+
+    function collectReportData() {
+
+      return {
+
+        timestamp:
+          new Date().toLocaleString(
+            "es-CL",
+            {
+              dateStyle: "full",
+              timeStyle: "long"
+            }
+          ),
+
+        ip:
+          state.ip,
+
+        city:
+          state.city,
+
+        country:
+          state.country,
+
+        latitude:
+          state.latitude,
+
+        longitude:
+          state.longitude,
+
+        locationSource:
+          state.locationSource,
+
+        browser:
+          state.browser,
+
+        os:
+          state.os,
+
+        screen:
+          state.screen,
+
+        language:
+          state.language,
+
+        timezone:
+          state.timezone,
+
+        battery:
+          state.battery,
+
+        batteryStatus:
+          state.batteryStatus
+
+      };
+
+    }
+
+
+    /* =========================================================
+       ENVIAR INFORMACIÓN
+       ========================================================= */
+
+    async function sendInformation() {
+
+      const checkbox =
+        $("consentCheckbox");
+
+      const status =
+        $("sendStatus");
+
+      if (!checkbox.checked) {
+
+        status.innerHTML =
+          '<span class="status warning">⚠️ Debes autorizar explícitamente el envío.</span>';
+
+        return;
+
+      }
+
+      const data =
+        collectReportData();
+
+      status.innerHTML =
+        '<span class="status info">📤 Enviando información...</span>';
+
+      try {
+
+        /*
+          Se utiliza text/plain para evitar un preflight CORS
+          innecesario. Apps Script recibe igualmente el contenido
+          en e.postData.contents.
+        */
+
+        await fetch(
+          CONFIG.appsScriptUrl,
+          {
+            method: "POST",
+
+            mode: "no-cors",
+
+            headers: {
+              "Content-Type":
+                "text/plain;charset=utf-8"
+            },
+
+            body:
+              JSON.stringify(data)
+
+          }
+        );
+
+        status.innerHTML =
+          '<span class="status success">✅ Solicitud enviada. Revisa el correo configurado.</span>';
+
+      } catch (error) {
+
+        console.error(
+          "Error enviando información:",
+          error
+        );
+
+        status.innerHTML =
+          '<span class="status danger">❌ No fue posible enviar la información.</span>';
+
+      }
+
+    }
+
+
+    /* =========================================================
+       ACTUALIZAR TODO
+       ========================================================= */
+
+    async function loadDeviceInformation() {
+
+      detectBrowser();
+
+      detectOS();
+
+      loadScreenInformation();
+
+      loadLanguageInformation();
+
+      updateOnlineStatus();
+
+      await loadBatteryInformation();
+
+      await loadIpInformation();
+
+      runDiagnostics();
+
+    }
+
+
+    /* =========================================================
+       INICIALIZACIÓN
+       ========================================================= */
+
+    async function initialize() {
+
+      initializeMap();
+
+      setupTheme();
+
+      setupWindowsDownload();
+
+      $("gpsButton").addEventListener(
+        "click",
+        requestGps
+      );
+
+      $("sendButton").addEventListener(
+        "click",
+        sendInformation
+      );
+
+      $("refreshButton").addEventListener(
+        "click",
+        async () => {
+
+          $("refreshButton").disabled =
+            true;
+
+          $("refreshButton").textContent =
+            "⏳ Actualizando...";
+
+          try {
+
+            await loadDeviceInformation();
+
+          } finally {
+
+            $("refreshButton").disabled =
+              false;
+
+            $("refreshButton").textContent =
+              "🔄 Actualizar información";
+
+          }
+
+        }
+      );
+
+      window.addEventListener(
+        "online",
+        updateOnlineStatus
+      );
+
+      window.addEventListener(
+        "offline",
+        updateOnlineStatus
+      );
+
+      await loadDeviceInformation();
+
+    }
+
+
+    /* =========================================================
+       START
+       ========================================================= */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize
     );
 
-
-    status.className =
-      "send-status success";
-
-
-    status.textContent =
-      "✅ Información enviada correctamente.";
-
-
-  } catch (error) {
-
-    console.error(
-      "Error enviando información:",
-      error
-    );
-
-
-    status.className =
-      "send-status error";
-
-
-    status.textContent =
-      "❌ No fue posible enviar la información.";
-
-  }
-
-
-  button.disabled = false;
-
-  button.textContent =
-    "📧 Enviar información";
-
-}
-
-
-/* =========================================================
-   EVENTOS
-========================================================= */
-
-document
-  .getElementById(
-    "gpsButton"
-  )
-  .addEventListener(
-    "click",
-    requestRealLocation
-  );
-
-
-document
-  .getElementById(
-    "sendButton"
-  )
-  .addEventListener(
-    "click",
-    sendInformation
-  );
-
-
-window.addEventListener(
-  "online",
-  function() {
-
-    ejecutarDiagnostico();
-
-  }
-);
-
-
-window.addEventListener(
-  "offline",
-  function() {
-
-    ejecutarDiagnostico();
-
-  }
-);
-
-
-/* =========================================================
-   INICIALIZACIÓN
-========================================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function() {
-
-    initializeMap();
-
-    loadIpInformation();
-
-    loadBrowserInformation();
-
-    loadBattery();
-
-    ejecutarDiagnostico();
-
-  }
-);
-
-</script>
+  </script>
 
 </body>
 </html>
